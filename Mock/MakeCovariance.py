@@ -1,0 +1,286 @@
+# make covariance matrices for mock data
+import numpy as np  
+from scipy.interpolate import interp1d
+import matplotlib.pyplot as plt
+n_realizations = 500
+DATA_DIR = '/cephfs/jbai/DefectMockGaussian'
+def random_noise(data_vector, noise_level=0.01):
+    noise_sigma = noise_level * np.min(np.abs(data_vector))
+    noise = np.random.normal(0, noise_sigma, size=data_vector.shape)
+    return data_vector + noise
+
+sigmas = [np.radians(15/60), np.radians(30/60), np.radians(90/60)]
+pdf_all_scales = []
+dpdf_all_scales = []
+nn_all_scales = []
+kk_all_scales = []
+defects_all_scales = []
+for sigma in sigmas:
+    s = int(np.degrees(sigma)*60)
+
+    # full pdf
+    pdfs = []
+    for i in range(n_realizations):
+        data = np.load(f"{DATA_DIR}/PDFs/realisation_{i}_s{s}_kappa_pdf.npz")
+        hist = data['hist']
+        hist = random_noise(hist, noise_level=0.0001)
+        bin_centers = 0.5 * (data['bin_edges'][:-1] + data['bin_edges'][1:])
+        pdfs.append(hist)
+    pdfs = np.array(pdfs)
+    pdf_all_scales.append(pdfs)
+
+    pdfs_mean = np.mean(pdfs, axis=0)
+    cov_matrix = np.cov(pdfs, rowvar=False)
+    np.save(f"PDF_mean_s{s}.npy", pdfs_mean)
+    np.save(f"CovPDF_s{s}.npy", cov_matrix)
+    plt.figure(figsize=(8,6))
+    plt.errorbar(bin_centers, pdfs_mean, yerr=np.sqrt(np.diag(cov_matrix)), fmt='o', label='Mean PDF with error bars')
+    plt.xlabel('Kappa')
+    plt.ylabel('Probability Density')
+    plt.title('Mean Kappa PDF with Covariance Error Bars')
+    plt.legend()
+    plt.savefig(f"outfiles/Mean_Kappa_PDF_with_Covariance_Error_Bars_s{s}.png")
+    plt.close()
+
+    # defect pdf +1/2
+    pdfs_pos = []
+    for i in range(n_realizations):
+        data = np.load(f"{DATA_DIR}/DefectPDFs/realisation_{i}_s{s}_defect_kappa_pos_pdf.npz")
+        hist = data['hist']
+        bin_centers = data['bin_edges']
+        pdfs_pos.append(hist)
+    pdfs_pos = np.array(pdfs_pos)
+    pdfs_pos_mean = np.mean(pdfs_pos, axis=0)
+    cov_matrix_pos = np.cov(pdfs_pos, rowvar=False)
+    np.save(f"CovDPDF_pos_s{s}.npy", cov_matrix_pos)
+    np.save(f"DPDF_pos_mean_s{s}.npy", pdfs_pos_mean)
+    plt.figure(figsize=(8,6))
+    plt.errorbar(bin_centers, pdfs_pos_mean, yerr=np.sqrt(np.diag(cov_matrix_pos)), fmt='o', label='Mean Defect +1/2 PDF with error bars')
+    plt.xlabel('Kappa')
+    plt.ylabel('Probability Density')
+    plt.title('Mean Defect +1/2 Kappa PDF with Covariance Error Bars')
+    plt.legend()
+    plt.savefig(f"outfiles/Mean_Defect_Positive_Half_Kappa_PDF_with_Covariance_Error_Bars_s{s}.png")
+    plt.close()
+
+    # defect pdf -1/2
+    pdfs_neg = []
+    for i in range(n_realizations):
+        data = np.load(f"{DATA_DIR}/DefectPDFs/realisation_{i}_s{s}_defect_kappa_neg_pdf.npz")
+        hist = data['hist']
+        bin_centers = data['bin_edges']
+        pdfs_neg.append(hist)
+    pdfs_neg = np.array(pdfs_neg)
+    pdfs_neg_mean = np.mean(pdfs_neg, axis=0)
+    cov_matrix_neg = np.cov(pdfs_neg, rowvar=False)
+    np.save(f"CovDPDF_neg_s{s}.npy", cov_matrix_neg)
+    np.save(f"DPDF_neg_mean_s{s}.npy", pdfs_neg_mean)
+    plt.figure(figsize=(8,6))
+    plt.errorbar(bin_centers, pdfs_neg_mean, yerr=np.sqrt(np.diag(cov_matrix_neg)), fmt='o', label='Mean Defect -1/2 PDF with error bars')
+    plt.xlabel('Kappa')
+    plt.ylabel('Probability Density')
+    plt.title('Mean Defect -1/2 Kappa PDF with Covariance Error Bars')
+    plt.legend()
+    plt.savefig(f"outfiles/Mean_Defect_Negative_Half_Kappa_PDF_with_Covariance_Error_Bars_s{s}.png")
+    plt.close()
+
+
+    # KK
+
+    kk = []
+    for i in range(n_realizations):
+        data = np.load(f"{DATA_DIR}/KKs/realisation_{i}_s{s}_kappa_kappa_corr.npz")
+        theta = data['theta']
+        xi_kk = data['xi_kk']
+        kk.append(xi_kk)
+    kk = np.array(kk)
+    kk_all_scales.append(kk)
+    kk_mean = np.mean(kk, axis=0)
+    np.save(f"KK_mean_s{s}.npy", kk_mean)
+    cov_matrix_kk = np.cov(kk, rowvar=False)
+    np.save(f"CovKK_s{s}.npy", cov_matrix_kk)
+    plt.figure(figsize=(8,6))
+    plt.errorbar(theta, kk_mean, yerr=np.sqrt(np.diag(cov_matrix_kk)), fmt='o', label='Mean KK Correlation with error bars')
+    plt.xscale('log')
+    plt.xlabel('Theta (arcmin)')
+    plt.ylabel('KK Correlation')
+    plt.title('Mean KK Correlation with Covariance Error Bars')
+    plt.legend()
+    plt.savefig(f"outfiles/Mean_KK_Correlation_with_Covariance_Error_Bars_s{s}.png")
+    plt.close()
+
+    # NNs
+    nn_pos_same1 = []
+    nn_neg_same1 = []
+    nn_pos_opp1 = []
+    nn_neg_opp1 = []
+    nn_pos_same2 = []
+    nn_neg_same2 = []
+    nn_pos_opp2 = []
+    nn_neg_opp2 = []
+    nn_pos_same4 = []
+    nn_neg_same4 = []
+    nn_pos_opp4 = []
+    nn_neg_opp4 = []
+    nn_pos_same8 = []
+    nn_neg_same8 = []
+    nn_pos_opp8 = []
+    nn_neg_opp8 = []
+    for i in range(n_realizations):
+        data = np.load(f"{DATA_DIR}/NNs/realisation_{i}_s{s}_NNs.npz")
+        nn_pos_same1.append(random_noise(data['nn_pos_same1_cum']))
+        nn_neg_same1.append(random_noise(data['nn_neg_same1_cum']))
+        nn_pos_opp1.append(random_noise(data['nn_pos_opp1_cum']))
+        nn_neg_opp1.append(random_noise(data['nn_neg_opp1_cum']))
+        nn_pos_same2.append(random_noise(data['nn_pos_same2_cum']))
+        nn_neg_same2.append(random_noise(data['nn_neg_same2_cum']))
+        nn_pos_opp2.append(random_noise(data['nn_pos_opp2_cum']))
+        nn_neg_opp2.append(random_noise(data['nn_neg_opp2_cum']))
+        nn_pos_same4.append(random_noise(data['nn_pos_same4_cum']))
+        nn_neg_same4.append(random_noise(data['nn_neg_same4_cum']))
+        nn_pos_opp4.append(random_noise(data['nn_pos_opp4_cum']))
+        nn_neg_opp4.append(random_noise(data['nn_neg_opp4_cum']))
+        nn_pos_same8.append(random_noise(data['nn_pos_same8_cum']))
+        nn_neg_same8.append(random_noise(data['nn_neg_same8_cum']))
+        nn_pos_opp8.append(random_noise(data['nn_pos_opp8_cum']))
+        nn_neg_opp8.append(random_noise(data['nn_neg_opp8_cum']))
+    nn_pos_same1 = np.array(nn_pos_same1)
+    nn_neg_same1 = np.array(nn_neg_same1)
+    nn_pos_opp1 = np.array(nn_pos_opp1)
+    nn_neg_opp1 = np.array(nn_neg_opp1)
+    nn_pos_same2 = np.array(nn_pos_same2)
+    nn_neg_same2 = np.array(nn_neg_same2)
+    nn_pos_opp2 = np.array(nn_pos_opp2)
+    nn_neg_opp2 = np.array(nn_neg_opp2)
+    nn_pos_same4 = np.array(nn_pos_same4)
+    nn_neg_same4 = np.array(nn_neg_same4)
+    nn_pos_opp4 = np.array(nn_pos_opp4)
+    nn_neg_opp4 = np.array(nn_neg_opp4)
+    nn_pos_same8 = np.array(nn_pos_same8)
+    nn_neg_same8 = np.array(nn_neg_same8)
+    nn_pos_opp8 = np.array(nn_pos_opp8)
+    nn_neg_opp8 = np.array(nn_neg_opp8)
+
+    np.save(f"NNs_mean_s{s}.npy", {
+        'nn_pos_same1_mean': np.mean(nn_pos_same1, axis=0),
+        'nn_neg_same1_mean': np.mean(nn_neg_same1, axis=0),
+        'nn_pos_opp1_mean': np.mean(nn_pos_opp1, axis=0),
+        'nn_neg_opp1_mean': np.mean(nn_neg_opp1, axis=0),
+        'nn_pos_same2_mean': np.mean(nn_pos_same2, axis=0),
+        'nn_neg_same2_mean': np.mean(nn_neg_same2, axis=0),
+        'nn_pos_opp2_mean': np.mean(nn_pos_opp2, axis=0),
+        'nn_neg_opp2_mean': np.mean(nn_neg_opp2, axis=0),
+        'nn_pos_same4_mean': np.mean(nn_pos_same4, axis=0),
+        'nn_neg_same4_mean': np.mean(nn_neg_same4, axis=0),
+        'nn_pos_opp4_mean': np.mean(nn_pos_opp4, axis=0),
+        'nn_neg_opp4_mean': np.mean(nn_neg_opp4, axis=0),
+        'nn_pos_same8_mean': np.mean(nn_pos_same8, axis=0),
+        'nn_neg_same8_mean': np.mean(nn_neg_same8, axis=0),
+        'nn_pos_opp8_mean': np.mean(nn_pos_opp8, axis=0),
+        'nn_neg_opp8_mean': np.mean(nn_neg_opp8, axis=0)
+    })
+    cov_matrix_nns = {
+        'cov_nn_pos_same1': np.cov(nn_pos_same1, rowvar=False),
+        'cov_nn_neg_same1': np.cov(nn_neg_same1, rowvar=False),
+        'cov_nn_pos_opp1': np.cov(nn_pos_opp1, rowvar=False),
+        'cov_nn_neg_opp1': np.cov(nn_neg_opp1, rowvar=False),
+        'cov_nn_pos_same2': np.cov(nn_pos_same2, rowvar=False),
+        'cov_nn_neg_same2': np.cov(nn_neg_same2, rowvar=False),
+        'cov_nn_pos_opp2': np.cov(nn_pos_opp2, rowvar=False),
+        'cov_nn_neg_opp2': np.cov(nn_neg_opp2, rowvar=False),
+        'cov_nn_pos_same4': np.cov(nn_pos_same4, rowvar=False),
+        'cov_nn_neg_same4': np.cov(nn_neg_same4, rowvar=False),
+        'cov_nn_pos_opp4': np.cov(nn_pos_opp4, rowvar=False),
+        'cov_nn_neg_opp4': np.cov(nn_neg_opp4, rowvar=False),
+        'cov_nn_pos_same8': np.cov(nn_pos_same8, rowvar=False),
+        'cov_nn_neg_same8': np.cov(nn_neg_same8, rowvar=False),
+        'cov_nn_pos_opp8': np.cov(nn_pos_opp8, rowvar=False),
+        'cov_nn_neg_opp8': np.cov(nn_neg_opp8, rowvar=False)
+    }
+    np.save(f"CovNNs_s{s}.npy", cov_matrix_nns)
+    # combined covariance
+    nn_combined = np.hstack([
+        nn_pos_same1, nn_neg_same1, nn_pos_opp1, nn_neg_opp1,
+        nn_pos_same2, nn_neg_same2, nn_pos_opp2, nn_neg_opp2,
+        nn_pos_same4, nn_neg_same4, nn_pos_opp4, nn_neg_opp4,
+        nn_pos_same8, nn_neg_same8, nn_pos_opp8, nn_neg_opp8
+    ])
+    nn_all_scales.append(nn_combined)
+    cov_matrix_nn_combined = np.cov(nn_combined, rowvar=False)
+    np.save(f"CovNNs_combined_s{s}.npy", cov_matrix_nn_combined)
+    plt.figure(figsize=(8,6))
+    plt.errorbar(np.arange(nn_pos_same1.shape[1]), np.mean(nn_pos_same1, axis=0), yerr=np.sqrt(np.diag(cov_matrix_nns['cov_nn_pos_same1'])), fmt='o', label='Mean NN Pos Same 1 with error bars')
+    plt.xlabel('Bin Index')
+    plt.ylabel('Cumulative Number Count')
+    plt.title('Mean NN Pos Same 1 with Covariance Error Bars')
+    plt.legend()
+    plt.savefig(f"outfiles/Mean_NN_Pos_Same_1_with_Covariance_Error_Bars_s{s}.png")
+    plt.close()
+
+    plt.figure(figsize=(8,6))
+    plt.errorbar(np.arange(nn_neg_opp4.shape[1]), np.mean(nn_neg_opp4, axis=0), yerr=np.sqrt(np.diag(cov_matrix_nns['cov_nn_neg_opp4'])), fmt='o', label='Mean NN Neg Opp 4 with error bars')
+    plt.xlabel('Bin Index')
+    plt.ylabel('Cumulative Number Count')
+    plt.title('Mean NN Neg Opp 4 with Covariance Error Bars')
+    plt.legend()
+    plt.savefig(f"outfiles/Mean_NN_Neg_Opp_4_with_Covariance_Error_Bars_s{s}.png")
+    plt.close()
+
+    plt.figure(figsize=(8,6))   
+    plt.errorbar(np.arange(nn_pos_same8.shape[1]), np.mean(nn_pos_same8, axis=0), yerr=np.sqrt(np.diag(cov_matrix_nns['cov_nn_pos_same8'])), fmt='o', label='Mean NN Pos Same 8 with error bars')
+    plt.xlabel('Bin Index')
+    plt.ylabel('Cumulative Number Count')
+    plt.title('Mean NN Pos Same 8 with Covariance Error Bars')
+    plt.legend()
+    plt.savefig(f"outfiles/Mean_NN_Pos_Same_8_with_Covariance_Error_Bars_s{s}.png")
+    plt.close()
+
+
+    # DPDF combined covariance
+    # first connect data vectors head to tail
+    dpdf_combined = np.hstack((pdfs_pos, pdfs_neg)) 
+    cov_matrix_dpdf_combined = np.cov(dpdf_combined, rowvar=False)
+    np.save(f"CovDPDF_combined_s{s}.npy", cov_matrix_dpdf_combined)
+    dpdf_all_scales.append(dpdf_combined)
+
+    # dpdf&cdf combined
+    cdf_combined = np.hstack((pdfs_pos, pdfs_neg, nn_combined))
+    defects_all_scales.append(cdf_combined)
+    cov_matrix_cdf_combined = np.cov(cdf_combined, rowvar=False)
+    np.save(f"CovCDF_combined_s{s}.npy", cov_matrix_cdf_combined)
+
+
+pdf_all_scales = np.hstack(pdf_all_scales)
+print("PDF all scales shape:", pdf_all_scales.shape)
+pdf_all_scales_mean = np.mean(pdf_all_scales, axis=0)
+pdf_all_scales_cov = np.cov(pdf_all_scales, rowvar=False)
+np.save("PDF_all_scales_mean.npy", pdf_all_scales_mean)
+np.save("PDF_all_scales_cov.npy", pdf_all_scales_cov)
+
+dpdf_all_scales = np.hstack(dpdf_all_scales)
+print("DPDF all scales shape:", dpdf_all_scales.shape)
+dpdf_all_scales_mean = np.mean(dpdf_all_scales, axis=0)
+dpdf_all_scales_cov = np.cov(dpdf_all_scales, rowvar=False)
+np.save("DPDF_all_scales_mean.npy", dpdf_all_scales_mean)
+np.save("DPDF_all_scales_cov.npy", dpdf_all_scales_cov)
+
+nn_all_scales = np.hstack(nn_all_scales)
+print("NN all scales shape:", nn_all_scales.shape)
+nn_all_scales_mean = np.mean(nn_all_scales, axis=0)
+nn_all_scales_cov = np.cov(nn_all_scales, rowvar=False)
+np.save("NN_all_scales_mean.npy", nn_all_scales_mean)
+np.save("NN_all_scales_cov.npy", nn_all_scales_cov)
+
+kk_all_scales = np.hstack(kk_all_scales)
+print("KK all scales shape:", kk_all_scales.shape)
+kk_all_scales_mean = np.mean(kk_all_scales, axis=0)
+kk_all_scales_cov = np.cov(kk_all_scales, rowvar=False)
+np.save("KK_all_scales_mean.npy", kk_all_scales_mean)
+np.save("KK_all_scales_cov.npy", kk_all_scales_cov)
+
+defects_all_scales = np.hstack(defects_all_scales)
+print("Defects all scales shape:", defects_all_scales.shape)
+defects_all_scales_mean = np.mean(defects_all_scales, axis=0)
+defects_all_scales_cov = np.cov(defects_all_scales, rowvar=False)
+np.save("Defects_all_scales_mean.npy", defects_all_scales_mean)
+np.save("Defects_all_scales_cov.npy", defects_all_scales_cov)
