@@ -6,6 +6,7 @@ from tqdm import tqdm
 import os
 from healpy.sphtfunc import smoothing
 import gc
+import glass
 DATA_DIR = '/cephfs/jbai/DefectMockGaussian'
 params = {
     'Om': 0.3,
@@ -45,6 +46,8 @@ for i in tqdm(range(500), desc="Generating mock data"):
     for sigma in sigmas:
         s = int(np.degrees(sigma)*60)
         df.kappa_bar = smoothing(df.kappa_bar_unsmoothed, sigma=sigma, lmax=res*3)
+        df.gamm1_bar, df.gamm2_bar = glass.shear_from_convergence(df.kappa_bar, lmax=res*3)
+        df.phi_bar = 0.5 * np.arctan2(df.gamm2_bar, df.gamm1_bar)
         df.find_defects(savepath=f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects.npz", cluster=True)
         df.load_defects(defect_datapath=f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects.npz")
         df.save_defects(savepath=f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects")
