@@ -44,18 +44,24 @@ nn_combined_s30 = []
 nn_combined_s90 = []
 for i in range(4):
     data = np.load(f"{DATA_DIR}/TrainPDFs/train_{i}_s15_kappa_pdf.npz")
+    print("PDF S15:", data['hist'])
     pdfs_s15.append((data['hist'], data['bin_centers']))
     data = np.load(f"{DATA_DIR}/TrainPDFs/train_{i}_s30_kappa_pdf.npz")
+    print("PDF S30:", data['hist'])
     pdfs_s30.append((data['hist'], data['bin_centers']))
     data = np.load(f"{DATA_DIR}/TrainPDFs/train_{i}_s90_kappa_pdf.npz")
+    print("PDF S90:", data['hist'])
     pdfs_s90.append((data['hist'], data['bin_centers']))
 
     data_pos = np.load(f"{DATA_DIR}/TrainDPDFs/train_{i}_s15_defect_kappa_pos_pdf.npz")
     dpdfs_pos_s15.append((data_pos['hist'], data_pos['bin_centers']))
+    print("DPDF POS S15:", data_pos['hist'])
     data_pos = np.load(f"{DATA_DIR}/TrainDPDFs/train_{i}_s30_defect_kappa_pos_pdf.npz")
     dpdfs_pos_s30.append((data_pos['hist'], data_pos['bin_centers']))
+    print("DPDF POS S30:", data_pos['hist'])
     data_pos = np.load(f"{DATA_DIR}/TrainDPDFs/train_{i}_s90_defect_kappa_pos_pdf.npz")
     dpdfs_pos_s90.append((data_pos['hist'], data_pos['bin_centers']))
+    print("DPDF POS S90:", data_pos['hist'])
 
     data_neg = np.load(f"{DATA_DIR}/TrainDPDFs/train_{i}_s15_defect_kappa_neg_pdf.npz")
     dpdfs_neg_s15.append((data_neg['hist'], data_neg['bin_centers']))
@@ -72,11 +78,14 @@ for i in range(4):
     kk_corrs_s90.append((data_kk['theta'], data_kk['xi_kk']))
 
     data_nn_combined = np.load(f"{DATA_DIR}/TrainNNs/train_{i}_s15_NNs_combined.npz")
+    print("NN COMBINED S15:", data_nn_combined['nn_combined'])
     nn_combined_s15.append((data_nn_combined['nn_combined']))
     data_nn_combined = np.load(f"{DATA_DIR}/TrainNNs/train_{i}_s30_NNs_combined.npz")
+    print("NN COMBINED S30:", data_nn_combined['nn_combined']) 
     nn_combined_s30.append((data_nn_combined['nn_combined']))
     data_nn_combined = np.load(f"{DATA_DIR}/TrainNNs/train_{i}_s90_NNs_combined.npz")
     nn_combined_s90.append((data_nn_combined['nn_combined']))
+    print("NN COMBINED S90:", data_nn_combined['nn_combined'])
 
 
 # compute derivatives
@@ -186,13 +195,13 @@ deriv_pdfs_s90 = np.array(deriv_pdfs_s90)
 deriv_dpdfs_pos_s15 = np.array(deriv_dpdfs_pos_s15)
 deriv_dpdfs_pos_s30 = np.array(deriv_dpdfs_pos_s30)
 deriv_dpdfs_pos_s90 = np.array(deriv_dpdfs_pos_s90)
-
 deriv_dpdfs_neg_s15 = np.array(deriv_dpdfs_neg_s15)
 deriv_dpdfs_neg_s30 = np.array(deriv_dpdfs_neg_s30)
 deriv_dpdfs_neg_s90 = np.array(deriv_dpdfs_neg_s90)
 deriv_dpdfs_combined_s15 = np.hstack((deriv_dpdfs_pos_s15, deriv_dpdfs_neg_s15))
 deriv_dpdfs_combined_s30 = np.hstack((deriv_dpdfs_pos_s30, deriv_dpdfs_neg_s30))
 deriv_dpdfs_combined_s90 = np.hstack((deriv_dpdfs_pos_s90, deriv_dpdfs_neg_s90))
+print("DERIV DPDFS COMBINED S90:", deriv_dpdfs_combined_s90)
 deriv_dpdfs_combined_all_scales = np.hstack((deriv_dpdfs_combined_s15, deriv_dpdfs_combined_s30, deriv_dpdfs_combined_s90))
 deriv_kk_corrs_s15 = np.array(deriv_kk_corrs_s15)
 deriv_kk_corrs_s30 = np.array(deriv_kk_corrs_s30)
@@ -200,6 +209,7 @@ deriv_kk_corrs_s90 = np.array(deriv_kk_corrs_s90)
 deriv_nns_combined_s15 = np.array(deriv_nns_combined_s15)
 deriv_nns_combined_s30 = np.array(deriv_nns_combined_s30)
 deriv_nns_combined_s90 = np.array(deriv_nns_combined_s90)
+print("DERIV NNS COMBINED S90:", deriv_nns_combined_s90)
 deriv_dpdf_nn_combined_s15 = np.hstack((deriv_dpdfs_combined_s15, deriv_nns_combined_s15))
 deriv_dpdf_nn_combined_s30 = np.hstack((deriv_dpdfs_combined_s30, deriv_nns_combined_s30))
 deriv_dpdf_nn_combined_s90 = np.hstack((deriv_dpdfs_combined_s90, deriv_nns_combined_s90))
@@ -420,82 +430,110 @@ labels = ['\\Omega_m', '\\sigma_8']
 covariance_dpdf_combined_s15 = np.linalg.inv(Fisher_dpdf_combined_s15)
 covariance_dpdf_combined_s30 = np.linalg.inv(Fisher_dpdf_combined_s30)
 covariance_dpdf_combined_s90 = np.linalg.inv(Fisher_dpdf_combined_s90)
+print("DPDF COMBINED S90 COVARIANCE:", covariance_dpdf_combined_s90)
 covariance_dpdf_combined_all_scales = np.linalg.inv(Fisher_dpdf_combined_all_scales)
-dpdf_combined_s15_samples = GaussianND(mean, covariance_dpdf_combined_s15, names=names, labels=labels, label='DCDF smoothing 15 arcmin')
-dpdf_combined_s30_samples = GaussianND(mean, covariance_dpdf_combined_s30, names=names, labels=labels, label='DCDF smoothing 30 arcmin')
-dpdf_combined_s90_samples = GaussianND(mean, covariance_dpdf_combined_s90, names=names, labels=labels, label='DCDF smoothing 90 arcmin')
-dpdf_combined_all_scales_samples = GaussianND(mean, covariance_dpdf_combined_all_scales, names=names, labels=labels, label='DCDF all scales')
+
+# 修复：增加空格，保持数学格式一致
+dpdf_combined_s15_samples = GaussianND(mean, covariance_dpdf_combined_s15, names=names, labels=labels, label=r'$C^{p+n}(\kappa), \ \theta_G=15$')
+dpdf_combined_s30_samples = GaussianND(mean, covariance_dpdf_combined_s30, names=names, labels=labels, label=r'$C^{p+n}(\kappa), \ \theta_G=30$')
+dpdf_combined_s90_samples = GaussianND(mean, covariance_dpdf_combined_s90, names=names, labels=labels, label=r'$C^{p+n}(\kappa), \ \theta_G=90$')
+dpdf_combined_all_scales_samples = GaussianND(mean, covariance_dpdf_combined_all_scales, names=names, labels=labels, label=r'$C^{p+n}(\kappa)$, all scales')
 
 covariance_pdf_s15 = np.linalg.inv(Fisher_pdf_s15)
 covariance_pdf_s30 = np.linalg.inv(Fisher_pdf_s30)
 covariance_pdf_s90 = np.linalg.inv(Fisher_pdf_s90)
 covariance_pdf_all_scales = np.linalg.inv(Fisher_pdf_all_scales)
-pdf_s15_samples = GaussianND(mean, covariance_pdf_s15, names=names, labels=labels, label='PDF smoothing 15 arcmin')
-pdf_s30_samples = GaussianND(mean, covariance_pdf_s30, names=names, labels=labels, label='PDF smoothing 30 arcmin')
-pdf_s90_samples = GaussianND(mean, covariance_pdf_s90, names=names, labels=labels, label='PDF smoothing 90 arcmin')
-pdf_all_scales_samples = GaussianND(mean, covariance_pdf_all_scales, names=names, labels=labels, label='PDF all scales')
+
+# 修复：统一 PDF 为文本格式，theta_G 为数学格式
+pdf_s15_samples = GaussianND(mean, covariance_pdf_s15, names=names, labels=labels, label=r'PDF, $\theta_G=15$')
+pdf_s30_samples = GaussianND(mean, covariance_pdf_s30, names=names, labels=labels, label=r'PDF, $\theta_G=30$')
+pdf_s90_samples = GaussianND(mean, covariance_pdf_s90, names=names, labels=labels, label=r'PDF, $\theta_G=90$')
+pdf_all_scales_samples = GaussianND(mean, covariance_pdf_all_scales, names=names, labels=labels, label=r'PDF, all scales')
 
 covariance_kk_s15 = np.linalg.inv(Fisher_kk_s15)
 covariance_kk_s30 = np.linalg.inv(Fisher_kk_s30)
 covariance_kk_s90 = np.linalg.inv(Fisher_kk_s90)
-
 covariance_kk_all_scales = np.linalg.inv(Fisher_kk_all_scales)
-kk_s15_samples = GaussianND(mean, covariance_kk_s15, names=names, labels=labels, label='KK smoothing 15 arcmin')
-kk_s30_samples = GaussianND(mean, covariance_kk_s30, names=names, labels=labels, label='KK smoothing 30 arcmin')
-kk_s90_samples = GaussianND(mean, covariance_kk_s90, names=names, labels=labels, label='KK smoothing 90 arcmin')
-kk_all_scales_samples = GaussianND(mean, covariance_kk_all_scales, names=names, labels=labels, label='KK all scales')
+
+# 修复：补全缺失的 $ 符号，修复 all scales 的 $ 位置
+kk_s15_samples = GaussianND(mean, covariance_kk_s15, names=names, labels=labels, label=r'$\xi(\theta), \ \theta_G=15$')
+kk_s30_samples = GaussianND(mean, covariance_kk_s30, names=names, labels=labels, label=r'$\xi(\theta), \ \theta_G=30$')
+kk_s90_samples = GaussianND(mean, covariance_kk_s90, names=names, labels=labels, label=r'$\xi(\theta), \ \theta_G=90$')
+kk_all_scales_samples = GaussianND(mean, covariance_kk_all_scales, names=names, labels=labels, label=r'$\xi(\theta)$, all scales')
 
 covariance_nns_s15 = np.linalg.inv(Fisher_nns_s15)
 covariance_nns_s30 = np.linalg.inv(Fisher_nns_s30)
 covariance_nns_s90 = np.linalg.inv(Fisher_nns_s90)
+print("NNS S90 COVARIANCE:", covariance_nns_s90)
 covariance_nns_all_scales = np.linalg.inv(Fisher_nns_all_scales)
-nns_s15_samples = GaussianND(mean, covariance_nns_s15, names=names, labels=labels, label='NN CDF smoothing 15 arcmin')
-nns_s30_samples = GaussianND(mean, covariance_nns_s30, names=names, labels=labels, label='NN CDF smoothing 30 arcmin')
-nns_s90_samples = GaussianND(mean, covariance_nns_s90, names=names, labels=labels, label='NN CDF smoothing 90 arcmin')
-nns_all_scales_samples = GaussianND(mean, covariance_nns_all_scales, names=names, labels=labels, label='NN CDF all scales')
+
+# 修复：补全 $，使用 \mathrm{all} 避免斜体，移除上标中不规范的 "-th"
+nns_s15_samples = GaussianND(mean, covariance_nns_s15, names=names, labels=labels, label=r'$C^{\mathrm{all}}_{1,2,4,8}(\theta), \ \theta_G=15$')
+nns_s30_samples = GaussianND(mean, covariance_nns_s30, names=names, labels=labels, label=r'$C^{\mathrm{all}}_{1,2,4,8}(\theta), \ \theta_G=30$')
+nns_s90_samples = GaussianND(mean, covariance_nns_s90, names=names, labels=labels, label=r'$C^{\mathrm{all}}_{1,2,4,8}(\theta), \ \theta_G=90$')
+nns_all_scales_samples = GaussianND(mean, covariance_nns_all_scales, names=names, labels=labels, label=r'$C^{\mathrm{all}}_{1,2,4,8}(\theta)$, all scales')
 
 covariance_dpdf_nn_combined_s15 = np.linalg.inv(Fisher_dpdf_nn_combined_s15)
 covariance_dpdf_nn_combined_s30 = np.linalg.inv(Fisher_dpdf_nn_combined_s30)
 covariance_dpdf_nn_combined_s90 = np.linalg.inv(Fisher_dpdf_nn_combined_s90)
 covariance_dpdf_nn_combined_all_scales = np.linalg.inv(Fisher_dpdf_nn_combined_all_scales)
-dpdf_nn_combined_s15_samples = GaussianND(mean, covariance_dpdf_nn_combined_s15, names=names, labels=labels, label='DCDF NN combined smoothing 15 arcmin')
-dpdf_nn_combined_s30_samples = GaussianND(mean, covariance_dpdf_nn_combined_s30, names=names, labels=labels, label='DCDF NN combined smoothing 30 arcmin')
-dpdf_nn_combined_s90_samples = GaussianND(mean, covariance_dpdf_nn_combined_s90, names=names, labels=labels, label='DCDF NN combined smoothing 90 arcmin')
-dpdf_nn_combined_all_scales_samples = GaussianND(mean, covariance_dpdf_nn_combined_all_scales, names=names, labels=labels, label='DCDF NN combined all scales')
+
+# 修复：将 DCDF + kNN 放在文本模式，theta_G 放在数学模式
+dpdf_nn_combined_s15_samples = GaussianND(mean, covariance_dpdf_nn_combined_s15, names=names, labels=labels, label=r'DCDF + kNN, $\theta_G=15$')
+dpdf_nn_combined_s30_samples = GaussianND(mean, covariance_dpdf_nn_combined_s30, names=names, labels=labels, label=r'DCDF + kNN, $\theta_G=30$')
+dpdf_nn_combined_s90_samples = GaussianND(mean, covariance_dpdf_nn_combined_s90, names=names, labels=labels, label=r'DCDF + kNN, $\theta_G=90$')
+dpdf_nn_combined_all_scales_samples = GaussianND(mean, covariance_dpdf_nn_combined_all_scales, names=names, labels=labels, label=r'DCDF + kNN, all scales')
+
+
+import matplotlib.pyplot as plt
 from getdist import plots
+# use tab10 colors
+color_map = plt.get_cmap('tab10')
 # pdf s15 to s90, and all scales
-g = plots.get_subplot_plotter()
-g.triangle_plot([pdf_s15_samples, pdf_s30_samples, pdf_s90_samples, pdf_all_scales_samples],
+g = plots.get_subplot_plotter(width_inch=6)
+g.triangle_plot([pdf_s15_samples, pdf_s30_samples, pdf_s90_samples, pdf_all_scales_samples, kk_all_scales_samples],
                 filled=False,
-                param_limits={"Om": (0.1, 0.5), "sigma8": (0.6, 1.0)})
+                param_limits={"Om": (0.2, 0.4), "sigma8": (0.7, 0.9)},
+                contour_colors=[color_map(i) for i in range(5)],
+                contour_lws=1.5)
 g.export("outfiles/pdf.png", dpi=300)
 
-g = plots.get_subplot_plotter()
-g.triangle_plot([dpdf_combined_s15_samples, dpdf_combined_s30_samples, dpdf_combined_s90_samples, dpdf_combined_all_scales_samples],
+g = plots.get_subplot_plotter(width_inch=6)
+g.triangle_plot([dpdf_combined_s15_samples, dpdf_combined_s30_samples, dpdf_combined_s90_samples, dpdf_combined_all_scales_samples, kk_all_scales_samples],
                 filled=False,
-                param_limits={"Om": (0.1, 0.5), "sigma8": (0.6, 1.0)})
+                param_limits={"Om": (0.2, 0.4), "sigma8": (0.7, 0.9)},
+                contour_colors=[color_map(i) for i in range(5)],
+                contour_lws=1.5)
 g.export("outfiles/dcdf.png", dpi=300)
 
-g = plots.get_subplot_plotter()
+g = plots.get_subplot_plotter(width_inch=6)
 g.triangle_plot([kk_s15_samples, kk_s30_samples, kk_s90_samples, kk_all_scales_samples],
                 filled=False,
-                param_limits={"Om": (0.2, 0.4), "sigma8": (0.7, 0.9)})
+                param_limits={"Om": (0.2, 0.4), "sigma8": (0.7, 0.9)},
+                contour_colors=[color_map(i) for i in range(4)],
+                contour_lws=1.5)
 g.export("outfiles/kk.png", dpi=300)
 
-g = plots.get_subplot_plotter()
-g.triangle_plot([nns_s15_samples, nns_s30_samples, nns_s90_samples, nns_all_scales_samples],
+g = plots.get_subplot_plotter(width_inch=6)
+g.triangle_plot([nns_s15_samples, nns_s30_samples, nns_s90_samples, nns_all_scales_samples, kk_all_scales_samples],
                 filled=False,
-                param_limits={"Om": (0.1, 0.5), "sigma8": (0.6, 1.0)})
+                param_limits={"Om": (0.26, 0.34), "sigma8": (0.76, 0.84)},
+                contour_colors=[color_map(i) for i in range(5)],
+                contour_lws=1.5)
 g.export("outfiles/nns.png", dpi=300)
 
-g = plots.get_subplot_plotter()
-g.triangle_plot([dpdf_nn_combined_s15_samples, dpdf_nn_combined_s30_samples, dpdf_nn_combined_s90_samples, dpdf_nn_combined_all_scales_samples],
+g = plots.get_subplot_plotter(width_inch=6)
+g.triangle_plot([dpdf_nn_combined_s15_samples, dpdf_nn_combined_s30_samples, dpdf_nn_combined_s90_samples, dpdf_nn_combined_all_scales_samples, kk_all_scales_samples],
                 filled=False,
-                param_limits={"Om": (0.1, 0.5), "sigma8": (0.6, 1.0)})
+                param_limits={"Om": (0.2, 0.4), "sigma8": (0.7, 0.9)},
+                contour_colors=[color_map(i) for i in range(5)],
+                contour_lws=1.5)
 g.export("outfiles/dcdf_nn_combined.png", dpi=300)
 
-g = plots.get_subplot_plotter()
+g = plots.get_subplot_plotter(width_inch=6)
 g.triangle_plot([pdf_all_scales_samples, dpdf_combined_all_scales_samples, nns_all_scales_samples, dpdf_nn_combined_all_scales_samples, kk_all_scales_samples],
                 filled=False,
-                param_limits={"Om": (0.1, 0.5), "sigma8": (0.6, 1.0)})
+                param_limits={"Om": (0.26, 0.34), "sigma8": (0.76, 0.84)},
+                contour_colors=[color_map(i) for i in range(5)],
+                contour_lws=1.5)    
 g.export("outfiles/all_combined.png", dpi=300)

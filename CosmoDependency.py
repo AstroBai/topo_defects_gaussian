@@ -5,7 +5,7 @@ import numpy as np
 
 # change S8 only
 cosmo1 = {'h': 0.7,
-            'Oc': 0.15,
+            'Oc': 0.25,
             'Ob': 0.05,
             'S8': 0.8,
             'w': -1.0}
@@ -17,7 +17,7 @@ cosmo2 = {'h': 0.7,
             'w': -1.0}
 
 cosmo3 = {'h': 0.7,
-            'Oc': 0.35,
+            'Oc': 0.25,
             'Ob': 0.05,
             'S8': 0.8,
             'w': -1.0}
@@ -25,13 +25,13 @@ cosmo3 = {'h': 0.7,
 res = 512
 lmax = int(res/4 - 1)
 # generate maps for the three cosmologies
-# kappa1_unsmoothed, kappa1, gamm11, gamm21, phi1 = GenMap(cosmo1, nside=res, lmax=res*3, random_seed=24, random_type='gaussian', smooth_angle=np.radians(90/60), smooth_type='post')
-# kappa2_unsmoothed, kappa2, gamm12, gamm22, phi2 = GenMap(cosmo2, nside=res, lmax=res*3, random_seed=24, random_type='gaussian', smooth_angle=np.radians(90/60), smooth_type='post')
-# kappa3_unsmoothed, kappa3, gamm13, gamm23, phi3 = GenMap(cosmo3, nside=res, lmax=res*3, random_seed=24, random_type='gaussian', smooth_angle=np.radians(90/60), smooth_type='post')
+kappa1_unsmoothed, kappa1, gamm11, gamm21, phi1 = GenMap(cosmo1, nside=res, lmax=res*3, random_seed=24, random_type='gaussian', smooth_angle=np.radians(30/60), smooth_type='post')
+kappa2_unsmoothed, kappa2, gamm12, gamm22, phi2 = GenMap(cosmo2, nside=res, lmax=res*3, random_seed=24, random_type='gaussian', smooth_angle=np.radians(30/60), smooth_type='post')
+kappa3_unsmoothed, kappa3, gamm13, gamm23, phi3 = GenMap(cosmo3, nside=res, lmax=res*3, random_seed=24, random_type='gaussian', smooth_angle=np.radians(30/60), smooth_type='post')
 
-# np.savez("outfiles/map_data_cosmo1.npz", kappa_bar_unsmoothed=kappa1_unsmoothed, kappa_bar=kappa1, gamm1_bar=gamm11, gamm2_bar=gamm21, phi_bar=phi1)
-# np.savez("outfiles/map_data_cosmo2.npz", kappa_bar_unsmoothed=kappa2_unsmoothed, kappa_bar=kappa2, gamm1_bar=gamm12, gamm2_bar=gamm22, phi_bar=phi2)
-# np.savez("outfiles/map_data_cosmo3.npz", kappa_bar_unsmoothed=kappa3_unsmoothed, kappa_bar=kappa3, gamm1_bar=gamm13, gamm2_bar=gamm23, phi_bar=phi3)
+np.savez("outfiles/map_data_cosmo1.npz", kappa_bar_unsmoothed=kappa1_unsmoothed, kappa_bar=kappa1, gamm1_bar=gamm11, gamm2_bar=gamm21, phi_bar=phi1)
+np.savez("outfiles/map_data_cosmo2.npz", kappa_bar_unsmoothed=kappa2_unsmoothed, kappa_bar=kappa2, gamm1_bar=gamm12, gamm2_bar=gamm22, phi_bar=phi2)
+np.savez("outfiles/map_data_cosmo3.npz", kappa_bar_unsmoothed=kappa3_unsmoothed, kappa_bar=kappa3, gamm1_bar=gamm13, gamm2_bar=gamm23, phi_bar=phi3)
 
 # find defects in the three maps
 df1 = DefectFinder(data_path="outfiles/map_data_cosmo1.npz")
@@ -56,8 +56,8 @@ print(df2.number(), df2.number_estimation())
 print(df3.number(), df3.number_estimation())
 
 nearest_pos_dist1 = df1.nearest_distance(charge=0.5, k=1)
-nearest_pos_dist2 = df2.nearest_distance(charge=0.5, k=1)
-nearest_pos_dist3 = df3.nearest_distance(charge=0.5, k=1)
+nearest_pos_dist2 = df2.nearest_distance(charge=0.5, k=4)
+nearest_pos_dist3 = df3.nearest_distance(charge=0.5, k=8)
 plt.figure(figsize=(8, 6))
 plt.hist(nearest_pos_dist1, bins=30, density=False, cumulative=True, histtype='step', label=f'Oc={cosmo1["Oc"]}')
 plt.hist(nearest_pos_dist2, bins=30, density=False, cumulative=True, histtype='step', label=f'Oc={cosmo2["Oc"]}')
@@ -73,8 +73,8 @@ plt.savefig("outfiles/nearest_pos_distance_comparison.png", dpi=300, bbox_inches
 
 
 nearest_neg_dist1 = df1.nearest_distance(charge=-0.5, k=1)
-nearest_neg_dist2 = df2.nearest_distance(charge=-0.5, k=1)
-nearest_neg_dist3 = df3.nearest_distance(charge=-0.5, k=1)
+nearest_neg_dist2 = df2.nearest_distance(charge=-0.5, k=4)
+nearest_neg_dist3 = df3.nearest_distance(charge=-0.5, k=8)
 
 plt.figure(figsize=(8, 6))
 plt.hist(nearest_neg_dist1, bins=30, density=False, cumulative=True, histtype='step', label=f'Oc={cosmo1["Oc"]}')
@@ -92,8 +92,8 @@ plt.savefig("outfiles/nearest_neg_distance_comparison.png", dpi=300, bbox_inches
 
 
 nearest_opp_pos_dist1 = df1.nearest_opposite_distance(charge=0.5, k=1)
-nearest_opp_pos_dist2 = df2.nearest_opposite_distance(charge=0.5, k=1)
-nearest_opp_pos_dist3 = df3.nearest_opposite_distance(charge=0.5, k=1)
+nearest_opp_pos_dist2 = df2.nearest_opposite_distance(charge=0.5, k=4)
+nearest_opp_pos_dist3 = df3.nearest_opposite_distance(charge=0.5, k=8)
 plt.figure(figsize=(8, 6))
 plt.hist(nearest_opp_pos_dist1, bins=30, density=False, cumulative=True, histtype='step', label=f'Oc={cosmo1["Oc"]}')
 plt.hist(nearest_opp_pos_dist2, bins=30, density=False, cumulative=True, histtype='step', label=f'Oc={cosmo2["Oc"]}')
@@ -108,8 +108,8 @@ plt.tight_layout()
 plt.savefig("outfiles/nearest_opp_pos_distance_comparison.png", dpi=300, bbox_inches='tight')
 
 nearest_opp_neg_dist1 = df1.nearest_opposite_distance(charge=-0.5, k=1)
-nearest_opp_neg_dist2 = df2.nearest_opposite_distance(charge=-0.5, k=1)
-nearest_opp_neg_dist3 = df3.nearest_opposite_distance(charge=-0.5, k=1)
+nearest_opp_neg_dist2 = df2.nearest_opposite_distance(charge=-0.5, k=4)
+nearest_opp_neg_dist3 = df3.nearest_opposite_distance(charge=-0.5, k=8)
 plt.figure(figsize=(8, 6))
 plt.hist(nearest_opp_neg_dist1, bins=30, density=False, cumulative=True, histtype='step', label=f'Oc={cosmo1["Oc"]}')
 plt.hist(nearest_opp_neg_dist2, bins=30, density=False, cumulative=True, histtype='step', label=f'Oc={cosmo2["Oc"]}')
@@ -127,8 +127,8 @@ plt.savefig("outfiles/nearest_opp_neg_distance_comparison.png", dpi=300, bbox_in
 kappa_pos1 = df1.convergence_dist(charge=0.5)
 kappa_pos2 = df2.convergence_dist(charge=0.5)
 kappa_pos3 = df3.convergence_dist(charge=0.5)
-bins = np.array([-0.005, -0.0025, 0.0025, 0.005])
-bins = np.linspace(-0.005, 0.005, 50)
+bins = np.array([-0.01, -0.005, 0.005, 0.01])
+bins = np.linspace(-0.01, 0.01, 50)
 
 kappa_pos_cum1 = np.array([np.sum(kappa_pos1 < b) for b in bins]) / 4 / np.pi
 kappa_pos_cum2 = np.array([np.sum(kappa_pos2 < b) for b in bins]) / 4 / np.pi
@@ -149,8 +149,8 @@ plt.savefig("outfiles/kappa_pos_pdf_comparison.png", dpi=300, bbox_inches='tight
 kappa_neg1 = df1.convergence_dist(charge=-0.5)
 kappa_neg2 = df2.convergence_dist(charge=-0.5)
 kappa_neg3 = df3.convergence_dist(charge=-0.5)
-bins = np.array([-0.005, -0.0025, 0.0025, 0.005])
-bins = np.linspace(-0.005, 0.005, 50)
+bins = np.array([-0.01, -0.005, 0.005, 0.01])
+bins = np.linspace(-0.01, 0.01, 50)
 kappa_neg_cum1 = np.array([np.sum(kappa_neg1 < b) for b in bins]) / 4 / np.pi
 kappa_neg_cum2 = np.array([np.sum(kappa_neg2 < b) for b in bins]) / 4 / np.pi
 kappa_neg_cum3 = np.array([np.sum(kappa_neg3 < b) for b in bins]) / 4 / np.pi
@@ -174,7 +174,7 @@ plt.savefig("outfiles/kappa_neg_pdf_comparison.png", dpi=300, bbox_inches='tight
 kappa_defects1 = np.concatenate([kappa_pos1, kappa_neg1])
 kappa_defects2 = np.concatenate([kappa_pos2, kappa_neg2])
 kappa_defects3 = np.concatenate([kappa_pos3, kappa_neg3])
-bins = np.linspace(-0.005, 0.005, 50)
+bins = np.linspace(-0.01, 0.01, 50)
 kappa_defects_cum1 = np.array([np.sum(kappa_defects1 < b) for b in bins]) / 4 / np.pi
 kappa_defects_cum2 = np.array([np.sum(kappa_defects2 < b) for b in bins]) / 4 / np.pi
 kappa_defects_cum3 = np.array([np.sum(kappa_defects3 < b) for b in bins]) / 4 / np.pi
@@ -195,7 +195,7 @@ plt.savefig("outfiles/kappa_defects_pdf_comparison.png", dpi=300, bbox_inches='t
 kappa_all1 = df1.kappa_bar
 kappa_all2 = df2.kappa_bar
 kappa_all3 = df3.kappa_bar
-bin_edges = np.array([-0.005, -0.0025, 0.0, 0.0025, 0.005])
+bin_edges = np.array([-0.01, -0.005, 0.0, 0.005, 0.01])
 bin_centers = 0.5 * (bin_edges[:-1] + bin_edges[1:])
 kappa_all_hist1, _ = np.histogram(kappa_all1, bins=bin_edges, density=True)
 kappa_all_hist2, _ = np.histogram(kappa_all2, bins=bin_edges, density=True)

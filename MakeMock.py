@@ -28,15 +28,15 @@ for i in tqdm(range(500), desc="Generating mock data"):
         'S8': params['S8'],
         'w': w
     }
-    kappa_bar_unsmoothed, kappa_bar, gamm1_bar, gamm2_bar, phi_bar = GenMap(param_dict, nside=res, lmax=res*3, random_type='gaussian', random_seed=i)
-    # create path if not exists
-    os.makedirs(f"{DATA_DIR}/Maps", exist_ok=True)
-    np.savez(f"{DATA_DIR}/Maps/realisation_{i}.npz",
-             kappa_bar_unsmoothed=kappa_bar_unsmoothed,
-             kappa_bar=kappa_bar,
-             gamm1_bar=gamm1_bar,
-             gamm2_bar=gamm2_bar,
-             phi_bar=phi_bar)
+    # kappa_bar_unsmoothed, kappa_bar, gamm1_bar, gamm2_bar, phi_bar = GenMap(param_dict, nside=res, lmax=res*3, random_type='gaussian', random_seed=i)
+    # # create path if not exists
+    # os.makedirs(f"{DATA_DIR}/Maps", exist_ok=True)
+    # np.savez(f"{DATA_DIR}/Maps/realisation_{i}.npz",
+    #          kappa_bar_unsmoothed=kappa_bar_unsmoothed,
+    #          kappa_bar=kappa_bar,
+    #          gamm1_bar=gamm1_bar,
+    #          gamm2_bar=gamm2_bar,
+    #          phi_bar=phi_bar)
     
 
     # Find defects and saves
@@ -46,13 +46,18 @@ for i in tqdm(range(500), desc="Generating mock data"):
     for sigma in sigmas:
         s = int(np.degrees(sigma)*60)
         df.kappa_bar = smoothing(df.kappa_bar_unsmoothed, sigma=sigma, lmax=res*3)
-        df.gamm1_bar, df.gamm2_bar = glass.shear_from_convergence(df.kappa_bar, lmax=res*3)
-        df.phi_bar = 0.5 * np.arctan2(df.gamm2_bar, df.gamm1_bar)
-        df.find_defects(savepath=f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects.npz", cluster=True)
+        # df.gamm1_bar, df.gamm2_bar = glass.shear_from_convergence(df.kappa_bar, lmax=res*3)
+        # df.phi_bar = 0.5 * np.arctan2(df.gamm2_bar, df.gamm1_bar)
+        # df.find_defects(savepath=f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects.npz", cluster=True)
         df.load_defects(defect_datapath=f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects.npz")
         df.save_defects(savepath=f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects")
         # Save convergence PDF
-        bin_edges = np.array([-0.005, -0.0025, 0.0, 0.0025, 0.005])
+        if s == 15:
+            bin_edges = np.array([-0.01, -0.005, 0.0, 0.005, 0.01])
+        elif s == 30:
+            bin_edges = np.array([-0.008, -0.004, 0.0, 0.004, 0.008])
+        elif s == 90:
+            bin_edges = np.array([-0.005, -0.0025, 0.0, 0.0025, 0.005])
         hist, bin_edges = np.histogram(df.kappa_bar, bins=bin_edges, density=True)
         os.makedirs(f"{DATA_DIR}/PDFs", exist_ok=True)
         np.savez(f"{DATA_DIR}/PDFs/realisation_{i}_s{s}_kappa_pdf.npz",
@@ -60,7 +65,12 @@ for i in tqdm(range(500), desc="Generating mock data"):
                  bin_edges=bin_edges)
 
         # save defect PDFs
-        bins = np.array([-0.005, -0.0025, 0.0025, 0.005])
+        if s == 15:
+            bins = np.array([-0.01, -0.005, 0.005, 0.01])
+        elif s == 30:
+            bins = np.array([-0.008, -0.004, 0.004, 0.008])
+        elif s == 90:
+            bins = np.array([-0.005, -0.0025, 0.0025, 0.005])
         kappa_pos = df.convergence_dist(charge=0.5)
         kappa_pos_cum = np.array([np.sum(kappa_pos < b) for b in bins]) / 4 / np.pi
 
