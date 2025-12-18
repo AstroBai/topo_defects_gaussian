@@ -9,6 +9,7 @@ w = -1.0
 # surrounding cosmology params, e.g. Om +/- delta_Om
 delta_params = {'Om': 0.02,
                 'sigma8': 0.02}
+n_seeds = 60
 
 params = []
 for key in fid.keys():
@@ -42,7 +43,7 @@ kk_corrs_s90 = []
 nn_combined_s15 = []
 nn_combined_s30 = []
 nn_combined_s90 = []
-for seed in range(30):
+for seed in range(n_seeds):
     for i in range(4):
         data = np.load(f"{DATA_DIR}/TrainPDFs/train_{i}_s15_seed_{seed}_kappa_pdf.npz")
         pdfs_s15.append((data['hist']))
@@ -96,22 +97,21 @@ nn_combined_s90 = np.array(nn_combined_s90)
 print(f"pdfs_s15 shape: {pdfs_s15.shape}")
 print(f"nn_combined_s15 shape: {nn_combined_s15.shape}")
 
-pdfs_s15 = pdfs_s15.reshape(30, 4, -1)
-pdfs_s30 = pdfs_s30.reshape(30, 4, -1)
-pdfs_s90 = pdfs_s90.reshape(30, 4, -1)
-dpdfs_pos_s15 = dpdfs_pos_s15.reshape(30, 4, -1)
-dpdfs_pos_s30 = dpdfs_pos_s30.reshape(30, 4, -1)
-dpdfs_pos_s90 = dpdfs_pos_s90.reshape(30, 4, -1)
-dpdfs_neg_s15 = dpdfs_neg_s15.reshape(30, 4, -1)
-dpdfs_neg_s30 = dpdfs_neg_s30.reshape(30, 4, -1)
-dpdfs_neg_s90 = dpdfs_neg_s90.reshape(30, 4, -1)
-kk_corrs_s15 = kk_corrs_s15.reshape(30, 4, -1)
-kk_corrs_s30 = kk_corrs_s30.reshape(30, 4, -1)
-kk_corrs_s90 = kk_corrs_s90.reshape(30, 4, -1)
-nn_combined_s15 = nn_combined_s15.reshape(30, 4, -1)
-nn_combined_s30 = nn_combined_s30.reshape(30, 4, -1)
-nn_combined_s90 = nn_combined_s90.reshape(30, 4, -1)
-
+pdfs_s15 = pdfs_s15.reshape(n_seeds, 4, -1)
+pdfs_s30 = pdfs_s30.reshape(n_seeds, 4, -1)
+pdfs_s90 = pdfs_s90.reshape(n_seeds, 4, -1)
+dpdfs_pos_s15 = dpdfs_pos_s15.reshape(n_seeds, 4, -1)
+dpdfs_pos_s30 = dpdfs_pos_s30.reshape(n_seeds, 4, -1)
+dpdfs_pos_s90 = dpdfs_pos_s90.reshape(n_seeds, 4, -1)
+dpdfs_neg_s15 = dpdfs_neg_s15.reshape(n_seeds, 4, -1)
+dpdfs_neg_s30 = dpdfs_neg_s30.reshape(n_seeds, 4, -1)
+dpdfs_neg_s90 = dpdfs_neg_s90.reshape(n_seeds, 4, -1)
+kk_corrs_s15 = kk_corrs_s15.reshape(n_seeds, 4, -1)
+kk_corrs_s30 = kk_corrs_s30.reshape(n_seeds, 4, -1)
+kk_corrs_s90 = kk_corrs_s90.reshape(n_seeds, 4, -1)
+nn_combined_s15 = nn_combined_s15.reshape(n_seeds, 4, -1)
+nn_combined_s30 = nn_combined_s30.reshape(n_seeds, 4, -1)
+nn_combined_s90 = nn_combined_s90.reshape(n_seeds, 4, -1)
 print(f"After reshape - nn_combined_s15: {nn_combined_s15.shape}")
 
 
@@ -444,7 +444,7 @@ mpl.rcParams['xtick.direction'] = 'in'
 mpl.rcParams['ytick.direction'] = 'in'
 
 N_fid = 500
-N_deriv = 30
+N_deriv = n_seeds
 
 # pdfs, 1x3, share y axis
 fig, axes = plt.subplots(1, 3, figsize=(6, 2), sharey=True)

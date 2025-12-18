@@ -30,7 +30,7 @@ for key in fid.keys():
 params = np.array(params)
 print(params)
 res = 512
-n_seeds = 30  # Number of random seeds per parameter point
+n_seeds = 60  # Number of random seeds per parameter point
 
 for i, param in enumerate(params):
     param_dict = {
