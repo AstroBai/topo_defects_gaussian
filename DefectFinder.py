@@ -18,6 +18,7 @@ class DefectFinder:
         self.gamm1_bar = data['gamm1_bar']
         self.gamm2_bar = data['gamm2_bar']
         self.phi_bar = data['phi_bar']
+        self.shear_amp = np.sqrt(self.gamm1_bar**2 + self.gamm2_bar**2)
         self.nside = hp.npix2nside(len(self.phi_bar))
         resolution = hp.nside2resol(self.nside, arcmin=True)
         #print(f"Loaded data with nside={self.nside}, resolution={resolution:.2f} arcmin")
@@ -70,6 +71,9 @@ class DefectFinder:
         if cluster:
             #if multiple defects with same charge are found in neighboring pixels, keep only one, moving a mask of 3*3 pixels
             defect_pixels = list(self.defects.keys())
+            # Sort defects by shear amplitude (ascending)
+            defect_pixels.sort(key=lambda p: self.shear_amp[p])
+
             clustered_defects = {}
             visited = set()
             for pix in defect_pixels:
@@ -443,14 +447,24 @@ class DefectFinder:
     def number(self):
         # for integer charge, count as 2 defects
         total_defects = 0
+        n_pos = 0
+        n_neg = 0
         for wnum in self.defects.values():
-            if np.abs(wnum) == 0.5:
+            if wnum == 0.5:
                 total_defects += 1
-            else:
+                n_pos += 1
+            elif wnum == -0.5:
+                total_defects += 1
+                n_neg += 1
+            elif wnum == 1:
                 total_defects += 2
+                n_pos += 2
+            elif wnum == -1:
+                total_defects += 2
+                n_neg += 2
         self.defect_count = total_defects  
         n = total_defects / (4 * np.pi)  # number per steradian
-        return n
+        return n, n_pos, n_neg
 
 
 

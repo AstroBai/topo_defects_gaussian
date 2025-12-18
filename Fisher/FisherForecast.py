@@ -7,8 +7,8 @@ Ob = 0.049
 h = 0.67
 w = -1.0
 # surrounding cosmology params, e.g. Om +/- delta_Om
-delta_params = {'Om': 0.1,
-                'sigma8': 0.1}
+delta_params = {'Om': 0.02,
+                'sigma8': 0.02}
 
 params = []
 for key in fid.keys():
@@ -487,23 +487,32 @@ dpdf_nn_combined_all_scales_samples = GaussianND(mean, covariance_dpdf_nn_combin
 
 import matplotlib.pyplot as plt
 from getdist import plots
+import matplotlib as mpl
+mpl.rcParams['xtick.direction'] = 'in'
+mpl.rcParams['ytick.direction'] = 'in'
 # use tab10 colors
 color_map = plt.get_cmap('tab10')
 # pdf s15 to s90, and all scales
 g = plots.get_subplot_plotter(width_inch=6)
-g.triangle_plot([pdf_s15_samples, pdf_s30_samples, pdf_s90_samples, pdf_all_scales_samples, kk_all_scales_samples],
-                filled=False,
-                param_limits={"Om": (0.2, 0.4), "sigma8": (0.7, 0.9)},
-                contour_colors=[color_map(i) for i in range(5)],
-                contour_lws=1.5)
+g.plot_2d([pdf_s90_samples, pdf_s30_samples, pdf_s15_samples, pdf_all_scales_samples, kk_all_scales_samples],
+          param1="Om", param2="sigma8",
+                filled=[True]*3 + [False, False],
+                lims = [0.2, 0.4, 0.7, 0.9],
+                colors=[color_map(i) for i in range(3)] + ['red', 'black'],
+                lws=2,
+                alphas=[0.7, 0.7, 0.7, 1.0, 1.0])
+g.add_legend([r"PDF, $\theta_G=90$", r"PDF, $\theta_G=30$", r"PDF, $\theta_G=15$", r"PDF, all scales", r'$\xi(\theta)$, all scales'], legend_loc='upper right')
 g.export("outfiles/pdf.png", dpi=300)
 
 g = plots.get_subplot_plotter(width_inch=6)
-g.triangle_plot([dpdf_combined_s15_samples, dpdf_combined_s30_samples, dpdf_combined_s90_samples, dpdf_combined_all_scales_samples, kk_all_scales_samples],
-                filled=False,
-                param_limits={"Om": (0.2, 0.4), "sigma8": (0.7, 0.9)},
-                contour_colors=[color_map(i) for i in range(5)],
-                contour_lws=1.5)
+g.plot_2d([dpdf_combined_s90_samples, dpdf_combined_s30_samples, dpdf_combined_s15_samples, dpdf_combined_all_scales_samples, kk_all_scales_samples],
+                param1="Om", param2="sigma8",
+                filled=[True]*3 + [False, False],
+                lims = [0.2, 0.4, 0.7, 0.9],
+                colors=[color_map(i) for i in range(3)] + ['red', 'black'],
+                lws=2,
+                alphas=[0.7, 0.7, 0.7, 1.0, 1.0])
+g.add_legend([r'$C^{p+n}(\kappa), \ \theta_G=90$', r'$C^{p+n}(\kappa), \ \theta_G=30$', r'$C^{p+n}(\kappa), \ \theta_G=15$', r'$C^{p+n}(\kappa)$, all scales', r'$\xi(\theta)$, all scales'], legend_loc='upper right')
 g.export("outfiles/dcdf.png", dpi=300)
 
 g = plots.get_subplot_plotter(width_inch=6)
@@ -515,25 +524,34 @@ g.triangle_plot([kk_s15_samples, kk_s30_samples, kk_s90_samples, kk_all_scales_s
 g.export("outfiles/kk.png", dpi=300)
 
 g = plots.get_subplot_plotter(width_inch=6)
-g.triangle_plot([nns_s15_samples, nns_s30_samples, nns_s90_samples, nns_all_scales_samples, kk_all_scales_samples],
-                filled=False,
-                param_limits={"Om": (0.26, 0.34), "sigma8": (0.76, 0.84)},
-                contour_colors=[color_map(i) for i in range(5)],
-                contour_lws=1.5)
+g.plot_2d([nns_s90_samples, nns_s30_samples, nns_s15_samples, nns_all_scales_samples, kk_all_scales_samples],
+                param1="Om", param2="sigma8",
+                filled=[True]*3 + [False, False],
+                lims = [0.2, 0.4, 0.7, 0.9],
+                colors=[color_map(i) for i in range(3)] + ['red', 'black'],
+                lws=2,
+                alphas=[0.7, 0.7, 0.7, 1.0, 1.0])
+g.add_legend([r'$C^{\mathrm{all}}_{1,2,4,8}(\theta), \ \theta_G=90$', r'$C^{\mathrm{all}}_{1,2,4,8}(\theta), \ \theta_G=30$', r'$C^{\mathrm{all}}_{1,2,4,8}(\theta), \ \theta_G=15$', r'$C^{\mathrm{all}}_{1,2,4,8}(\theta)$, all scales', r'$\xi(\theta)$, all scales'], legend_loc='upper right')
 g.export("outfiles/nns.png", dpi=300)
 
 g = plots.get_subplot_plotter(width_inch=6)
-g.triangle_plot([dpdf_nn_combined_s15_samples, dpdf_nn_combined_s30_samples, dpdf_nn_combined_s90_samples, dpdf_nn_combined_all_scales_samples, kk_all_scales_samples],
-                filled=False,
-                param_limits={"Om": (0.2, 0.4), "sigma8": (0.7, 0.9)},
-                contour_colors=[color_map(i) for i in range(5)],
-                contour_lws=1.5)
+g.plot_2d([dpdf_nn_combined_s90_samples, dpdf_nn_combined_s30_samples, dpdf_nn_combined_s15_samples, dpdf_nn_combined_all_scales_samples, kk_all_scales_samples],
+                param1="Om", param2="sigma8",
+                filled=[True]*3 + [False, False],
+                lims = [0.2, 0.4, 0.7, 0.9],
+                colors=[color_map(i) for i in range(3)] + ['red', 'black'],
+                lws=2,
+                alphas=[0.7, 0.7, 0.7, 1.0, 1.0])
+g.add_legend([r'$C^{p+n}_{1,2,4,8}(\kappa), \ \theta_G=90$', r'$C^{p+n}_{1,2,4,8}(\kappa), \ \theta_G=30$', r'$C^{p+n}_{1,2,4,8}(\kappa), \ \theta_G=15$', r'$C^{p+n}_{1,2,4,8}(\kappa)$, all scales', r'$\xi(\theta)$, all scales'], legend_loc='upper right')
 g.export("outfiles/dcdf_nn_combined.png", dpi=300)
 
 g = plots.get_subplot_plotter(width_inch=6)
-g.triangle_plot([pdf_all_scales_samples, dpdf_combined_all_scales_samples, nns_all_scales_samples, dpdf_nn_combined_all_scales_samples, kk_all_scales_samples],
-                filled=False,
-                param_limits={"Om": (0.26, 0.34), "sigma8": (0.76, 0.84)},
-                contour_colors=[color_map(i) for i in range(5)],
-                contour_lws=1.5)    
+g.plot_2d([pdf_all_scales_samples, kk_all_scales_samples, dpdf_nn_combined_all_scales_samples],
+                param1="Om", param2="sigma8",
+                filled=[True]*2 + [False],
+                lims = [0.25, 0.35, 0.75, 0.85],
+                colors=[color_map(i) for i in range(2)] + ['red'],
+                lws=2,
+                alphas=[0.7, 0.7, 1.0])    
+g.add_legend([r'PDF, all scales', r'$\xi(\theta)$, all scales', r'DCDF + kNN, all scales'], legend_loc='upper right')
 g.export("outfiles/all_combined.png", dpi=300)

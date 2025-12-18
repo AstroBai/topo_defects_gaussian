@@ -7,8 +7,8 @@ Ob = 0.049
 h = 0.67
 w = -1.0
 # surrounding cosmology params, e.g. Om +/- delta_Om
-delta_params = {'Om': 0.1,
-                'sigma8': 0.1}
+delta_params = {'Om': 0.02,
+                'sigma8': 0.02}
 
 params = []
 for key in fid.keys():
@@ -443,6 +443,8 @@ import matplotlib as mpl
 mpl.rcParams['xtick.direction'] = 'in'
 mpl.rcParams['ytick.direction'] = 'in'
 
+N_fid = 500
+N_deriv = 30
 
 # pdfs, 1x3, share y axis
 fig, axes = plt.subplots(1, 3, figsize=(6, 2), sharey=True)
@@ -454,15 +456,15 @@ bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 print(f"Bin centers for s15: {bin_centers}")
 print(deriv_pdfs_s15_mean)
 ax.plot(bin_centers, pdfs_fid_s15, c='black')
-ax.errorbar(bin_centers, pdfs_fid_s15, yerr=np.sqrt(np.diag(cov_pdfs_fid_s15)), fmt='o', label='Fiducial', c='black')
-ax.errorbar(bin_centers, deriv_pdfs_s15_mean[0:4], yerr=np.sqrt(np.diag(deriv_pdfs_s15_cov[0:4, 0:4])), fmt='o', label=r'Derv. w.r.t $\Omega_m$')
-ax.errorbar(bin_centers, deriv_pdfs_s15_mean[4:8], yerr=np.sqrt(np.diag(deriv_pdfs_s15_cov[4:8, 4:8])), fmt='o', label=r'Derv. w.r.t $\sigma_8$')
-ax.fill_between(bin_centers, deriv_pdfs_s15_mean[0:4] - np.sqrt(np.diag(deriv_pdfs_s15_cov[0:4, 0:4])), deriv_pdfs_s15_mean[0:4] + np.sqrt(np.diag(deriv_pdfs_s15_cov[0:4, 0:4])), alpha=0.3)
-ax.fill_between(bin_centers, deriv_pdfs_s15_mean[4:8] - np.sqrt(np.diag(deriv_pdfs_s15_cov[4:8, 4:8])), deriv_pdfs_s15_mean[4:8] + np.sqrt(np.diag(deriv_pdfs_s15_cov[4:8, 4:8])), alpha=0.3)
+ax.errorbar(bin_centers, pdfs_fid_s15, yerr=np.sqrt(np.diag(cov_pdfs_fid_s15))/np.sqrt(N_fid), fmt='o', label='Fiducial', c='black')
+ax.errorbar(bin_centers, deriv_pdfs_s15_mean[0:4], yerr=np.sqrt(np.diag(deriv_pdfs_s15_cov[0:4, 0:4]))/np.sqrt(N_deriv), fmt='o', label=r'Derv. w.r.t $\Omega_m$')
+ax.errorbar(bin_centers, deriv_pdfs_s15_mean[4:8], yerr=np.sqrt(np.diag(deriv_pdfs_s15_cov[4:8, 4:8]))/np.sqrt(N_deriv), fmt='o', label=r'Derv. w.r.t $\sigma_8$')
+ax.fill_between(bin_centers, deriv_pdfs_s15_mean[0:4] - np.sqrt(np.diag(deriv_pdfs_s15_cov[0:4, 0:4]))/np.sqrt(N_deriv), deriv_pdfs_s15_mean[0:4] + np.sqrt(np.diag(deriv_pdfs_s15_cov[0:4, 0:4]))/np.sqrt(N_deriv), alpha=0.3)
+ax.fill_between(bin_centers, deriv_pdfs_s15_mean[4:8] - np.sqrt(np.diag(deriv_pdfs_s15_cov[4:8, 4:8]))/np.sqrt(N_deriv), deriv_pdfs_s15_mean[4:8] + np.sqrt(np.diag(deriv_pdfs_s15_cov[4:8, 4:8]))/np.sqrt(N_deriv), alpha=0.3)
 ax.set_title(r'$\theta_G$ = 15 arcmin')
 ax.set_xlabel(r'$\kappa$')
 ax.set_ylabel('Probability Density')
-ax.set_xticks([-0.005, 0.0, 0.005])
+ax.set_xticks([-0.005, 0.005])
 ax.grid(True, alpha=0.3)
 
 
@@ -471,14 +473,14 @@ ax = axes[1]
 bin_edges = np.array([-0.008, -0.004, 0.0, 0.004, 0.008])
 bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 ax.plot(bin_centers, pdfs_fid_s30, c='black')
-ax.errorbar(bin_centers, pdfs_fid_s30, yerr=np.sqrt(np.diag(cov_pdfs_fid_s30)), fmt='o', label='Fiducial', c='black')
-ax.errorbar(bin_centers, deriv_pdfs_s30_mean[0:4], yerr=np.sqrt(np.diag(deriv_pdfs_s30_cov[0:4, 0:4])), fmt='o', label=r'Derv. w.r.t $\Omega_m$')
-ax.errorbar(bin_centers, deriv_pdfs_s30_mean[4:8], yerr=np.sqrt(np.diag(deriv_pdfs_s30_cov[4:8, 4:8])), fmt='o', label=r'Derv. w.r.t $\sigma_8$')
-ax.fill_between(bin_centers, deriv_pdfs_s30_mean[0:4] - np.sqrt(np.diag(deriv_pdfs_s30_cov[0:4, 0:4])), deriv_pdfs_s30_mean[0:4] + np.sqrt(np.diag(deriv_pdfs_s30_cov[0:4, 0:4])), alpha=0.3)
-ax.fill_between(bin_centers, deriv_pdfs_s30_mean[4:8] - np.sqrt(np.diag(deriv_pdfs_s30_cov[4:8, 4:8])), deriv_pdfs_s30_mean[4:8] + np.sqrt(np.diag(deriv_pdfs_s30_cov[4:8, 4:8])), alpha=0.3)
+ax.errorbar(bin_centers, pdfs_fid_s30, yerr=np.sqrt(np.diag(cov_pdfs_fid_s30))/np.sqrt(N_fid), fmt='o', label='Fiducial', c='black')
+ax.errorbar(bin_centers, deriv_pdfs_s30_mean[0:4], yerr=np.sqrt(np.diag(deriv_pdfs_s30_cov[0:4, 0:4]))/np.sqrt(N_deriv), fmt='o', label=r'Derv. w.r.t $\Omega_m$')
+ax.errorbar(bin_centers, deriv_pdfs_s30_mean[4:8], yerr=np.sqrt(np.diag(deriv_pdfs_s30_cov[4:8, 4:8]))/np.sqrt(N_deriv), fmt='o', label=r'Derv. w.r.t $\sigma_8$')
+ax.fill_between(bin_centers, deriv_pdfs_s30_mean[0:4] - np.sqrt(np.diag(deriv_pdfs_s30_cov[0:4, 0:4]))/np.sqrt(N_deriv), deriv_pdfs_s30_mean[0:4] + np.sqrt(np.diag(deriv_pdfs_s30_cov[0:4, 0:4]))/np.sqrt(N_deriv), alpha=0.3)
+ax.fill_between(bin_centers, deriv_pdfs_s30_mean[4:8] - np.sqrt(np.diag(deriv_pdfs_s30_cov[4:8, 4:8]))/np.sqrt(N_deriv), deriv_pdfs_s30_mean[4:8] + np.sqrt(np.diag(deriv_pdfs_s30_cov[4:8, 4:8]))/np.sqrt(N_deriv), alpha=0.3)
 ax.set_title(r'$\theta_G$ = 30 arcmin')
 ax.set_xlabel(r'$\kappa$')
-ax.set_xticks([-0.004, 0.0, 0.004])
+ax.set_xticks([-0.004, 0.004])
 ax.grid(True, alpha=0.3)
 
 
@@ -487,14 +489,14 @@ ax = axes[2]
 bin_edges = np.array([-0.005, -0.0025, 0.0, 0.0025, 0.005])
 bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 ax.plot(bin_centers, pdfs_fid_s90, c='black')
-ax.errorbar(bin_centers, pdfs_fid_s90, yerr=np.sqrt(np.diag(cov_pdfs_fid_s90)), fmt='o', label='Fiducial', c='black')
-ax.errorbar(bin_centers, deriv_pdfs_s90_mean[0:4], yerr=np.sqrt(np.diag(deriv_pdfs_s90_cov[0:4, 0:4])), fmt='o', label=r'Derv. w.r.t $\Omega_m$')
-ax.errorbar(bin_centers, deriv_pdfs_s90_mean[4:8], yerr=np.sqrt(np.diag(deriv_pdfs_s90_cov[4:8, 4:8])), fmt='o', label=r'Derv. w.r.t $\sigma_8$')
-ax.fill_between(bin_centers, deriv_pdfs_s90_mean[0:4] - np.sqrt(np.diag(deriv_pdfs_s90_cov[0:4, 0:4])), deriv_pdfs_s90_mean[0:4] + np.sqrt(np.diag(deriv_pdfs_s90_cov[0:4, 0:4])), alpha=0.3)
-ax.fill_between(bin_centers, deriv_pdfs_s90_mean[4:8] - np.sqrt(np.diag(deriv_pdfs_s90_cov[4:8, 4:8])), deriv_pdfs_s90_mean[4:8] + np.sqrt(np.diag(deriv_pdfs_s90_cov[4:8, 4:8])), alpha=0.3)
+ax.errorbar(bin_centers, pdfs_fid_s90, yerr=np.sqrt(np.diag(cov_pdfs_fid_s90))/np.sqrt(N_fid), fmt='o', label='Fiducial', c='black')
+ax.errorbar(bin_centers, deriv_pdfs_s90_mean[0:4], yerr=np.sqrt(np.diag(deriv_pdfs_s90_cov[0:4, 0:4]))/np.sqrt(N_deriv), fmt='o', label=r'Derv. w.r.t $\Omega_m$')
+ax.errorbar(bin_centers, deriv_pdfs_s90_mean[4:8], yerr=np.sqrt(np.diag(deriv_pdfs_s90_cov[4:8, 4:8]))/np.sqrt(N_deriv), fmt='o', label=r'Derv. w.r.t $\sigma_8$')
+ax.fill_between(bin_centers, deriv_pdfs_s90_mean[0:4] - np.sqrt(np.diag(deriv_pdfs_s90_cov[0:4, 0:4]))/np.sqrt(N_deriv), deriv_pdfs_s90_mean[0:4] + np.sqrt(np.diag(deriv_pdfs_s90_cov[0:4, 0:4]))/np.sqrt(N_deriv), alpha=0.3)
+ax.fill_between(bin_centers, deriv_pdfs_s90_mean[4:8] - np.sqrt(np.diag(deriv_pdfs_s90_cov[4:8, 4:8]))/np.sqrt(N_deriv), deriv_pdfs_s90_mean[4:8] + np.sqrt(np.diag(deriv_pdfs_s90_cov[4:8, 4:8]))/np.sqrt(N_deriv), alpha=0.3)
 ax.set_title(r'$\theta_G$ = 90 arcmin')
 ax.set_xlabel(r'$\kappa$')
-ax.set_xticks([-0.0025, 0.0, 0.0025])
+ax.set_xticks([-0.0025, 0.0025])
 ax.grid(True, alpha=0.3)
 
 
@@ -510,11 +512,11 @@ ax = axes[0,0]
 bin_edges = np.array([-0.01, -0.005, 0.0, 0.005, 0.01])
 bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 ax.plot(bin_centers, dpdfs_pos_fid_s15, c='black')
-ax.errorbar(bin_centers, dpdfs_pos_fid_s15, yerr=np.sqrt(np.diag(cov_dpdfs_pos_s15)), fmt='o', label='Fiducial', c='black')
-ax.errorbar(bin_centers, deriv_dpdfs_combined_s15_mean[0:4], yerr=np.sqrt(np.diag(deriv_dpdfs_combined_s15_cov[0:4, 0:4])), fmt='o', label=r'Derv. w.r.t $\Omega_m$')
-ax.errorbar(bin_centers, deriv_dpdfs_combined_s15_mean[8:12], yerr=np.sqrt(np.diag(deriv_dpdfs_combined_s15_cov[8:12, 8:12])), fmt='o', label=r'Derv. w.r.t $\sigma_8$')
-ax.fill_between(bin_centers, deriv_dpdfs_combined_s15_mean[0:4] - np.sqrt(np.diag(deriv_dpdfs_combined_s15_cov[0:4, 0:4])), deriv_dpdfs_combined_s15_mean[0:4] + np.sqrt(np.diag(deriv_dpdfs_combined_s15_cov[0:4, 0:4])), alpha=0.3)
-ax.fill_between(bin_centers, deriv_dpdfs_combined_s15_mean[8:12] - np.sqrt(np.diag(deriv_dpdfs_combined_s15_cov[8:12, 8:12])), deriv_dpdfs_combined_s15_mean[8:12] + np.sqrt(np.diag(deriv_dpdfs_combined_s15_cov[8:12, 8:12])), alpha=0.3)
+ax.errorbar(bin_centers, dpdfs_pos_fid_s15, yerr=np.sqrt(np.diag(cov_dpdfs_pos_s15))/np.sqrt(N_fid), fmt='o', label='Fiducial', c='black')
+ax.errorbar(bin_centers, deriv_dpdfs_combined_s15_mean[0:4], yerr=np.sqrt(np.diag(deriv_dpdfs_combined_s15_cov[0:4, 0:4]))/np.sqrt(N_deriv), fmt='o', label=r'Derv. w.r.t $\Omega_m$')
+ax.errorbar(bin_centers, deriv_dpdfs_combined_s15_mean[8:12], yerr=np.sqrt(np.diag(deriv_dpdfs_combined_s15_cov[8:12, 8:12]))/np.sqrt(N_deriv), fmt='o', label=r'Derv. w.r.t $\sigma_8$')
+ax.fill_between(bin_centers, deriv_dpdfs_combined_s15_mean[0:4] - np.sqrt(np.diag(deriv_dpdfs_combined_s15_cov[0:4, 0:4]))/np.sqrt(N_deriv), deriv_dpdfs_combined_s15_mean[0:4] + np.sqrt(np.diag(deriv_dpdfs_combined_s15_cov[0:4, 0:4]))/np.sqrt(N_deriv), alpha=0.3)
+ax.fill_between(bin_centers, deriv_dpdfs_combined_s15_mean[8:12] - np.sqrt(np.diag(deriv_dpdfs_combined_s15_cov[8:12, 8:12]))/np.sqrt(N_deriv), deriv_dpdfs_combined_s15_mean[8:12] + np.sqrt(np.diag(deriv_dpdfs_combined_s15_cov[8:12, 8:12]))/np.sqrt(N_deriv), alpha=0.3)
 ax.set_title(r'$\theta_G$ = 15 arcmin')
 ax.set_xlabel(r'$\kappa$')
 ax.set_ylabel(r'$C^p(\kappa)$')
@@ -527,11 +529,11 @@ ax = axes[0,1]
 bin_edges = np.array([-0.008, -0.004, 0.0, 0.004, 0.008])
 bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 ax.plot(bin_centers, dpdfs_pos_fid_s30, c='black')
-ax.errorbar(bin_centers, dpdfs_pos_fid_s30, yerr=np.sqrt(np.diag(cov_dpdfs_pos_s30)), fmt='o', label='Fiducial', c='black')   
-ax.errorbar(bin_centers, deriv_dpdfs_combined_s30_mean[0:4], yerr=np.sqrt(np.diag(deriv_dpdfs_combined_s30_cov[0:4, 0:4])), fmt='o', label=r'Derv. w.r.t $\Omega_m$')
-ax.errorbar(bin_centers, deriv_dpdfs_combined_s30_mean[8:12], yerr=np.sqrt(np.diag(deriv_dpdfs_combined_s30_cov[8:12, 8:12])), fmt='o', label=r'Derv. w.r.t $\sigma_8$')
-ax.fill_between(bin_centers, deriv_dpdfs_combined_s30_mean[0:4] - np.sqrt(np.diag(deriv_dpdfs_combined_s30_cov[0:4, 0:4])), deriv_dpdfs_combined_s30_mean[0:4] + np.sqrt(np.diag(deriv_dpdfs_combined_s30_cov[0:4, 0:4])), alpha=0.3)
-ax.fill_between(bin_centers, deriv_dpdfs_combined_s30_mean[8:12] - np.sqrt(np.diag(deriv_dpdfs_combined_s30_cov[8:12, 8:12])), deriv_dpdfs_combined_s30_mean[8:12] + np.sqrt(np.diag(deriv_dpdfs_combined_s30_cov[8:12, 8:12])), alpha=0.3)
+ax.errorbar(bin_centers, dpdfs_pos_fid_s30, yerr=np.sqrt(np.diag(cov_dpdfs_pos_s30))/np.sqrt(N_fid), fmt='o', label='Fiducial', c='black')   
+ax.errorbar(bin_centers, deriv_dpdfs_combined_s30_mean[0:4], yerr=np.sqrt(np.diag(deriv_dpdfs_combined_s30_cov[0:4, 0:4]))/np.sqrt(N_deriv), fmt='o', label=r'Derv. w.r.t $\Omega_m$')
+ax.errorbar(bin_centers, deriv_dpdfs_combined_s30_mean[8:12], yerr=np.sqrt(np.diag(deriv_dpdfs_combined_s30_cov[8:12, 8:12]))/np.sqrt(N_deriv), fmt='o', label=r'Derv. w.r.t $\sigma_8$')
+ax.fill_between(bin_centers, deriv_dpdfs_combined_s30_mean[0:4] - np.sqrt(np.diag(deriv_dpdfs_combined_s30_cov[0:4, 0:4]))/np.sqrt(N_deriv), deriv_dpdfs_combined_s30_mean[0:4] + np.sqrt(np.diag(deriv_dpdfs_combined_s30_cov[0:4, 0:4]))/np.sqrt(N_deriv), alpha=0.3)
+ax.fill_between(bin_centers, deriv_dpdfs_combined_s30_mean[8:12] - np.sqrt(np.diag(deriv_dpdfs_combined_s30_cov[8:12, 8:12]))/np.sqrt(N_deriv), deriv_dpdfs_combined_s30_mean[8:12] + np.sqrt(np.diag(deriv_dpdfs_combined_s30_cov[8:12, 8:12]))/np.sqrt(N_deriv), alpha=0.3)
 ax.set_title(r'$\theta_G$ = 30 arcmin')
 ax.set_xlabel(r'$\kappa$')
 ax.set_xticks([-0.004, 0.004])
@@ -543,11 +545,11 @@ ax = axes[0,2]
 bin_edges = np.array([-0.005, -0.0025, 0.0, 0.0025, 0.005])
 bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 ax.plot(bin_centers, dpdfs_pos_fid_s90, c='black')
-ax.errorbar(bin_centers, dpdfs_pos_fid_s90, yerr=np.sqrt(np.diag(cov_dpdfs_pos_s90)), fmt='o', label='Fiducial', c='black')   
-ax.errorbar(bin_centers, deriv_dpdfs_combined_s90_mean[0:4], yerr=np.sqrt(np.diag(deriv_dpdfs_combined_s90_cov[0:4, 0:4])), fmt='o', label=r'Derv. w.r.t $\Omega_m$')
-ax.errorbar(bin_centers, deriv_dpdfs_combined_s90_mean[8:12], yerr=np.sqrt(np.diag(deriv_dpdfs_combined_s90_cov[8:12, 8:12])), fmt='o', label=r'Derv. w.r.t $\sigma_8$')
-ax.fill_between(bin_centers, deriv_dpdfs_combined_s90_mean[0:4] - np.sqrt(np.diag(deriv_dpdfs_combined_s90_cov[0:4, 0:4])), deriv_dpdfs_combined_s90_mean[0:4] + np.sqrt(np.diag(deriv_dpdfs_combined_s90_cov[0:4, 0:4])), alpha=0.3)
-ax.fill_between(bin_centers, deriv_dpdfs_combined_s90_mean[8:12] - np.sqrt(np.diag(deriv_dpdfs_combined_s90_cov[8:12, 8:12])), deriv_dpdfs_combined_s90_mean[8:12] + np.sqrt(np.diag(deriv_dpdfs_combined_s90_cov[8:12, 8:12])), alpha=0.3)
+ax.errorbar(bin_centers, dpdfs_pos_fid_s90, yerr=np.sqrt(np.diag(cov_dpdfs_pos_s90))/np.sqrt(N_fid), fmt='o', label='Fiducial', c='black')   
+ax.errorbar(bin_centers, deriv_dpdfs_combined_s90_mean[0:4], yerr=np.sqrt(np.diag(deriv_dpdfs_combined_s90_cov[0:4, 0:4]))/np.sqrt(N_deriv), fmt='o', label=r'Derv. w.r.t $\Omega_m$')
+ax.errorbar(bin_centers, deriv_dpdfs_combined_s90_mean[8:12], yerr=np.sqrt(np.diag(deriv_dpdfs_combined_s90_cov[8:12, 8:12]))/np.sqrt(N_deriv), fmt='o', label=r'Derv. w.r.t $\sigma_8$')
+ax.fill_between(bin_centers, deriv_dpdfs_combined_s90_mean[0:4] - np.sqrt(np.diag(deriv_dpdfs_combined_s90_cov[0:4, 0:4]))/np.sqrt(N_deriv), deriv_dpdfs_combined_s90_mean[0:4] + np.sqrt(np.diag(deriv_dpdfs_combined_s90_cov[0:4, 0:4]))/np.sqrt(N_deriv), alpha=0.3)
+ax.fill_between(bin_centers, deriv_dpdfs_combined_s90_mean[8:12] - np.sqrt(np.diag(deriv_dpdfs_combined_s90_cov[8:12, 8:12]))/np.sqrt(N_deriv), deriv_dpdfs_combined_s90_mean[8:12] + np.sqrt(np.diag(deriv_dpdfs_combined_s90_cov[8:12, 8:12]))/np.sqrt(N_deriv), alpha=0.3)
 ax.set_title(r'$\theta_G$ = 90 arcmin')
 ax.set_xlabel(r'$\kappa$')
 ax.set_xticks([-0.0025, 0.0, 0.0025])
@@ -558,11 +560,11 @@ ax = axes[1,0]
 bin_edges = np.array([-0.01, -0.005, 0.0, 0.005, 0.01])
 bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 ax.plot(bin_centers, dpdfs_neg_fid_s15, c='black')
-ax.errorbar(bin_centers, dpdfs_neg_fid_s15, yerr=np.sqrt(np.diag(cov_dpdfs_neg_s15)), fmt='o', label='Fiducial', c='black')   
-ax.errorbar(bin_centers, deriv_dpdfs_combined_s15_mean[4:8], yerr=np.sqrt(np.diag(deriv_dpdfs_combined_s15_cov[4:8, 4:8])), fmt='o', label=r'Derv. w.r.t $\Omega_m$')
-ax.errorbar(bin_centers, deriv_dpdfs_combined_s15_mean[12:16], yerr=np.sqrt(np.diag(deriv_dpdfs_combined_s15_cov[12:16, 12:16])), fmt='o', label=r'Derv. w.r.t $\sigma_8$')
-ax.fill_between(bin_centers, deriv_dpdfs_combined_s15_mean[4:8] - np.sqrt(np.diag(deriv_dpdfs_combined_s15_cov[4:8, 4:8])), deriv_dpdfs_combined_s15_mean[4:8] + np.sqrt(np.diag(deriv_dpdfs_combined_s15_cov[4:8, 4:8])), alpha=0.3)
-ax.fill_between(bin_centers, deriv_dpdfs_combined_s15_mean[12:16] - np.sqrt(np.diag(deriv_dpdfs_combined_s15_cov[12:16, 12:16])), deriv_dpdfs_combined_s15_mean[12:16] + np.sqrt(np.diag(deriv_dpdfs_combined_s15_cov[12:16, 12:16])), alpha=0.3)
+ax.errorbar(bin_centers, dpdfs_neg_fid_s15, yerr=np.sqrt(np.diag(cov_dpdfs_neg_s15))/np.sqrt(N_fid), fmt='o', label='Fiducial', c='black')   
+ax.errorbar(bin_centers, deriv_dpdfs_combined_s15_mean[4:8], yerr=np.sqrt(np.diag(deriv_dpdfs_combined_s15_cov[4:8, 4:8]))/np.sqrt(N_deriv), fmt='o', label=r'Derv. w.r.t $\Omega_m$')
+ax.errorbar(bin_centers, deriv_dpdfs_combined_s15_mean[12:16], yerr=np.sqrt(np.diag(deriv_dpdfs_combined_s15_cov[12:16, 12:16]))/np.sqrt(N_deriv), fmt='o', label=r'Derv. w.r.t $\sigma_8$')
+ax.fill_between(bin_centers, deriv_dpdfs_combined_s15_mean[4:8] - np.sqrt(np.diag(deriv_dpdfs_combined_s15_cov[4:8, 4:8]))/np.sqrt(N_deriv), deriv_dpdfs_combined_s15_mean[4:8] + np.sqrt(np.diag(deriv_dpdfs_combined_s15_cov[4:8, 4:8]))/np.sqrt(N_deriv), alpha=0.3)
+ax.fill_between(bin_centers, deriv_dpdfs_combined_s15_mean[12:16] - np.sqrt(np.diag(deriv_dpdfs_combined_s15_cov[12:16, 12:16]))/np.sqrt(N_deriv), deriv_dpdfs_combined_s15_mean[12:16] + np.sqrt(np.diag(deriv_dpdfs_combined_s15_cov[12:16, 12:16]))/np.sqrt(N_deriv), alpha=0.3)
 ax.set_xlabel(r'$\kappa$')
 ax.set_ylabel(r'$C^n(\kappa)$')
 ax.set_xticks([-0.005, 0.005])
@@ -573,11 +575,11 @@ ax = axes[1,1]
 bin_edges = np.array([-0.008, -0.004, 0.0, 0.004, 0.008])
 bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 ax.plot(bin_centers, dpdfs_neg_fid_s30, c='black')
-ax.errorbar(bin_centers, dpdfs_neg_fid_s30, yerr=np.sqrt(np.diag(cov_dpdfs_neg_s30)), fmt='o', label='Fiducial', c='black')   
-ax.errorbar(bin_centers, deriv_dpdfs_combined_s30_mean[4:8], yerr=np.sqrt(np.diag(deriv_dpdfs_combined_s30_cov[4:8, 4:8])), fmt='o', label=r'Derv. w.r.t $\Omega_m$')
-ax.errorbar(bin_centers, deriv_dpdfs_combined_s30_mean[12:16], yerr=np.sqrt(np.diag(deriv_dpdfs_combined_s30_cov[12:16, 12:16])), fmt='o', label=r'Derv. w.r.t $\sigma_8$')
-ax.fill_between(bin_centers, deriv_dpdfs_combined_s30_mean[4:8] - np.sqrt(np.diag(deriv_dpdfs_combined_s30_cov[4:8, 4:8])), deriv_dpdfs_combined_s30_mean[4:8] + np.sqrt(np.diag(deriv_dpdfs_combined_s30_cov[4:8, 4:8])), alpha=0.3)
-ax.fill_between(bin_centers, deriv_dpdfs_combined_s30_mean[12:16] - np.sqrt(np.diag(deriv_dpdfs_combined_s30_cov[12:16, 12:16])), deriv_dpdfs_combined_s30_mean[12:16] + np.sqrt(np.diag(deriv_dpdfs_combined_s30_cov[12:16, 12:16])), alpha=0.3)
+ax.errorbar(bin_centers, dpdfs_neg_fid_s30, yerr=np.sqrt(np.diag(cov_dpdfs_neg_s30))/np.sqrt(N_fid), fmt='o', label='Fiducial', c='black')   
+ax.errorbar(bin_centers, deriv_dpdfs_combined_s30_mean[4:8], yerr=np.sqrt(np.diag(deriv_dpdfs_combined_s30_cov[4:8, 4:8]))/np.sqrt(N_deriv), fmt='o', label=r'Derv. w.r.t $\Omega_m$')
+ax.errorbar(bin_centers, deriv_dpdfs_combined_s30_mean[12:16], yerr=np.sqrt(np.diag(deriv_dpdfs_combined_s30_cov[12:16, 12:16]))/np.sqrt(N_deriv), fmt='o', label=r'Derv. w.r.t $\sigma_8$')
+ax.fill_between(bin_centers, deriv_dpdfs_combined_s30_mean[4:8] - np.sqrt(np.diag(deriv_dpdfs_combined_s30_cov[4:8, 4:8]))/np.sqrt(N_deriv), deriv_dpdfs_combined_s30_mean[4:8] + np.sqrt(np.diag(deriv_dpdfs_combined_s30_cov[4:8, 4:8]))/np.sqrt(N_deriv), alpha=0.3)
+ax.fill_between(bin_centers, deriv_dpdfs_combined_s30_mean[12:16] - np.sqrt(np.diag(deriv_dpdfs_combined_s30_cov[12:16, 12:16]))/np.sqrt(N_deriv), deriv_dpdfs_combined_s30_mean[12:16] + np.sqrt(np.diag(deriv_dpdfs_combined_s30_cov[12:16, 12:16]))/np.sqrt(N_deriv), alpha=0.3)
 ax.set_xlabel(r'$\kappa$')
 ax.set_xticks([-0.004, 0.004])
 ax.grid(True, alpha=0.3)
@@ -587,11 +589,11 @@ ax = axes[1,2]
 bin_edges = np.array([-0.005, -0.0025, 0.0, 0.0025, 0.005])
 bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 ax.plot(bin_centers, dpdfs_neg_fid_s90, c='black')
-ax.errorbar(bin_centers, dpdfs_neg_fid_s90, yerr=np.sqrt(np.diag(cov_dpdfs_neg_s90)), fmt='o', label='Fiducial', c='black')   
-ax.errorbar(bin_centers, deriv_dpdfs_combined_s90_mean[4:8], yerr=np.sqrt(np.diag(deriv_dpdfs_combined_s90_cov[4:8, 4:8])), fmt='o', label=r'Derv. w.r.t $\Omega_m$')
-ax.errorbar(bin_centers, deriv_dpdfs_combined_s90_mean[12:16], yerr=np.sqrt(np.diag(deriv_dpdfs_combined_s90_cov[12:16, 12:16])), fmt='o', label=r'Derv. w.r.t $\sigma_8$')
-ax.fill_between(bin_centers, deriv_dpdfs_combined_s90_mean[4:8] - np.sqrt(np.diag(deriv_dpdfs_combined_s90_cov[4:8, 4:8])), deriv_dpdfs_combined_s90_mean[4:8] + np.sqrt(np.diag(deriv_dpdfs_combined_s90_cov[4:8, 4:8])), alpha=0.3)
-ax.fill_between(bin_centers, deriv_dpdfs_combined_s90_mean[12:16] - np.sqrt(np.diag(deriv_dpdfs_combined_s90_cov[12:16, 12:16])), deriv_dpdfs_combined_s90_mean[12:16] + np.sqrt(np.diag(deriv_dpdfs_combined_s90_cov[12:16, 12:16])), alpha=0.3)
+ax.errorbar(bin_centers, dpdfs_neg_fid_s90, yerr=np.sqrt(np.diag(cov_dpdfs_neg_s90))/np.sqrt(N_fid), fmt='o', label='Fiducial', c='black')   
+ax.errorbar(bin_centers, deriv_dpdfs_combined_s90_mean[4:8], yerr=np.sqrt(np.diag(deriv_dpdfs_combined_s90_cov[4:8, 4:8]))/np.sqrt(N_deriv), fmt='o', label=r'Derv. w.r.t $\Omega_m$')
+ax.errorbar(bin_centers, deriv_dpdfs_combined_s90_mean[12:16], yerr=np.sqrt(np.diag(deriv_dpdfs_combined_s90_cov[12:16, 12:16]))/np.sqrt(N_deriv), fmt='o', label=r'Derv. w.r.t $\sigma_8$')
+ax.fill_between(bin_centers, deriv_dpdfs_combined_s90_mean[4:8] - np.sqrt(np.diag(deriv_dpdfs_combined_s90_cov[4:8, 4:8]))/np.sqrt(N_deriv), deriv_dpdfs_combined_s90_mean[4:8] + np.sqrt(np.diag(deriv_dpdfs_combined_s90_cov[4:8, 4:8]))/np.sqrt(N_deriv), alpha=0.3)
+ax.fill_between(bin_centers, deriv_dpdfs_combined_s90_mean[12:16] - np.sqrt(np.diag(deriv_dpdfs_combined_s90_cov[12:16, 12:16]))/np.sqrt(N_deriv), deriv_dpdfs_combined_s90_mean[12:16] + np.sqrt(np.diag(deriv_dpdfs_combined_s90_cov[12:16, 12:16]))/np.sqrt(N_deriv), alpha=0.3)
 ax.set_xlabel(r'$\kappa$')
 ax.set_xticks([-0.0025, 0.0025])
 ax.grid(True, alpha=0.3)
@@ -608,11 +610,11 @@ fig, axes = plt.subplots(2, 3, figsize=(6, 3), sharex='col')
 ax = axes[0,0]
 bin_centers = np.linspace(30, 200, 5)[1:]
 ax.plot(bin_centers, nn_pos_same2_s15, c='black')
-ax.errorbar(bin_centers, nn_pos_same2_s15, yerr=np.sqrt(np.diag(cov_nn_pos_same2_s15)), fmt='o', c='black')   
-ax.errorbar(bin_centers, deriv_nns_combined_s15_mean[16:20], yerr=np.sqrt(np.diag(deriv_nns_combined_s15_cov[16:20, 16:20])), fmt='o', label=r'Derv. w.r.t $\Omega_m$')
-ax.errorbar(bin_centers, deriv_nns_combined_s15_mean[80:84], yerr=np.sqrt(np.diag(deriv_nns_combined_s15_cov[80:84, 80:84])), fmt='o', label=r'Derv. w.r.t $\sigma_8$')
-ax.fill_between(bin_centers, deriv_nns_combined_s15_mean[16:20] - np.sqrt(np.diag(deriv_nns_combined_s15_cov[16:20, 16:20])), deriv_nns_combined_s15_mean[16:20] + np.sqrt(np.diag(deriv_nns_combined_s15_cov[16:20, 16:20])), alpha=0.3)
-ax.fill_between(bin_centers, deriv_nns_combined_s15_mean[80:84] - np.sqrt(np.diag(deriv_nns_combined_s15_cov[80:84, 80:84])), deriv_nns_combined_s15_mean[80:84] + np.sqrt(np.diag(deriv_nns_combined_s15_cov[80:84, 80:84])), alpha=0.3)
+ax.errorbar(bin_centers, nn_pos_same2_s15, yerr=np.sqrt(np.diag(cov_nn_pos_same2_s15))/np.sqrt(N_fid), fmt='o', c='black')   
+ax.errorbar(bin_centers, deriv_nns_combined_s15_mean[16:20], yerr=np.sqrt(np.diag(deriv_nns_combined_s15_cov[16:20, 16:20]))/np.sqrt(N_deriv), fmt='o', label=r'Derv. w.r.t $\Omega_m$')
+ax.errorbar(bin_centers, deriv_nns_combined_s15_mean[80:84], yerr=np.sqrt(np.diag(deriv_nns_combined_s15_cov[80:84, 80:84]))/np.sqrt(N_deriv), fmt='o', label=r'Derv. w.r.t $\sigma_8$')
+ax.fill_between(bin_centers, deriv_nns_combined_s15_mean[16:20] - np.sqrt(np.diag(deriv_nns_combined_s15_cov[16:20, 16:20]))/np.sqrt(N_deriv), deriv_nns_combined_s15_mean[16:20] + np.sqrt(np.diag(deriv_nns_combined_s15_cov[16:20, 16:20]))/np.sqrt(N_deriv), alpha=0.3)
+ax.fill_between(bin_centers, deriv_nns_combined_s15_mean[80:84] - np.sqrt(np.diag(deriv_nns_combined_s15_cov[80:84, 80:84]))/np.sqrt(N_deriv), deriv_nns_combined_s15_mean[80:84] + np.sqrt(np.diag(deriv_nns_combined_s15_cov[80:84, 80:84]))/np.sqrt(N_deriv), alpha=0.3)
 ax.set_title(r'$\theta_G$ = 15 arcmin')
 ax.set_ylabel(r'$C^{pp}_{\rm 2nd}(\theta)$')
 ax.grid(True, alpha=0.3)
@@ -621,11 +623,11 @@ ax.grid(True, alpha=0.3)
 ax = axes[0,1]
 bin_centers = np.linspace(30, 450, 5)[1:]
 ax.plot(bin_centers, nn_pos_same2_s30, c='black')
-ax.errorbar(bin_centers, nn_pos_same2_s30, yerr=np.sqrt(np.diag(cov_nn_pos_same2_s30)), fmt='o', c='black')   
-ax.errorbar(bin_centers, deriv_nns_combined_s30_mean[16:20], yerr=np.sqrt(np.diag(deriv_nns_combined_s30_cov[16:20, 16:20])), fmt='o')
-ax.errorbar(bin_centers, deriv_nns_combined_s30_mean[80:84], yerr=np.sqrt(np.diag(deriv_nns_combined_s30_cov[80:84, 80:84])), fmt='o')
-ax.fill_between(bin_centers, deriv_nns_combined_s30_mean[16:20] - np.sqrt(np.diag(deriv_nns_combined_s30_cov[16:20, 16:20])), deriv_nns_combined_s30_mean[16:20] + np.sqrt(np.diag(deriv_nns_combined_s30_cov[16:20, 16:20])), alpha=0.3)
-ax.fill_between(bin_centers, deriv_nns_combined_s30_mean[80:84] - np.sqrt(np.diag(deriv_nns_combined_s30_cov[80:84, 80:84])), deriv_nns_combined_s30_mean[80:84] + np.sqrt(np.diag(deriv_nns_combined_s30_cov[80:84, 80:84])), alpha=0.3)
+ax.errorbar(bin_centers, nn_pos_same2_s30, yerr=np.sqrt(np.diag(cov_nn_pos_same2_s30))/np.sqrt(N_fid), fmt='o', c='black')   
+ax.errorbar(bin_centers, deriv_nns_combined_s30_mean[16:20], yerr=np.sqrt(np.diag(deriv_nns_combined_s30_cov[16:20, 16:20]))/np.sqrt(N_deriv), fmt='o')
+ax.errorbar(bin_centers, deriv_nns_combined_s30_mean[80:84], yerr=np.sqrt(np.diag(deriv_nns_combined_s30_cov[80:84, 80:84]))/np.sqrt(N_deriv), fmt='o')
+ax.fill_between(bin_centers, deriv_nns_combined_s30_mean[16:20] - np.sqrt(np.diag(deriv_nns_combined_s30_cov[16:20, 16:20]))/np.sqrt(N_deriv), deriv_nns_combined_s30_mean[16:20] + np.sqrt(np.diag(deriv_nns_combined_s30_cov[16:20, 16:20]))/np.sqrt(N_deriv), alpha=0.3)
+ax.fill_between(bin_centers, deriv_nns_combined_s30_mean[80:84] - np.sqrt(np.diag(deriv_nns_combined_s30_cov[80:84, 80:84]))/np.sqrt(N_deriv), deriv_nns_combined_s30_mean[80:84] + np.sqrt(np.diag(deriv_nns_combined_s30_cov[80:84, 80:84]))/np.sqrt(N_deriv), alpha=0.3)
 ax.set_title(r'$\theta_G$ = 30 arcmin')
 ax.grid(True, alpha=0.3)
 
@@ -633,11 +635,11 @@ ax.grid(True, alpha=0.3)
 ax = axes[0,2]
 bin_centers = np.linspace(30, 1125, 5)[1:]
 ax.plot(bin_centers, nn_pos_same2_s90, c='black')
-ax.errorbar(bin_centers, nn_pos_same2_s90, yerr=np.sqrt(np.diag(cov_nn_pos_same2_s90)), fmt='o', c='black')   
-ax.errorbar(bin_centers, deriv_nns_combined_s90_mean[16:20], yerr=np.sqrt(np.diag(deriv_nns_combined_s90_cov[16:20, 16:20])), fmt='o')
-ax.errorbar(bin_centers, deriv_nns_combined_s90_mean[80:84], yerr=np.sqrt(np.diag(deriv_nns_combined_s90_cov[80:84, 80:84])), fmt='o')
-ax.fill_between(bin_centers, deriv_nns_combined_s90_mean[16:20] - np.sqrt(np.diag(deriv_nns_combined_s90_cov[16:20, 16:20])), deriv_nns_combined_s90_mean[16:20] + np.sqrt(np.diag(deriv_nns_combined_s90_cov[16:20, 16:20])), alpha=0.3)
-ax.fill_between(bin_centers, deriv_nns_combined_s90_mean[80:84] - np.sqrt(np.diag(deriv_nns_combined_s90_cov[80:84, 80:84])), deriv_nns_combined_s90_mean[80:84] + np.sqrt(np.diag(deriv_nns_combined_s90_cov[80:84, 80:84])), alpha=0.3)
+ax.errorbar(bin_centers, nn_pos_same2_s90, yerr=np.sqrt(np.diag(cov_nn_pos_same2_s90))/np.sqrt(N_fid), fmt='o', c='black')   
+ax.errorbar(bin_centers, deriv_nns_combined_s90_mean[16:20], yerr=np.sqrt(np.diag(deriv_nns_combined_s90_cov[16:20, 16:20]))/np.sqrt(N_deriv), fmt='o')
+ax.errorbar(bin_centers, deriv_nns_combined_s90_mean[80:84], yerr=np.sqrt(np.diag(deriv_nns_combined_s90_cov[80:84, 80:84]))/np.sqrt(N_deriv), fmt='o')
+ax.fill_between(bin_centers, deriv_nns_combined_s90_mean[16:20] - np.sqrt(np.diag(deriv_nns_combined_s90_cov[16:20, 16:20]))/np.sqrt(N_deriv), deriv_nns_combined_s90_mean[16:20] + np.sqrt(np.diag(deriv_nns_combined_s90_cov[16:20, 16:20]))/np.sqrt(N_deriv), alpha=0.3)
+ax.fill_between(bin_centers, deriv_nns_combined_s90_mean[80:84] - np.sqrt(np.diag(deriv_nns_combined_s90_cov[80:84, 80:84]))/np.sqrt(N_deriv), deriv_nns_combined_s90_mean[80:84] + np.sqrt(np.diag(deriv_nns_combined_s90_cov[80:84, 80:84]))/np.sqrt(N_deriv), alpha=0.3)
 ax.set_title(r'$\theta_G$ = 90 arcmin')
 ax.grid(True, alpha=0.3)
 
@@ -646,11 +648,11 @@ ax.grid(True, alpha=0.3)
 ax = axes[1,0]
 bin_centers = np.linspace(30, 200, 5)[1:]
 ax.plot(bin_centers, nn_pos_opp2_s15, c='black')
-ax.errorbar(bin_centers, nn_pos_opp2_s15, yerr=np.sqrt(np.diag(cov_nn_pos_opp2_s15)), fmt='o', c='black')   
-ax.errorbar(bin_centers, deriv_nns_combined_s15_mean[24:28], yerr=np.sqrt(np.diag(deriv_nns_combined_s15_cov[24:28, 24:28])), fmt='o')
-ax.errorbar(bin_centers, deriv_nns_combined_s15_mean[88:92], yerr=np.sqrt(np.diag(deriv_nns_combined_s15_cov[88:92, 88:92])), fmt='o')
-ax.fill_between(bin_centers, deriv_nns_combined_s15_mean[24:28] - np.sqrt(np.diag(deriv_nns_combined_s15_cov[24:28, 24:28])), deriv_nns_combined_s15_mean[24:28] + np.sqrt(np.diag(deriv_nns_combined_s15_cov[24:28, 24:28])), alpha=0.3)
-ax.fill_between(bin_centers, deriv_nns_combined_s15_mean[88:92] - np.sqrt(np.diag(deriv_nns_combined_s15_cov[88:92, 88:92])), deriv_nns_combined_s15_mean[88:92] + np.sqrt(np.diag(deriv_nns_combined_s15_cov[88:92, 88:92])), alpha=0.3)
+ax.errorbar(bin_centers, nn_pos_opp2_s15, yerr=np.sqrt(np.diag(cov_nn_pos_opp2_s15))/np.sqrt(N_fid), fmt='o', c='black')   
+ax.errorbar(bin_centers, deriv_nns_combined_s15_mean[24:28], yerr=np.sqrt(np.diag(deriv_nns_combined_s15_cov[24:28, 24:28]))/np.sqrt(N_deriv), fmt='o')
+ax.errorbar(bin_centers, deriv_nns_combined_s15_mean[88:92], yerr=np.sqrt(np.diag(deriv_nns_combined_s15_cov[88:92, 88:92]))/np.sqrt(N_deriv), fmt='o')
+ax.fill_between(bin_centers, deriv_nns_combined_s15_mean[24:28] - np.sqrt(np.diag(deriv_nns_combined_s15_cov[24:28, 24:28]))/np.sqrt(N_deriv), deriv_nns_combined_s15_mean[24:28] + np.sqrt(np.diag(deriv_nns_combined_s15_cov[24:28, 24:28]))/np.sqrt(N_deriv), alpha=0.3)
+ax.fill_between(bin_centers, deriv_nns_combined_s15_mean[88:92] - np.sqrt(np.diag(deriv_nns_combined_s15_cov[88:92, 88:92]))/np.sqrt(N_deriv), deriv_nns_combined_s15_mean[88:92] + np.sqrt(np.diag(deriv_nns_combined_s15_cov[88:92, 88:92]))/np.sqrt(N_deriv), alpha=0.3)
 ax.set_ylabel(r'$C^{pn}_{\rm 2nd}(\theta)$')
 ax.set_xticks([100, 150])
 ax.grid(True, alpha=0.3)
@@ -659,23 +661,23 @@ ax.grid(True, alpha=0.3)
 ax = axes[1,1]
 bin_centers = np.linspace(30, 450, 5)[1:]
 ax.plot(bin_centers, nn_pos_opp2_s30, c='black')
-ax.errorbar(bin_centers, nn_pos_opp2_s30, yerr=np.sqrt(np.diag(cov_nn_pos_opp2_s30)), fmt='o', c='black')   
-ax.errorbar(bin_centers, deriv_nns_combined_s30_mean[24:28], yerr=np.sqrt(np.diag(deriv_nns_combined_s30_cov[24:28, 24:28])), fmt='o')
-ax.errorbar(bin_centers, deriv_nns_combined_s30_mean[88:92], yerr=np.sqrt(np.diag(deriv_nns_combined_s30_cov[88:92, 88:92])), fmt='o')
-ax.fill_between(bin_centers, deriv_nns_combined_s30_mean[24:28] - np.sqrt(np.diag(deriv_nns_combined_s30_cov[24:28, 24:28])), deriv_nns_combined_s30_mean[24:28] + np.sqrt(np.diag(deriv_nns_combined_s30_cov[24:28, 24:28])), alpha=0.3)
-ax.fill_between(bin_centers, deriv_nns_combined_s30_mean[88:92] - np.sqrt(np.diag(deriv_nns_combined_s30_cov[88:92, 88:92])), deriv_nns_combined_s30_mean[88:92] + np.sqrt(np.diag(deriv_nns_combined_s30_cov[88:92, 88:92])), alpha=0.3)
-ax.set_xticks([150, 500])
+ax.errorbar(bin_centers, nn_pos_opp2_s30, yerr=np.sqrt(np.diag(cov_nn_pos_opp2_s30))/np.sqrt(N_fid), fmt='o', c='black')   
+ax.errorbar(bin_centers, deriv_nns_combined_s30_mean[24:28], yerr=np.sqrt(np.diag(deriv_nns_combined_s30_cov[24:28, 24:28]))/np.sqrt(N_deriv), fmt='o')
+ax.errorbar(bin_centers, deriv_nns_combined_s30_mean[88:92], yerr=np.sqrt(np.diag(deriv_nns_combined_s30_cov[88:92, 88:92]))/np.sqrt(N_deriv), fmt='o')
+ax.fill_between(bin_centers, deriv_nns_combined_s30_mean[24:28] - np.sqrt(np.diag(deriv_nns_combined_s30_cov[24:28, 24:28]))/np.sqrt(N_deriv), deriv_nns_combined_s30_mean[24:28] + np.sqrt(np.diag(deriv_nns_combined_s30_cov[24:28, 24:28]))/np.sqrt(N_deriv), alpha=0.3)
+ax.fill_between(bin_centers, deriv_nns_combined_s30_mean[88:92] - np.sqrt(np.diag(deriv_nns_combined_s30_cov[88:92, 88:92]))/np.sqrt(N_deriv), deriv_nns_combined_s30_mean[88:92] + np.sqrt(np.diag(deriv_nns_combined_s30_cov[88:92, 88:92]))/np.sqrt(N_deriv), alpha=0.3)
+ax.set_xticks([150, 350])
 ax.grid(True, alpha=0.3)
 
 # s90
 ax = axes[1,2]
 bin_centers = np.linspace(30, 1125, 5)[1:]
 ax.plot(bin_centers, nn_pos_opp2_s90, c='black')
-ax.errorbar(bin_centers, nn_pos_opp2_s90, yerr=np.sqrt(np.diag(cov_nn_pos_opp2_s90)), fmt='o', c='black', label='Fiducial')   
-ax.errorbar(bin_centers, deriv_nns_combined_s90_mean[24:28], yerr=np.sqrt(np.diag(deriv_nns_combined_s90_cov[24:28, 24:28])), fmt='o', label=r'Derv. w.r.t $\Omega_m$')
-ax.errorbar(bin_centers, deriv_nns_combined_s90_mean[88:92], yerr=np.sqrt(np.diag(deriv_nns_combined_s90_cov[88:92, 88:92])), fmt='o', label=r'Derv. w.r.t $\sigma_8$')
-ax.fill_between(bin_centers, deriv_nns_combined_s90_mean[24:28] - np.sqrt(np.diag(deriv_nns_combined_s90_cov[24:28, 24:28])), deriv_nns_combined_s90_mean[24:28] + np.sqrt(np.diag(deriv_nns_combined_s90_cov[24:28, 24:28])), alpha=0.3)
-ax.fill_between(bin_centers, deriv_nns_combined_s90_mean[88:92] - np.sqrt(np.diag(deriv_nns_combined_s90_cov[88:92, 88:92])), deriv_nns_combined_s90_mean[88:92] + np.sqrt(np.diag(deriv_nns_combined_s90_cov[88:92, 88:92])), alpha=0.3)
+ax.errorbar(bin_centers, nn_pos_opp2_s90, yerr=np.sqrt(np.diag(cov_nn_pos_opp2_s90))/np.sqrt(N_fid), fmt='o', c='black', label='Fiducial')   
+ax.errorbar(bin_centers, deriv_nns_combined_s90_mean[24:28], yerr=np.sqrt(np.diag(deriv_nns_combined_s90_cov[24:28, 24:28]))/np.sqrt(N_deriv), fmt='o', label=r'Derv. w.r.t $\Omega_m$')
+ax.errorbar(bin_centers, deriv_nns_combined_s90_mean[88:92], yerr=np.sqrt(np.diag(deriv_nns_combined_s90_cov[88:92, 88:92]))/np.sqrt(N_deriv), fmt='o', label=r'Derv. w.r.t $\sigma_8$')
+ax.fill_between(bin_centers, deriv_nns_combined_s90_mean[24:28] - np.sqrt(np.diag(deriv_nns_combined_s90_cov[24:28, 24:28]))/np.sqrt(N_deriv), deriv_nns_combined_s90_mean[24:28] + np.sqrt(np.diag(deriv_nns_combined_s90_cov[24:28, 24:28]))/np.sqrt(N_deriv), alpha=0.3)
+ax.fill_between(bin_centers, deriv_nns_combined_s90_mean[88:92] - np.sqrt(np.diag(deriv_nns_combined_s90_cov[88:92, 88:92]))/np.sqrt(N_deriv), deriv_nns_combined_s90_mean[88:92] + np.sqrt(np.diag(deriv_nns_combined_s90_cov[88:92, 88:92]))/np.sqrt(N_deriv), alpha=0.3)
 ax.set_xticks([600, 1000])
 ax.grid(True, alpha=0.3)
 

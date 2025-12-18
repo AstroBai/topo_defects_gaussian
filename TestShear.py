@@ -10,8 +10,8 @@ def lens_potential(pos, epsilon=0.3):
     return -np.exp(-x**2/(1+epsilon) - y**2/(1-epsilon))
 
 # 创建网格
-x_1d = np.linspace(-2, 2, 50)
-y_1d = np.linspace(-2, 2, 50)
+x_1d = np.linspace(-2, 2, 51)
+y_1d = np.linspace(-2, 2, 51)
 x, y = np.meshgrid(x_1d, y_1d)
 
 # 将网格重塑为位置向量
@@ -77,7 +77,7 @@ def winding_number(pix, phi, ngrid):
     winding_num = total_dphi / (2 * np.pi)
     return winding_num
 
-def find_defects(phi, ngrid):
+def find_defects(phi, ngrid, shear_amp):
     defects = {}
     for i in tqdm(range(ngrid), desc="Finding defects"):
         for j in range(ngrid):
@@ -86,12 +86,15 @@ def find_defects(phi, ngrid):
             if abs(wnum) >= 0.5:
                 defects[pix] = wnum
     #if multiple defects with same charge are found in neighboring pixels, keep only one, moving a mask of 3*3 pixels
+    # Sort defects by shear amplitude (ascending) to keep the one with minimum shear
+    sorted_defects = sorted(defects.keys(), key=lambda p: shear_amp[p])
+
     clustered_defects = {}
     visited = set()
-    for pix, wnum in defects.items():
+    for pix in sorted_defects:
         if pix in visited:
             continue
-        clustered_defects[pix] = wnum
+        clustered_defects[pix] = defects[pix]
         # mark neighbors as visited
         for di in [-1, 0, 1]:
             for dj in [-1, 0, 1]:
@@ -100,53 +103,57 @@ def find_defects(phi, ngrid):
 
     return clustered_defects
 
-defect_dict = find_defects(phi, x.shape[0])
+shear_amp = np.sqrt(gamm1**2 + gamm2**2)
+defect_dict = find_defects(phi, x.shape[0], shear_amp)
 print(f"Found {len(defect_dict)} defects:")
 
 
 # 绘图
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(32/3, 4))
 
 # 左图：convergence with shear vectors
 im1 = ax1.imshow(kappa, extent=[-2, 2, -2, 2], cmap='RdYlBu_r', origin='lower')
-plt.colorbar(im1, ax=ax1, label='Convergence κ')
+plt.colorbar(im1, ax=ax1, label=r'Convergence $\kappa$')
 step = 2
 ax1.quiver(x[::step, ::step], y[::step, ::step], 
           ux[::step, ::step], uy[::step, ::step], 
           angles='xy', scale_units='xy',
           color='white', width=0.003, alpha=0.9,
-          headwidth=0, headlength=0, headaxislength=0)
+          headwidth=0, headlength=0, headaxislength=0, pivot='mid')
 # scatter defect locations
 for pix, wnum in defect_dict.items():
     if wnum > 0:
-        ax1.scatter(x[pix], y[pix], c='red', marker='o', label='+1/2 defect' if 'pos_defect' not in locals() else "")
+        ax1.scatter(x[pix], y[pix], c='red', marker='o')
     elif wnum < 0:
-        ax1.scatter(x[pix], y[pix], c='blue', marker='o', label='-1/2 defect' if 'neg_defect' not in locals() else "")
+        ax1.scatter(x[pix], y[pix], c='blue', marker='o')
 ax1.set_title('Convergence with Shear Orientation')
 ax1.set_xlabel('x')
 ax1.set_ylabel('y')
+ax1.set_xticks([-2, -1, 0, 1, 2])
+ax1.set_yticks([-2, -1, 0, 1, 2])
 ax1.set_aspect('equal')
-ax1.legend(loc='upper right')
 
 # 右图：shear amplitude
 shear_amp = np.sqrt(gamm1**2 + gamm2**2)
 im2 = ax2.imshow(shear_amp, extent=[-2, 2, -2, 2], cmap='plasma', origin='lower')
-plt.colorbar(im2, ax=ax2, label='Shear Amplitude |gamma|')
+plt.colorbar(im2, ax=ax2, label=r'Shear Amplitude $|\gamma|$')
 ax2.quiver(x[::step, ::step], y[::step, ::step], 
           ux[::step, ::step], uy[::step, ::step], 
           angles='xy', scale_units='xy',
           color='white', width=0.003, alpha=0.9,
-          headwidth=0, headlength=0, headaxislength=0)
+          headwidth=0, headlength=0, headaxislength=0, pivot='mid')
 # scatter defect locations
 for pix, wnum in defect_dict.items():
     if wnum > 0:
-        ax2.scatter(x[pix], y[pix], c='red', marker='o', label='+1/2 defect' if 'pos_defect' not in locals() else "")
+        ax2.scatter(x[pix], y[pix], c='red', marker='o')
     elif wnum < 0:
-        ax2.scatter(x[pix], y[pix], c='blue', marker='o', label='-1/2 defect' if 'neg_defect' not in locals() else "")
+        ax2.scatter(x[pix], y[pix], c='blue', marker='o')
 ax2.set_title('Shear Amplitude with Orientation')
 ax2.set_xlabel('x')
 ax2.set_ylabel('y')
+ax2.set_xticks([-2, -1, 0, 1, 2])
+ax2.set_yticks([-2, -1, 0, 1, 2])
 ax2.set_aspect('equal')
-ax2.legend(loc='upper right')
+
 plt.tight_layout()
 plt.savefig('outfiles/test_shear_field.png', dpi=300, bbox_inches='tight')
