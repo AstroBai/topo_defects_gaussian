@@ -8,7 +8,7 @@ h = 0.67
 w = -1.0
 # surrounding cosmology params, e.g. Om +/- delta_Om
 delta_params = {'Om': 0.02,
-                'sigma8': 0.02}
+                'sigma8': 0.04}
 
 params = []
 for key in fid.keys():
@@ -214,7 +214,7 @@ deriv_dpdf_nn_combined_s15 = np.hstack((deriv_dpdfs_combined_s15, deriv_nns_comb
 deriv_dpdf_nn_combined_s30 = np.hstack((deriv_dpdfs_combined_s30, deriv_nns_combined_s30))
 deriv_dpdf_nn_combined_s90 = np.hstack((deriv_dpdfs_combined_s90, deriv_nns_combined_s90))
 deriv_dpdf_nn_combined_all_scales = np.hstack((deriv_dpdf_nn_combined_s15, deriv_dpdf_nn_combined_s30, deriv_dpdf_nn_combined_s90))
-
+deriv_defects_pdf_combined_all_scales = np.hstack((deriv_dpdf_nn_combined_all_scales, deriv_pdfs_s15, deriv_pdfs_s30, deriv_pdfs_s90))
 
 MOCKS_DATA_DIR = '../Mock'
 # fisher matrix computation
@@ -285,6 +285,10 @@ inv_cov_dpdf_nn_combined_s90 = np.linalg.inv(cov_dpdf_nn_combined_s90 ) * (n-16*
 cov_dpdf_nn_combined_all_scales = np.load(f"{MOCKS_DATA_DIR}/Defects_all_scales_cov.npy")
 inv_cov_dpdf_nn_combined_all_scales = np.linalg.inv(cov_dpdf_nn_combined_all_scales) * (n-16*4*3-8-2) / (n-1)
 
+cov_defects_pdf_combined_all_scales = np.load(f"{MOCKS_DATA_DIR}/Defects_PDF_all_scales_cov.npy")
+inv_cov_defects_pdf_combined_all_scales = np.linalg.inv(cov_defects_pdf_combined_all_scales) * (n-16*4*3-4*3-2) / (n-1)
+
+
 # compute fisher matrix
 n_params = len(fid)
 fisher_matrix_pdfs_s15 = np.zeros((n_params, n_params))
@@ -312,6 +316,9 @@ fisher_matrix_dpdf_nn_combined_s30 = np.zeros((n_params, n_params))
 fisher_matrix_dpdf_nn_combined_s90 = np.zeros((n_params, n_params))
 fisher_matrix_dpdf_nn_combined_all_scales = np.zeros((n_params, n_params))
 
+fisher_matrix_defects_pdf_combined_all_scales = np.zeros((n_params, n_params))
+
+
 for i in range(n_params):
     deriv_pdf_i_s15 = deriv_pdfs_s15[i]
     deriv_pdf_i_s30 = deriv_pdfs_s30[i]
@@ -337,6 +344,8 @@ for i in range(n_params):
     deriv_dpdf_nn_combined_i_s30 = deriv_dpdf_nn_combined_s30[i] # + 1e-10
     deriv_dpdf_nn_combined_i_s90 = deriv_dpdf_nn_combined_s90[i] # + 1e-10
     deriv_dpdf_nn_combined_i_all_scales = np.concatenate([deriv_dpdf_nn_combined_i_s15, deriv_dpdf_nn_combined_i_s30, deriv_dpdf_nn_combined_i_s90])
+
+    deriv_defects_pdf_combined_i_all_scales = np.concatenate([deriv_dpdf_nn_combined_i_all_scales, deriv_pdf_i_all_scales])
     for j in range(n_params):
         deriv_pdf_j_s15 = deriv_pdfs_s15[j]
         deriv_pdf_j_s30 = deriv_pdfs_s30[j]
@@ -368,6 +377,8 @@ for i in range(n_params):
         deriv_dpdf_nn_combined_j_s90 = deriv_dpdf_nn_combined_s90[j] # + 1e-10
         deriv_dpdf_nn_combined_j_all_scales = np.concatenate([deriv_dpdf_nn_combined_j_s15, deriv_dpdf_nn_combined_j_s30, deriv_dpdf_nn_combined_j_s90])
 
+        deriv_defects_pdf_combined_j_all_scales = np.concatenate([deriv_dpdf_nn_combined_j_all_scales, deriv_pdf_j_all_scales])
+
         fisher_matrix_pdfs_s15[i, j] = deriv_pdf_i_s15 @ inv_cov_pdf_s15 @ deriv_pdf_j_s15
         fisher_matrix_pdfs_s30[i, j] = deriv_pdf_i_s30 @ inv_cov_pdf_s30 @ deriv_pdf_j_s30
         fisher_matrix_pdfs_s90[i, j] = deriv_pdf_i_s90 @ inv_cov_pdf_s90 @ deriv_pdf_j_s90
@@ -394,7 +405,7 @@ for i in range(n_params):
         fisher_matrix_dpdf_nn_combined_s90[i, j] = deriv_dpdf_nn_combined_i_s90 @ inv_cov_dpdf_nn_combined_s90 @ deriv_dpdf_nn_combined_j_s90
         fisher_matrix_dpdf_nn_combined_all_scales[i, j] = deriv_dpdf_nn_combined_i_all_scales @ inv_cov_dpdf_nn_combined_all_scales @ deriv_dpdf_nn_combined_j_all_scales
 
-
+        fisher_matrix_defects_pdf_combined_all_scales[i, j] = deriv_defects_pdf_combined_i_all_scales @ inv_cov_defects_pdf_combined_all_scales @ deriv_defects_pdf_combined_j_all_scales
 
 Fisher_dpdf_combined_s15 = fisher_matrix_dpdfs_combined_s15
 Fisher_dpdf_combined_s30 = fisher_matrix_dpdfs_combined_s30
@@ -421,6 +432,8 @@ Fisher_dpdf_nn_combined_s15 = fisher_matrix_dpdf_nn_combined_s15
 Fisher_dpdf_nn_combined_s30 = fisher_matrix_dpdf_nn_combined_s30
 Fisher_dpdf_nn_combined_s90 = fisher_matrix_dpdf_nn_combined_s90
 Fisher_dpdf_nn_combined_all_scales = fisher_matrix_dpdf_nn_combined_all_scales
+
+Fisher_defects_pdf_combined_all_scales = fisher_matrix_defects_pdf_combined_all_scales
 # covs ================
 from getdist.gaussian_mixtures import GaussianND
 mean = np.array([0.3, 0.8])
@@ -484,6 +497,8 @@ dpdf_nn_combined_s30_samples = GaussianND(mean, covariance_dpdf_nn_combined_s30,
 dpdf_nn_combined_s90_samples = GaussianND(mean, covariance_dpdf_nn_combined_s90, names=names, labels=labels, label=r'DCDF + kNN, $\theta_G=90$')
 dpdf_nn_combined_all_scales_samples = GaussianND(mean, covariance_dpdf_nn_combined_all_scales, names=names, labels=labels, label=r'DCDF + kNN, all scales')
 
+covariance_defects_pdf_combined_all_scales = np.linalg.inv(Fisher_defects_pdf_combined_all_scales)
+defects_pdf_combined_all_scales_samples = GaussianND(mean, covariance_defects_pdf_combined_all_scales, names=names, labels=labels, label=r'Defects + PDF, all scales') 
 
 import matplotlib.pyplot as plt
 from getdist import plots
@@ -546,12 +561,12 @@ g.add_legend([r'$C^{p+n}_{1,2,4,8}(\kappa), \ \theta_G=90$', r'$C^{p+n}_{1,2,4,8
 g.export("outfiles/dcdf_nn_combined.png", dpi=300)
 
 g = plots.get_subplot_plotter(width_inch=6)
-g.plot_2d([pdf_all_scales_samples, kk_all_scales_samples, dpdf_nn_combined_all_scales_samples],
+g.plot_2d([pdf_all_scales_samples, kk_all_scales_samples, dpdf_nn_combined_all_scales_samples, defects_pdf_combined_all_scales_samples],
                 param1="Om", param2="sigma8",
-                filled=[True]*2 + [False],
+                filled=[True]*2 + [False, False],
                 lims = [0.25, 0.35, 0.75, 0.85],
-                colors=[color_map(i) for i in range(2)] + ['red'],
+                colors=[color_map(i) for i in range(2)] + ['red', 'black'],
                 lws=2,
-                alphas=[0.7, 0.7, 1.0])    
-g.add_legend([r'PDF, all scales', r'$\xi(\theta)$, all scales', r'DCDF + kNN, all scales'], legend_loc='upper right')
+                alphas=[0.7, 0.7, 1.0, 1.0])    
+g.add_legend([r'PDF, all scales', r'$\xi(\theta)$, all scales', r'DCDF + kNN, all scales', r'Defects + PDF, all scales'], legend_loc='upper right')
 g.export("outfiles/all_combined.png", dpi=300)

@@ -16,7 +16,7 @@ h = 0.67
 w = -1.0
 # surrounding cosmology params, e.g. Om +/- delta_Om
 delta_params = {'Om': 0.02,
-                'sigma8': 0.02}
+                'sigma8': 0.04}
 
 params = []
 for key in fid.keys():
@@ -30,7 +30,7 @@ for key in fid.keys():
 params = np.array(params)
 print(params)
 res = 512
-n_seeds = 60  # Number of random seeds per parameter point
+n_seeds = 100  # Number of random seeds per parameter point
 
 for i, param in enumerate(params):
     param_dict = {

@@ -8,8 +8,8 @@ h = 0.67
 w = -1.0
 # surrounding cosmology params, e.g. Om +/- delta_Om
 delta_params = {'Om': 0.02,
-                'sigma8': 0.02}
-n_seeds = 60
+                'sigma8': 0.04}
+n_seeds = 100
 
 params = []
 for key in fid.keys():
