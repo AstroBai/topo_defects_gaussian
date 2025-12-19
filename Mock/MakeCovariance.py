@@ -2,7 +2,7 @@
 import numpy as np  
 from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
-n_realizations = 500
+n_realizations = 1000
 DATA_DIR = '/cephfs/jbai/DefectMockGaussian'
 def random_noise(data_vector, noise_level=0.00001):
     noise_sigma = noise_level * np.min(np.abs(data_vector))
@@ -291,3 +291,10 @@ defects_pdf_all_scales_mean = np.mean(defects_pdf_all_scales, axis=0)
 defects_pdf_all_scales_cov = np.cov(defects_pdf_all_scales, rowvar=False)
 np.save("Defects_PDF_all_scales_mean.npy", defects_pdf_all_scales_mean)
 np.save("Defects_PDF_all_scales_cov.npy", defects_pdf_all_scales_cov)
+
+all_all_scales = np.hstack((defects_pdf_all_scales, kk_all_scales[:,:10]))
+print("All all scales shape:", all_all_scales.shape)
+all_all_scales_mean = np.mean(all_all_scales, axis=0)
+all_all_scales_cov = np.cov(all_all_scales, rowvar=False)
+np.save("All_all_scales_mean.npy", all_all_scales_mean)
+np.save("All_all_scales_cov.npy", all_all_scales_cov)

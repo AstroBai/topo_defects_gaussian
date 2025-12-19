@@ -7,8 +7,8 @@ Ob = 0.049
 h = 0.67
 w = -1.0
 # surrounding cosmology params, e.g. Om +/- delta_Om
-delta_params = {'Om': 0.02,
-                'sigma8': 0.04}
+delta_params = {'Om': 0.03,
+                'sigma8': 0.08}
 n_seeds = 100
 
 params = []

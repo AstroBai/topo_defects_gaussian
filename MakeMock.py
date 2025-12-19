@@ -18,7 +18,7 @@ w = -1.0
 
 res = 512
 
-for i in tqdm(range(500), desc="Generating mock data"):
+for i in tqdm(range(500, 1000), desc="Generating mock data"):
     # dump memories
     gc.collect()
     param_dict = {
@@ -28,15 +28,15 @@ for i in tqdm(range(500), desc="Generating mock data"):
         'S8': params['S8'],
         'w': w
     }
-    # kappa_bar_unsmoothed, kappa_bar, gamm1_bar, gamm2_bar, phi_bar = GenMap(param_dict, nside=res, lmax=res*3, random_type='gaussian', random_seed=i)
-    # # create path if not exists
-    # os.makedirs(f"{DATA_DIR}/Maps", exist_ok=True)
-    # np.savez(f"{DATA_DIR}/Maps/realisation_{i}.npz",
-    #          kappa_bar_unsmoothed=kappa_bar_unsmoothed,
-    #          kappa_bar=kappa_bar,
-    #          gamm1_bar=gamm1_bar,
-    #          gamm2_bar=gamm2_bar,
-    #          phi_bar=phi_bar)
+    kappa_bar_unsmoothed, kappa_bar, gamm1_bar, gamm2_bar, phi_bar = GenMap(param_dict, nside=res, lmax=res*3, random_type='gaussian', random_seed=i)
+    # create path if not exists
+    os.makedirs(f"{DATA_DIR}/Maps", exist_ok=True)
+    np.savez(f"{DATA_DIR}/Maps/realisation_{i}.npz",
+             kappa_bar_unsmoothed=kappa_bar_unsmoothed,
+             kappa_bar=kappa_bar,
+             gamm1_bar=gamm1_bar,
+             gamm2_bar=gamm2_bar,
+             phi_bar=phi_bar)
     
 
     # Find defects and saves
@@ -46,9 +46,9 @@ for i in tqdm(range(500), desc="Generating mock data"):
     for sigma in sigmas:
         s = int(np.degrees(sigma)*60)
         df.kappa_bar = smoothing(df.kappa_bar_unsmoothed, sigma=sigma, lmax=res*3)
-        # df.gamm1_bar, df.gamm2_bar = glass.shear_from_convergence(df.kappa_bar, lmax=res*3)
-        # df.phi_bar = 0.5 * np.arctan2(df.gamm2_bar, df.gamm1_bar)
-        # df.find_defects(savepath=f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects.npz", cluster=True)
+        df.gamm1_bar, df.gamm2_bar = glass.shear_from_convergence(df.kappa_bar, lmax=res*3)
+        df.phi_bar = 0.5 * np.arctan2(df.gamm2_bar, df.gamm1_bar)
+        df.find_defects(savepath=f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects.npz", cluster=True)
         df.load_defects(defect_datapath=f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects.npz")
         df.save_defects(savepath=f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects")
         # Save convergence PDF
