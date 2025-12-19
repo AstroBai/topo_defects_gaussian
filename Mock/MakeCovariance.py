@@ -4,7 +4,7 @@ from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 n_realizations = 500
 DATA_DIR = '/cephfs/jbai/DefectMockGaussian'
-def random_noise(data_vector, noise_level=0.01):
+def random_noise(data_vector, noise_level=0.00001):
     noise_sigma = noise_level * np.min(np.abs(data_vector))
     noise = np.random.normal(0, noise_sigma, size=data_vector.shape)
     return data_vector + noise
@@ -23,7 +23,7 @@ for sigma in sigmas:
     for i in range(n_realizations):
         data = np.load(f"{DATA_DIR}/PDFs/realisation_{i}_s{s}_kappa_pdf.npz")
         hist = data['hist']
-        hist = random_noise(hist, noise_level=0.0001)
+        hist = random_noise(hist)
         bin_centers = 0.5 * (data['bin_edges'][:-1] + data['bin_edges'][1:])
         pdfs.append(hist)
     pdfs = np.array(pdfs)
