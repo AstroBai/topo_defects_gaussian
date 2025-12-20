@@ -5,7 +5,12 @@ import matplotlib.pyplot as plt
 n_realizations = 1000
 DATA_DIR = '/cephfs/jbai/DefectMockGaussian'
 def random_noise(data_vector, noise_level=0.00001):
-    noise_sigma = noise_level * np.min(np.abs(data_vector))
+    abs_values = np.abs(data_vector)
+    positive_values = abs_values[abs_values > 0]
+    if len(positive_values) > 0:
+        noise_sigma = noise_level * np.min(positive_values)
+    else:
+        noise_sigma = noise_level
     noise = np.random.normal(0, noise_sigma, size=data_vector.shape)
     return data_vector + noise
 
@@ -292,7 +297,7 @@ defects_pdf_all_scales_cov = np.cov(defects_pdf_all_scales, rowvar=False)
 np.save("Defects_PDF_all_scales_mean.npy", defects_pdf_all_scales_mean)
 np.save("Defects_PDF_all_scales_cov.npy", defects_pdf_all_scales_cov)
 
-all_all_scales = np.hstack((defects_pdf_all_scales, kk_all_scales[:,:10]))
+all_all_scales = np.hstack((defects_pdf_all_scales, kk_all_scales[:,:30]))
 print("All all scales shape:", all_all_scales.shape)
 all_all_scales_mean = np.mean(all_all_scales, axis=0)
 all_all_scales_cov = np.cov(all_all_scales, rowvar=False)

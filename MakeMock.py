@@ -18,7 +18,7 @@ w = -1.0
 
 res = 512
 
-for i in tqdm(range(1000), desc="Generating mock data"):
+for i in tqdm(range(400, 1000), desc="Generating mock data"):
     # dump memories
     gc.collect()
     param_dict = {
