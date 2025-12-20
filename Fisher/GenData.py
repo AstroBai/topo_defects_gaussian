@@ -71,14 +71,14 @@ for i, param in enumerate(params):
     all_nn_combined_s90 = []
     
     for seed in tqdm(range(n_seeds), desc=f"Seeds for param set {i}"):
-        kappa_bar_unsmoothed, kappa_bar, gamm1_bar, gamm2_bar, phi_bar = GenMap(param_dict, nside=res, lmax=res*3, random_type='gaussian', random_seed=seed * 1000 + i)
-        os.makedirs(f"{DATA_DIR}/TrainMaps", exist_ok=True)
-        np.savez(f"{DATA_DIR}/TrainMaps/train_map_{i}_seed_{seed}.npz",
-                kappa_bar_unsmoothed=kappa_bar_unsmoothed,
-                kappa_bar=kappa_bar,
-                gamm1_bar=gamm1_bar,
-                gamm2_bar=gamm2_bar,
-                phi_bar=phi_bar)
+        # kappa_bar_unsmoothed, kappa_bar, gamm1_bar, gamm2_bar, phi_bar = GenMap(param_dict, nside=res, lmax=res*3, random_type='gaussian', random_seed=seed * 1000 + i)
+        # os.makedirs(f"{DATA_DIR}/TrainMaps", exist_ok=True)
+        # np.savez(f"{DATA_DIR}/TrainMaps/train_map_{i}_seed_{seed}.npz",
+        #         kappa_bar_unsmoothed=kappa_bar_unsmoothed,
+        #         kappa_bar=kappa_bar,
+        #         gamm1_bar=gamm1_bar,
+        #         gamm2_bar=gamm2_bar,
+        #         phi_bar=phi_bar)
         # Find defects
         df = DefectFinder(data_path=f"{DATA_DIR}/TrainMaps/train_map_{i}_seed_{seed}.npz")
         sigmas = [np.radians(15/60), np.radians(30/60), np.radians(90/60)]
@@ -89,26 +89,26 @@ for i, param in enumerate(params):
             df.kappa_bar = smoothing(df.kappa_bar_unsmoothed, sigma=sigma, lmax=res*3)
             df.gamm1_bar, df.gamm2_bar = glass.shear_from_convergence(df.kappa_bar, lmax=res*3)
             df.phi_bar = 0.5 * np.arctan2(df.gamm2_bar, df.gamm1_bar)
-            df.find_defects(savepath=f"{DATA_DIR}/TrainDefects/realisation_{i}_s{s}_seed_{seed}_defects.npz", cluster=True)
+            # df.find_defects(savepath=f"{DATA_DIR}/TrainDefects/realisation_{i}_s{s}_seed_{seed}_defects.npz", cluster=True)
             df.load_defects(defect_datapath=f"{DATA_DIR}/TrainDefects/realisation_{i}_s{s}_seed_{seed}_defects.npz")
             df.save_defects(savepath=f"{DATA_DIR}/TrainDefects/realisation_{i}_s{s}_seed_{seed}_defects")
 
             # Save convergence PDF
             if s == 15:
-                bin_edges = np.array([-0.01, -0.005, 0.0, 0.005, 0.01])
+                bin_edges = np.linspace(-0.01, 0.01, 11)
             elif s == 30:
-                bin_edges = np.array([-0.008, -0.004, 0.0, 0.004, 0.008])
+                bin_edges = np.linspace(-0.008, 0.008, 11)
             elif s == 90:
-                bin_edges = np.array([-0.005, -0.0025, 0.0, 0.0025, 0.005])
+                bin_edges = np.linspace(-0.005, 0.005, 11)
             hist, bin_edges = np.histogram(df.kappa_bar, bins=bin_edges, density=True)
             
             # save defect PDFs
             if s == 15:
-                bins = np.array([-0.01, -0.005, 0.005, 0.01])
+                bins = np.linspace(-0.01, 0.01, 10)
             elif s == 30:
-                bins = np.array([-0.008, -0.004, 0.004, 0.008])
+                bins = np.linspace(-0.008, 0.008, 10)
             elif s == 90:
-                bins = np.array([-0.005, -0.0025, 0.0025, 0.005])   
+                bins = np.linspace(-0.005, 0.005, 10)   
             kappa_pos = df.convergence_dist(charge=0.5)
             kappa_pos_cum = np.array([np.sum(kappa_pos < b) for b in bins]) / 4 / np.pi
 
@@ -116,11 +116,11 @@ for i, param in enumerate(params):
             kappa_neg_cum = np.array([np.sum(kappa_neg < b) for b in bins]) / 4 / np.pi
 
             if s == 15:
-                theta, xi_kk, varxi_kk, covmat_kk = df.convergence_correlation(min_sep=15., max_sep=600, n_bins=10, smoothed=True)
+                theta, xi_kk, varxi_kk, covmat_kk = df.convergence_correlation(min_sep=15., max_sep=600, n_bins=30, smoothed=True)
             elif s == 30:
-                theta, xi_kk, varxi_kk, covmat_kk = df.convergence_correlation(min_sep=30., max_sep=600, n_bins=10, smoothed=True)
+                theta, xi_kk, varxi_kk, covmat_kk = df.convergence_correlation(min_sep=30., max_sep=600, n_bins=30, smoothed=True)
             elif s == 90:
-                theta, xi_kk, varxi_kk, covmat_kk = df.convergence_correlation(min_sep=90., max_sep=600, n_bins=10, smoothed=True)
+                theta, xi_kk, varxi_kk, covmat_kk = df.convergence_correlation(min_sep=90., max_sep=600, n_bins=30, smoothed=True)
 
             # NNs calculation
             nn_pos_same1 = df.nearest_distance(charge=0.5, k=1)
@@ -141,56 +141,38 @@ for i, param in enumerate(params):
             nn_neg_opp8 = df.nearest_opposite_distance(charge=-0.5, k=8)
             
             if s == 15:
-                bin_edges1 = np.linspace(30, 100, 5)
-                bin_edges2 = np.linspace(30, 200, 5)
-                bin_edges4 = np.linspace(30, 300, 5)
-                bin_edges8 = np.linspace(30, 400, 5)
+                bin_edges1 = np.linspace(30, 100, 10)
+                bin_edges2 = np.linspace(30, 200, 10)
+                bin_edges4 = np.linspace(30, 300, 10)
+                bin_edges8 = np.linspace(30, 400, 10)
             elif s == 30:
-                bin_edges1 = np.linspace(30, 300, 5)
-                bin_edges2 = np.linspace(30, 450, 5)
-                bin_edges4 = np.linspace(30, 600, 5)
-                bin_edges8 = np.linspace(30, 750, 5)
+                bin_edges1 = np.linspace(30, 300, 10)
+                bin_edges2 = np.linspace(30, 450, 10)
+                bin_edges4 = np.linspace(30, 600, 10)
+                bin_edges8 = np.linspace(30, 750, 10)
             elif s == 90:
-                bin_edges1 = np.linspace(30, 750, 5)
-                bin_edges2 = np.linspace(30, 1125, 5)
-                bin_edges4 = np.linspace(30, 1500, 5)
-                bin_edges8 = np.linspace(30, 1875, 5)
+                bin_edges1 = np.linspace(30, 750, 10)
+                bin_edges2 = np.linspace(30, 1125, 10)
+                bin_edges4 = np.linspace(30, 1500, 10)
+                bin_edges8 = np.linspace(30, 1875, 10)
             
             # cumulative number counts
-            nn_pos_same1_hist, _ = np.histogram(nn_pos_same1, bins=bin_edges1, density=False)
-            nn_neg_same1_hist, _ = np.histogram(nn_neg_same1, bins=bin_edges1, density=False)
-            nn_pos_opp1_hist, _ = np.histogram(nn_pos_opp1, bins=bin_edges1, density=False)
-            nn_neg_opp1_hist, _ = np.histogram(nn_neg_opp1, bins=bin_edges1, density=False)
-            nn_pos_same2_hist, _ = np.histogram(nn_pos_same2, bins=bin_edges2, density=False)    
-            nn_neg_same2_hist, _ = np.histogram(nn_neg_same2, bins=bin_edges2, density=False)
-            nn_pos_opp2_hist, _ = np.histogram(nn_pos_opp2, bins=bin_edges2, density=False)
-            nn_neg_opp2_hist, _ = np.histogram(nn_neg_opp2, bins=bin_edges2, density=False)
-            nn_pos_same4_hist, _ = np.histogram(nn_pos_same4, bins=bin_edges4, density=False)
-            nn_neg_same4_hist, _ = np.histogram(nn_neg_same4, bins=bin_edges4, density=False)
-            nn_pos_opp4_hist, _ = np.histogram(nn_pos_opp4, bins=bin_edges4, density=False)
-            nn_neg_opp4_hist, _ = np.histogram(nn_neg_opp4, bins=bin_edges4, density=False)
-            nn_pos_same8_hist, _ = np.histogram(nn_pos_same8, bins=bin_edges8, density=False)
-            nn_neg_same8_hist, _ = np.histogram(nn_neg_same8, bins=bin_edges8, density=False)
-            nn_pos_opp8_hist, _ = np.histogram(nn_pos_opp8, bins=bin_edges8, density=False)
-            nn_neg_opp8_hist, _ = np.histogram(nn_neg_opp8, bins=bin_edges8, density=False)
-            
-            # make cumulative
-            nn_pos_same1_cum = np.cumsum(nn_pos_same1_hist) / 4 / np.pi
-            nn_neg_same1_cum = np.cumsum(nn_neg_same1_hist) / 4 / np.pi
-            nn_pos_opp1_cum = np.cumsum(nn_pos_opp1_hist) / 4 / np.pi
-            nn_neg_opp1_cum = np.cumsum(nn_neg_opp1_hist) / 4 / np.pi
-            nn_pos_same2_cum = np.cumsum(nn_pos_same2_hist) / 4 / np.pi
-            nn_neg_same2_cum = np.cumsum(nn_neg_same2_hist) / 4 / np.pi
-            nn_pos_opp2_cum = np.cumsum(nn_pos_opp2_hist) / 4 / np.pi
-            nn_neg_opp2_cum = np.cumsum(nn_neg_opp2_hist) / 4 / np.pi
-            nn_pos_same4_cum = np.cumsum(nn_pos_same4_hist) / 4 / np.pi
-            nn_neg_same4_cum = np.cumsum(nn_neg_same4_hist) / 4 / np.pi
-            nn_pos_opp4_cum = np.cumsum(nn_pos_opp4_hist) / 4 / np.pi
-            nn_neg_opp4_cum = np.cumsum(nn_neg_opp4_hist) / 4 / np.pi
-            nn_pos_same8_cum = np.cumsum(nn_pos_same8_hist) / 4 / np.pi
-            nn_neg_same8_cum = np.cumsum(nn_neg_same8_hist) / 4 / np.pi
-            nn_pos_opp8_cum = np.cumsum(nn_pos_opp8_hist) / 4 / np.pi
-            nn_neg_opp8_cum = np.cumsum(nn_neg_opp8_hist) / 4 / np.pi
+            nn_pos_same1_cum = np.array([np.sum(nn_pos_same1 < b) for b in bin_edges1]) / 4 / np.pi
+            nn_neg_same1_cum = np.array([np.sum(nn_neg_same1 < b) for b in bin_edges1]) / 4 / np.pi
+            nn_pos_opp1_cum = np.array([np.sum(nn_pos_opp1 < b) for b in bin_edges1]) / 4 / np.pi
+            nn_neg_opp1_cum = np.array([np.sum(nn_neg_opp1 < b) for b in bin_edges1]) / 4 / np.pi
+            nn_pos_same2_cum = np.array([np.sum(nn_pos_same2 < b) for b in bin_edges2]) / 4 / np.pi
+            nn_neg_same2_cum = np.array([np.sum(nn_neg_same2 < b) for b in bin_edges2]) / 4 / np.pi
+            nn_pos_opp2_cum = np.array([np.sum(nn_pos_opp2 < b) for b in bin_edges2]) / 4 / np.pi
+            nn_neg_opp2_cum = np.array([np.sum(nn_neg_opp2 < b) for b in bin_edges2]) / 4 / np.pi
+            nn_pos_same4_cum = np.array([np.sum(nn_pos_same4 < b) for b in bin_edges4]) / 4 / np.pi
+            nn_neg_same4_cum = np.array([np.sum(nn_neg_same4 < b) for b in bin_edges4]) / 4 / np.pi
+            nn_pos_opp4_cum = np.array([np.sum(nn_pos_opp4 < b) for b in bin_edges4]) / 4 / np.pi
+            nn_neg_opp4_cum = np.array([np.sum(nn_neg_opp4 < b) for b in bin_edges4]) / 4 / np.pi
+            nn_pos_same8_cum = np.array([np.sum(nn_pos_same8 < b) for b in bin_edges8]) / 4 / np.pi
+            nn_neg_same8_cum = np.array([np.sum(nn_neg_same8 < b) for b in bin_edges8]) / 4 / np.pi
+            nn_pos_opp8_cum = np.array([np.sum(nn_pos_opp8 < b) for b in bin_edges8]) / 4 / np.pi
+            nn_neg_opp8_cum = np.array([np.sum(nn_neg_opp8 < b) for b in bin_edges8]) / 4 / np.pi
             
             # combine all nn data for this seed
             nn_combined = np.hstack([

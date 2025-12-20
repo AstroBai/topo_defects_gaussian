@@ -218,78 +218,77 @@ deriv_defects_pdf_combined_all_scales = np.hstack((deriv_dpdf_nn_combined_all_sc
 
 MOCKS_DATA_DIR = '../Mock'
 # fisher matrix computation
-n = 500 # number of realizations
+n = 1000 # number of realizations
 cov_pos_s15 = np.load(f"{MOCKS_DATA_DIR}/CovDPDF_pos_s15.npy")
-inv_cov_pos_s15 = np.linalg.inv(cov_pos_s15) * (n-4-2) / (n-1)
+inv_cov_pos_s15 = np.linalg.inv(cov_pos_s15) * (n-10-2) / (n-1)
 cov_pos_s30 = np.load(f"{MOCKS_DATA_DIR}/CovDPDF_pos_s30.npy")
-inv_cov_pos_s30 = np.linalg.inv(cov_pos_s30) * (n-4-2) / (n-1)
+inv_cov_pos_s30 = np.linalg.inv(cov_pos_s30) * (n-10-2) / (n-1)
 cov_pos_s90 = np.load(f"{MOCKS_DATA_DIR}/CovDPDF_pos_s90.npy")
-inv_cov_pos_s90 = np.linalg.inv(cov_pos_s90) * (n-4-2) / (n-1)
+inv_cov_pos_s90 = np.linalg.inv(cov_pos_s90) * (n-10-2) / (n-1)
 
 cov_neg_s15 = np.load(f"{MOCKS_DATA_DIR}/CovDPDF_neg_s15.npy")
-inv_cov_neg_s15 = np.linalg.inv(cov_neg_s15) * (n-4-2) / (n-1)
+inv_cov_neg_s15 = np.linalg.inv(cov_neg_s15) * (n-10-2) / (n-1)
 cov_neg_s30 = np.load(f"{MOCKS_DATA_DIR}/CovDPDF_neg_s30.npy")
-inv_cov_neg_s30 = np.linalg.inv(cov_neg_s30) * (n-4-2) / (n-1)
+inv_cov_neg_s30 = np.linalg.inv(cov_neg_s30) * (n-10-2) / (n-1)
 cov_neg_s90 = np.load(f"{MOCKS_DATA_DIR}/CovDPDF_neg_s90.npy")
-inv_cov_neg_s90 = np.linalg.inv(cov_neg_s90) * (n-4-2) / (n-1)
+inv_cov_neg_s90 = np.linalg.inv(cov_neg_s90) * (n-10-2) / (n-1)
 
 cov_dpdf_all_scales = np.load(f"{MOCKS_DATA_DIR}/DPDF_all_scales_cov.npy")
-inv_cov_dpdf_all_scales = np.linalg.inv(cov_dpdf_all_scales) * (n-4*3*2-2) / (n-1)
+inv_cov_dpdf_all_scales = np.linalg.inv(cov_dpdf_all_scales) * (n-10*3*2-2) / (n-1)
 
 
 cov_pdf_s15 = np.load(f"{MOCKS_DATA_DIR}/CovPDF_s15.npy")
-inv_cov_pdf_s15 = np.linalg.inv(cov_pdf_s15) * (n-4-2) / (n-1)
+inv_cov_pdf_s15 = np.linalg.inv(cov_pdf_s15) * (n-10-2) / (n-1)
 cov_pdf_s30 = np.load(f"{MOCKS_DATA_DIR}/CovPDF_s30.npy")
-inv_cov_pdf_s30 = np.linalg.inv(cov_pdf_s30) * (n-4-2) / (n-1)
+inv_cov_pdf_s30 = np.linalg.inv(cov_pdf_s30) * (n-10-2) / (n-1)
 cov_pdf_s90 = np.load(f"{MOCKS_DATA_DIR}/CovPDF_s90.npy")
-inv_cov_pdf_s90 = np.linalg.inv(cov_pdf_s90) * (n-4-2) / (n-1)
+inv_cov_pdf_s90 = np.linalg.inv(cov_pdf_s90) * (n-10-2) / (n-1)
 cov_pdf_all_scales = np.load(f"{MOCKS_DATA_DIR}/PDF_all_scales_cov.npy")
-inv_cov_pdf_all_scales = np.linalg.inv(cov_pdf_all_scales) * (n-4*3-2) / (n-1)
+inv_cov_pdf_all_scales = np.linalg.inv(cov_pdf_all_scales) * (n-10*3-2) / (n-1)
 
 
 cov_dpdf_combined_s15 = np.load(f"{MOCKS_DATA_DIR}/CovDPDF_combined_s15.npy")
-inv_cov_dpdf_combined_s15 = np.linalg.inv(cov_dpdf_combined_s15) * (n-8-2) / (n-1)
+inv_cov_dpdf_combined_s15 = np.linalg.inv(cov_dpdf_combined_s15) * (n-10*2-2) / (n-1)
 cov_dpdf_combined_s30 = np.load(f"{MOCKS_DATA_DIR}/CovDPDF_combined_s30.npy")
-inv_cov_dpdf_combined_s30 = np.linalg.inv(cov_dpdf_combined_s30) * (n-8-2) / (n-1)
+inv_cov_dpdf_combined_s30 = np.linalg.inv(cov_dpdf_combined_s30) * (n-10*2-2) / (n-1)
 cov_dpdf_combined_s90 = np.load(f"{MOCKS_DATA_DIR}/CovDPDF_combined_s90.npy")
-inv_cov_dpdf_combined_s90 = np.linalg.inv(cov_dpdf_combined_s90) * (n-8-2) / (n-1)
+inv_cov_dpdf_combined_s90 = np.linalg.inv(cov_dpdf_combined_s90) * (n-10*2-2) / (n-1)
 cov_dpdf_combined_all_scales = np.load(f"{MOCKS_DATA_DIR}/DPDF_all_scales_cov.npy")
-inv_cov_dpdf_combined_all_scales = np.linalg.inv(cov_dpdf_combined_all_scales) * (n-8*3-2) / (n-1)
+inv_cov_dpdf_combined_all_scales = np.linalg.inv(cov_dpdf_combined_all_scales) * (n-10*2*3-2) / (n-1)
 
     
 cov_kk_s15 = np.load(f"{MOCKS_DATA_DIR}/CovKK_s15.npy")
-inv_cov_kk_s15 = np.linalg.inv(cov_kk_s15) * (n-10-2) / (n-1)
+inv_cov_kk_s15 = np.linalg.inv(cov_kk_s15) * (n-30-2) / (n-1)
 cov_kk_s30 = np.load(f"{MOCKS_DATA_DIR}/CovKK_s30.npy")
-inv_cov_kk_s30 = np.linalg.inv(cov_kk_s30) * (n-10-2) / (n-1)
+inv_cov_kk_s30 = np.linalg.inv(cov_kk_s30) * (n-30-2) / (n-1)
 cov_kk_s90 = np.load(f"{MOCKS_DATA_DIR}/CovKK_s90.npy")
-inv_cov_kk_s90 = np.linalg.inv(cov_kk_s90) * (n-10-2) / (n-1)
+inv_cov_kk_s90 = np.linalg.inv(cov_kk_s90) * (n-30-2) / (n-1)
 cov_kk_all_scales = np.load(f"{MOCKS_DATA_DIR}/CovKK_s15.npy")
-inv_cov_kk_all_scales = np.linalg.inv(cov_kk_all_scales) * (n-10-2) / (n-1)
+inv_cov_kk_all_scales = np.linalg.inv(cov_kk_all_scales) * (n-30-2) / (n-1)
 
 
 cov_nn_s15 = np.load(f"{MOCKS_DATA_DIR}/CovNNs_combined_s15.npy")
-inv_cov_nn_s15 = np.linalg.inv(cov_nn_s15) * (n-16*4-2) / (n-1)
+inv_cov_nn_s15 = np.linalg.inv(cov_nn_s15) * (n-16*10-2) / (n-1)
 cov_nn_s30 = np.load(f"{MOCKS_DATA_DIR}/CovNNs_combined_s30.npy")
-inv_cov_nn_s30 = np.linalg.inv(cov_nn_s30) * (n-16*4-2) / (n-1)
+inv_cov_nn_s30 = np.linalg.inv(cov_nn_s30) * (n-16*10-2) / (n-1)
 cov_nn_s90 = np.load(f"{MOCKS_DATA_DIR}/CovNNs_combined_s90.npy")
-inv_cov_nn_s90 = np.linalg.inv(cov_nn_s90) * (n-16*4-2) / (n-1)
+inv_cov_nn_s90 = np.linalg.inv(cov_nn_s90) * (n-16*10-2) / (n-1)
 cov_nn_all_scales = np.load(f"{MOCKS_DATA_DIR}/NN_all_scales_cov.npy")
-inv_cov_nn_all_scales = np.linalg.inv(cov_nn_all_scales) * (n-16*4*3-2) / (n-1)
-
+inv_cov_nn_all_scales = np.linalg.inv(cov_nn_all_scales) * (n-16*10*3-2) / (n-1)
 cov_dpdf_nn_combined_s15 = np.load(f"{MOCKS_DATA_DIR}/CovCDF_combined_s15.npy")
-inv_cov_dpdf_nn_combined_s15 = np.linalg.inv(cov_dpdf_nn_combined_s15) * (n-16*4-8-2) / (n-1)
+inv_cov_dpdf_nn_combined_s15 = np.linalg.inv(cov_dpdf_nn_combined_s15) * (n-16*10-20-2) / (n-1)
 cov_dpdf_nn_combined_s30 = np.load(f"{MOCKS_DATA_DIR}/CovCDF_combined_s30.npy")
-inv_cov_dpdf_nn_combined_s30 = np.linalg.inv(cov_dpdf_nn_combined_s30) * (n-16*4-8-2) / (n-1)
+inv_cov_dpdf_nn_combined_s30 = np.linalg.inv(cov_dpdf_nn_combined_s30) * (n-16*10-20-2) / (n-1)
 cov_dpdf_nn_combined_s90 = np.load(f"{MOCKS_DATA_DIR}/CovCDF_combined_s90.npy")
-inv_cov_dpdf_nn_combined_s90 = np.linalg.inv(cov_dpdf_nn_combined_s90 ) * (n-16*4-8-2) / (n-1)
+inv_cov_dpdf_nn_combined_s90 = np.linalg.inv(cov_dpdf_nn_combined_s90 ) * (n-16*10-20-2) / (n-1)
 cov_dpdf_nn_combined_all_scales = np.load(f"{MOCKS_DATA_DIR}/Defects_all_scales_cov.npy")
-inv_cov_dpdf_nn_combined_all_scales = np.linalg.inv(cov_dpdf_nn_combined_all_scales) * (n-16*4*3-8*3-2) / (n-1)
+inv_cov_dpdf_nn_combined_all_scales = np.linalg.inv(cov_dpdf_nn_combined_all_scales) * (n-16*10*3-20*3-2) / (n-1)
 
 cov_defects_pdf_combined_all_scales = np.load(f"{MOCKS_DATA_DIR}/Defects_PDF_all_scales_cov.npy")
-inv_cov_defects_pdf_combined_all_scales = np.linalg.inv(cov_defects_pdf_combined_all_scales) * (n-16*4*3-8*3-4*3-2) / (n-1)
+inv_cov_defects_pdf_combined_all_scales = np.linalg.inv(cov_defects_pdf_combined_all_scales) * (n-16*10*3-20*3-10*3-2) / (n-1)
 
 cov_all_all_scales = np.load(f"{MOCKS_DATA_DIR}/All_all_scales_cov.npy")
-inv_cov_all_all_scales = np.linalg.inv(cov_all_all_scales) * (n-16*4*3-8*3-4*3-10-2) / (n-1)
+inv_cov_all_all_scales = np.linalg.inv(cov_all_all_scales) * (n-16*10*3-20*3-10*3-30-2) / (n-1)
 
 # compute fisher matrix
 n_params = len(fid)

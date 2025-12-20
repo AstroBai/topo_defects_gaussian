@@ -34,54 +34,38 @@ for i in tqdm(range(realizations)):
         nn_neg_opp8 = df.nearest_opposite_distance(charge=-0.5, k=8)
 
         if s == 15:
-            bin_edges1 = np.linspace(30, 100, 5)
-            bin_edges2 = np.linspace(30, 200, 5)
-            bin_edges4 = np.linspace(30, 300, 5)
-            bin_edges8 = np.linspace(30, 400, 5)
+            bin_edges1 = np.linspace(30, 100, 10)
+            bin_edges2 = np.linspace(30, 200, 10)
+            bin_edges4 = np.linspace(30, 300, 10)
+            bin_edges8 = np.linspace(30, 400, 10)
         elif s == 30:
-            bin_edges1 = np.linspace(30, 300, 5)
-            bin_edges2 = np.linspace(30, 450, 5)
-            bin_edges4 = np.linspace(30, 600, 5)
-            bin_edges8 = np.linspace(30, 750, 5)
+            bin_edges1 = np.linspace(30, 300, 10)
+            bin_edges2 = np.linspace(30, 450, 10)
+            bin_edges4 = np.linspace(30, 600, 10)
+            bin_edges8 = np.linspace(30, 750, 10)
         elif s == 90:
-            bin_edges1 = np.linspace(30, 750, 5)
-            bin_edges2 = np.linspace(30, 1125, 5)
-            bin_edges4 = np.linspace(30, 1500, 5)
-            bin_edges8 = np.linspace(30, 1875, 5)
+            bin_edges1 = np.linspace(30, 750, 10)
+            bin_edges2 = np.linspace(30, 1125, 10)
+            bin_edges4 = np.linspace(30, 1500, 10)
+            bin_edges8 = np.linspace(30, 1875, 10)
         # cumulative number counts
-        nn_pos_same1_hist, _ = np.histogram(nn_pos_same1, bins=bin_edges1, density=False)
-        nn_neg_same1_hist, _ = np.histogram(nn_neg_same1, bins=bin_edges1, density=False)
-        nn_pos_opp1_hist, _ = np.histogram(nn_pos_opp1, bins=bin_edges1, density=False)
-        nn_neg_opp1_hist, _ = np.histogram(nn_neg_opp1, bins=bin_edges1, density=False)
-        nn_pos_same2_hist, _ = np.histogram(nn_pos_same2, bins=bin_edges2, density=False)
-        nn_neg_same2_hist, _ = np.histogram(nn_neg_same2, bins=bin_edges2, density=False)
-        nn_pos_opp2_hist, _ = np.histogram(nn_pos_opp2, bins=bin_edges2, density=False)
-        nn_neg_opp2_hist, _ = np.histogram(nn_neg_opp2, bins=bin_edges2, density=False)
-        nn_pos_same4_hist, _ = np.histogram(nn_pos_same4, bins=bin_edges4, density=False)
-        nn_neg_same4_hist, _ = np.histogram(nn_neg_same4, bins=bin_edges4, density=False)
-        nn_pos_opp4_hist, _ = np.histogram(nn_pos_opp4, bins=bin_edges4, density=False)
-        nn_neg_opp4_hist, _ = np.histogram(nn_neg_opp4, bins=bin_edges4, density=False)
-        nn_pos_same8_hist, _ = np.histogram(nn_pos_same8, bins=bin_edges8, density=False)
-        nn_neg_same8_hist, _ = np.histogram(nn_neg_same8, bins=bin_edges8, density=False)
-        nn_pos_opp8_hist, _ = np.histogram(nn_pos_opp8, bins=bin_edges8, density=False)
-        nn_neg_opp8_hist, _ = np.histogram(nn_neg_opp8, bins=bin_edges8, density=False)
         # make cumulative
-        nn_pos_same1_cum = np.cumsum(nn_pos_same1_hist) / 4 / np.pi
-        nn_neg_same1_cum = np.cumsum(nn_neg_same1_hist) / 4 / np.pi
-        nn_pos_opp1_cum = np.cumsum(nn_pos_opp1_hist) / 4 / np.pi
-        nn_neg_opp1_cum = np.cumsum(nn_neg_opp1_hist) / 4 / np.pi
-        nn_pos_same2_cum = np.cumsum(nn_pos_same2_hist) / 4 / np.pi
-        nn_neg_same2_cum = np.cumsum(nn_neg_same2_hist) / 4 / np.pi
-        nn_pos_opp2_cum = np.cumsum(nn_pos_opp2_hist) / 4 / np.pi
-        nn_neg_opp2_cum = np.cumsum(nn_neg_opp2_hist) / 4 / np.pi
-        nn_pos_same4_cum = np.cumsum(nn_pos_same4_hist) / 4 / np.pi
-        nn_neg_same4_cum = np.cumsum(nn_neg_same4_hist) / 4 / np.pi
-        nn_pos_opp4_cum = np.cumsum(nn_pos_opp4_hist) / 4 / np.pi
-        nn_neg_opp4_cum = np.cumsum(nn_neg_opp4_hist) / 4 / np.pi
-        nn_pos_same8_cum = np.cumsum(nn_pos_same8_hist) / 4 / np.pi
-        nn_neg_same8_cum = np.cumsum(nn_neg_same8_hist) / 4 / np.pi
-        nn_pos_opp8_cum = np.cumsum(nn_pos_opp8_hist) / 4 / np.pi
-        nn_neg_opp8_cum = np.cumsum(nn_neg_opp8_hist) / 4 / np.pi
+        nn_pos_same1_cum = np.array([np.sum(nn_pos_same1 < b) for b in bin_edges1]) / 4 / np.pi
+        nn_neg_same1_cum = np.array([np.sum(nn_neg_same1 < b) for b in bin_edges1]) / 4 / np.pi
+        nn_pos_opp1_cum = np.array([np.sum(nn_pos_opp1 < b) for b in bin_edges1]) / 4 / np.pi
+        nn_neg_opp1_cum = np.array([np.sum(nn_neg_opp1 < b) for b in bin_edges1]) / 4 / np.pi
+        nn_pos_same2_cum = np.array([np.sum(nn_pos_same2 < b) for b in bin_edges2]) / 4 / np.pi
+        nn_neg_same2_cum = np.array([np.sum(nn_neg_same2 < b) for b in bin_edges2]) / 4 / np.pi
+        nn_pos_opp2_cum = np.array([np.sum(nn_pos_opp2 < b) for b in bin_edges2]) / 4 / np.pi
+        nn_neg_opp2_cum = np.array([np.sum(nn_neg_opp2 < b) for b in bin_edges2]) / 4 / np.pi
+        nn_pos_same4_cum = np.array([np.sum(nn_pos_same4 < b) for b in bin_edges4]) / 4 / np.pi
+        nn_neg_same4_cum = np.array([np.sum(nn_neg_same4 < b) for b in bin_edges4]) / 4 / np.pi
+        nn_pos_opp4_cum = np.array([np.sum(nn_pos_opp4 < b) for b in bin_edges4]) / 4 / np.pi
+        nn_neg_opp4_cum = np.array([np.sum(nn_neg_opp4 < b) for b in bin_edges4]) / 4 / np.pi
+        nn_pos_same8_cum = np.array([np.sum(nn_pos_same8 < b) for b in bin_edges8]) / 4 / np.pi
+        nn_neg_same8_cum = np.array([np.sum(nn_neg_same8 < b) for b in bin_edges8]) / 4 / np.pi
+        nn_pos_opp8_cum = np.array([np.sum(nn_pos_opp8 < b) for b in bin_edges8]) / 4 / np.pi
+        nn_neg_opp8_cum = np.array([np.sum(nn_neg_opp8 < b) for b in bin_edges8]) / 4 / np.pi
 
         os.makedirs(f"{DATA_DIR}/NNs", exist_ok=True)
         np.savez(f"{DATA_DIR}/NNs/realisation_{i}_s{s}_NNs.npz",

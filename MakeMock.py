@@ -18,7 +18,7 @@ w = -1.0
 
 res = 512
 
-for i in tqdm(range(500, 1000), desc="Generating mock data"):
+for i in tqdm(range(1000), desc="Generating mock data"):
     # dump memories
     gc.collect()
     param_dict = {
@@ -28,15 +28,15 @@ for i in tqdm(range(500, 1000), desc="Generating mock data"):
         'S8': params['S8'],
         'w': w
     }
-    kappa_bar_unsmoothed, kappa_bar, gamm1_bar, gamm2_bar, phi_bar = GenMap(param_dict, nside=res, lmax=res*3, random_type='gaussian', random_seed=i)
-    # create path if not exists
-    os.makedirs(f"{DATA_DIR}/Maps", exist_ok=True)
-    np.savez(f"{DATA_DIR}/Maps/realisation_{i}.npz",
-             kappa_bar_unsmoothed=kappa_bar_unsmoothed,
-             kappa_bar=kappa_bar,
-             gamm1_bar=gamm1_bar,
-             gamm2_bar=gamm2_bar,
-             phi_bar=phi_bar)
+    # kappa_bar_unsmoothed, kappa_bar, gamm1_bar, gamm2_bar, phi_bar = GenMap(param_dict, nside=res, lmax=res*3, random_type='gaussian', random_seed=i)
+    # # create path if not exists
+    # os.makedirs(f"{DATA_DIR}/Maps", exist_ok=True)
+    # np.savez(f"{DATA_DIR}/Maps/realisation_{i}.npz",
+    #          kappa_bar_unsmoothed=kappa_bar_unsmoothed,
+    #          kappa_bar=kappa_bar,
+    #          gamm1_bar=gamm1_bar,
+    #          gamm2_bar=gamm2_bar,
+    #          phi_bar=phi_bar)
     
 
     # Find defects and saves
@@ -48,16 +48,16 @@ for i in tqdm(range(500, 1000), desc="Generating mock data"):
         df.kappa_bar = smoothing(df.kappa_bar_unsmoothed, sigma=sigma, lmax=res*3)
         df.gamm1_bar, df.gamm2_bar = glass.shear_from_convergence(df.kappa_bar, lmax=res*3)
         df.phi_bar = 0.5 * np.arctan2(df.gamm2_bar, df.gamm1_bar)
-        df.find_defects(savepath=f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects.npz", cluster=True)
+        # df.find_defects(savepath=f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects.npz", cluster=True)
         df.load_defects(defect_datapath=f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects.npz")
         df.save_defects(savepath=f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects")
         # Save convergence PDF
         if s == 15:
-            bin_edges = np.array([-0.01, -0.005, 0.0, 0.005, 0.01])
+            bin_edges = np.linspace(-0.01, 0.01, 11)
         elif s == 30:
-            bin_edges = np.array([-0.008, -0.004, 0.0, 0.004, 0.008])
+            bin_edges = np.linspace(-0.008, 0.008, 11)
         elif s == 90:
-            bin_edges = np.array([-0.005, -0.0025, 0.0, 0.0025, 0.005])
+            bin_edges = np.linspace(-0.005, 0.005, 11)
         hist, bin_edges = np.histogram(df.kappa_bar, bins=bin_edges, density=True)
         os.makedirs(f"{DATA_DIR}/PDFs", exist_ok=True)
         np.savez(f"{DATA_DIR}/PDFs/realisation_{i}_s{s}_kappa_pdf.npz",
@@ -66,11 +66,11 @@ for i in tqdm(range(500, 1000), desc="Generating mock data"):
 
         # save defect PDFs
         if s == 15:
-            bins = np.array([-0.01, -0.005, 0.005, 0.01])
+            bins = np.linspace(-0.01, 0.01, 10)
         elif s == 30:
-            bins = np.array([-0.008, -0.004, 0.004, 0.008])
+            bins = np.linspace(-0.008, 0.008, 10)
         elif s == 90:
-            bins = np.array([-0.005, -0.0025, 0.0025, 0.005])
+            bins = np.linspace(-0.005, 0.005, 10)
         kappa_pos = df.convergence_dist(charge=0.5)
         kappa_pos_cum = np.array([np.sum(kappa_pos < b) for b in bins]) / 4 / np.pi
 
@@ -88,11 +88,11 @@ for i in tqdm(range(500, 1000), desc="Generating mock data"):
                 bin_edges=bins)
         
         if s == 15:
-            theta, xi_kk, varxi_kk, covmat_kk = df.convergence_correlation(min_sep=15., max_sep=600, n_bins=10, smoothed=True)
+            theta, xi_kk, varxi_kk, covmat_kk = df.convergence_correlation(min_sep=15., max_sep=600, n_bins=30, smoothed=True)
         elif s == 30:
-            theta, xi_kk, varxi_kk, covmat_kk = df.convergence_correlation(min_sep=30., max_sep=600, n_bins=10, smoothed=True)
+            theta, xi_kk, varxi_kk, covmat_kk = df.convergence_correlation(min_sep=30., max_sep=600, n_bins=30, smoothed=True)
         elif s == 90:
-            theta, xi_kk, varxi_kk, covmat_kk = df.convergence_correlation(min_sep=90., max_sep=600, n_bins=10, smoothed=True)
+            theta, xi_kk, varxi_kk, covmat_kk = df.convergence_correlation(min_sep=90., max_sep=600, n_bins=30, smoothed=True)
         os.makedirs(f"{DATA_DIR}/KKs", exist_ok=True)
         np.savez(f"{DATA_DIR}/KKs/realisation_{i}_s{s}_kappa_kappa_corr.npz",
                  theta=theta,
