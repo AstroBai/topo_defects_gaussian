@@ -15,8 +15,8 @@ Ob = 0.049
 h = 0.67
 w = -1.0
 # surrounding cosmology params, e.g. Om +/- delta_Om
-delta_params = {'Om': 0.003,
-                'sigma8': 0.008}
+delta_params = {'Om': 0.1,
+                'sigma8': 0.1}
 
 params = []
 for key in fid.keys():
@@ -65,6 +65,66 @@ for i, param in enumerate(params):
     all_covmat_kk_s15 = []
     all_covmat_kk_s30 = []
     all_covmat_kk_s90 = []
+
+    all_xi_pp_s15 = []
+    all_xi_pp_s30 = []
+    all_xi_pp_s90 = []  
+
+    all_varxi_pp_s15 = []
+    all_varxi_pp_s30 = []
+    all_varxi_pp_s90 = []
+
+    all_covmat_pp_s15 = []
+    all_covmat_pp_s30 = []
+    all_covmat_pp_s90 = []
+
+    all_xi_nn_s15 = []
+    all_xi_nn_s30 = []
+    all_xi_nn_s90 = []
+
+    all_varxi_nn_s15 = []
+    all_varxi_nn_s30 = []
+    all_varxi_nn_s90 = []
+
+    all_covmat_nn_s15 = []
+    all_covmat_nn_s30 = []
+    all_covmat_nn_s90 = []
+
+    all_xi_pn_s15 = []
+    all_xi_pn_s30 = []
+    all_xi_pn_s90 = []
+
+    all_varxi_pn_s15 = []
+    all_varxi_pn_s30 = []
+    all_varxi_pn_s90 = []
+
+    all_covmat_pn_s15 = []
+    all_covmat_pn_s30 = []
+    all_covmat_pn_s90 = []
+
+    all_xi_pk_s15 = []
+    all_xi_pk_s30 = []
+    all_xi_pk_s90 = []
+
+    all_varxi_pk_s15 = []
+    all_varxi_pk_s30 = []
+    all_varxi_pk_s90 = []
+
+    all_covmat_pk_s15 = []
+    all_covmat_pk_s30 = []
+    all_covmat_pk_s90 = []
+
+    all_xi_nk_s15 = []
+    all_xi_nk_s30 = []
+    all_xi_nk_s90 = []  
+
+    all_varxi_nk_s15 = []
+    all_varxi_nk_s30 = []
+    all_varxi_nk_s90 = []
+
+    all_covmat_nk_s15 = []
+    all_covmat_nk_s30 = []
+    all_covmat_nk_s90 = []
     
     all_nn_combined_s15 = []
     all_nn_combined_s30 = []
@@ -121,6 +181,77 @@ for i, param in enumerate(params):
                 theta, xi_kk, varxi_kk, covmat_kk = df.convergence_correlation(min_sep=30., max_sep=600, n_bins=30, smoothed=True)
             elif s == 90:
                 theta, xi_kk, varxi_kk, covmat_kk = df.convergence_correlation(min_sep=90., max_sep=600, n_bins=30, smoothed=True)
+
+            if s == 15:
+                savepath=f"{DATA_DIR}/TrainDefects/realisation_{i}_s{s}_seed_{seed}_defects"
+                theta, xi_pp, varxi_pp, covmat_pp = df.correlation_function(charge1_path=f"{savepath}_charge_+0.5.fits",
+                                                                            charge2_path=f"{savepath}_charge_+0.5.fits",
+                                                                            min_sep=15., max_sep=600, n_bins=30)
+            elif s == 30:
+                savepath=f"{DATA_DIR}/TrainDefects/realisation_{i}_s{s}_seed_{seed}_defects"
+                theta, xi_pp, varxi_pp, covmat_pp = df.correlation_function(charge1_path=f"{savepath}_charge_+0.5.fits",
+                                                                            charge2_path=f"{savepath}_charge_+0.5.fits",
+                                                                            min_sep=30., max_sep=600, n_bins=30)
+            elif s == 90:
+                savepath=f"{DATA_DIR}/TrainDefects/realisation_{i}_s{s}_seed_{seed}_defects"
+                theta, xi_pp, varxi_pp, covmat_pp = df.correlation_function(charge1_path=f"{savepath}_charge_+0.5.fits",
+                                                                            charge2_path=f"{savepath}_charge_+0.5.fits",
+                                                                            min_sep=90., max_sep=600, n_bins=30)
+            
+            if s == 15:
+                savepath=f"{DATA_DIR}/TrainDefects/realisation_{i}_s{s}_seed_{seed}_defects"
+                theta, xi_nn, varxi_nn, covmat_nn = df.correlation_function(charge1_path=f"{savepath}_charge_-0.5.fits",
+                                                                            charge2_path=f"{savepath}_charge_-0.5.fits",
+                                                                            min_sep=15., max_sep=600, n_bins=30)
+            elif s == 30:
+                savepath=f"{DATA_DIR}/TrainDefects/realisation_{i}_s{s}_seed_{seed}_defects"
+                theta, xi_nn, varxi_nn, covmat_nn = df.correlation_function(charge1_path=f"{savepath}_charge_-0.5.fits",
+                                                                            charge2_path=f"{savepath}_charge_-0.5.fits",
+                                                                            min_sep=30., max_sep=600, n_bins=30)
+            elif s == 90:
+                savepath=f"{DATA_DIR}/TrainDefects/realisation_{i}_s{s}_seed_{seed}_defects"
+                theta, xi_nn, varxi_nn, covmat_nn = df.correlation_function(charge1_path=f"{savepath}_charge_-0.5.fits",
+                                                                            charge2_path=f"{savepath}_charge_-0.5.fits",
+                                                                            min_sep=90., max_sep=600, n_bins=30)
+
+            
+            if s == 15:
+                savepath=f"{DATA_DIR}/TrainDefects/realisation_{i}_s{s}_seed_{seed}_defects"
+                theta, xi_pn, varxi_pn, covmat_pn = df.correlation_function(charge1_path=f"{savepath}_charge_+0.5.fits",
+                                                                            charge2_path=f"{savepath}_charge_-0.5.fits",
+                                                                            min_sep=15., max_sep=600, n_bins=30)
+            elif s == 30:
+                savepath=f"{DATA_DIR}/TrainDefects/realisation_{i}_s{s}_seed_{seed}_defects"
+                theta, xi_pn, varxi_pn, covmat_pn = df.correlation_function(charge1_path=f"{savepath}_charge_+0.5.fits",
+                                                                            charge2_path=f"{savepath}_charge_-0.5.fits",
+                                                                            min_sep=30., max_sep=600, n_bins=30)
+            elif s == 90:
+                savepath=f"{DATA_DIR}/TrainDefects/realisation_{i}_s{s}_seed_{seed}_defects"
+                theta, xi_pn, varxi_pn, covmat_pn = df.correlation_function(charge1_path=f"{savepath}_charge_+0.5.fits",
+                                                                            charge2_path=f"{savepath}_charge_-0.5.fits",
+                                                                            min_sep=90., max_sep=600, n_bins=30)
+
+            
+            if s == 15:
+                theta, xi_pk, varxi_pk, covmat_pk = df.defect_convergence_correlation(charge=0.5,
+                                                                            min_sep=15., max_sep=1000, n_bins=30)
+            elif s == 30:
+                theta, xi_pk, varxi_pk, covmat_pk = df.defect_convergence_correlation(charge=0.5,
+                                                                            min_sep=30., max_sep=1000, n_bins=30)
+            elif s == 90:
+                theta, xi_pk, varxi_pk, covmat_pk = df.defect_convergence_correlation(charge=0.5,
+                                                                            min_sep=90., max_sep=1000, n_bins=30)
+            
+            if s == 15:
+                theta, xi_nk, varxi_nk, covmat_nk = df.defect_convergence_correlation(charge=-0.5,
+                                                                            min_sep=15., max_sep=1000, n_bins=30)
+            elif s == 30:
+                theta, xi_nk, varxi_nk, covmat_nk = df.defect_convergence_correlation(charge=-0.5,
+                                                                            min_sep=30., max_sep=1000, n_bins=30)
+            elif s == 90:
+                theta, xi_nk, varxi_nk, covmat_nk = df.defect_convergence_correlation(charge=-0.5,
+                                                                            min_sep=90., max_sep=1000, n_bins=30)
+                
 
             # NNs calculation
             nn_pos_same1 = df.nearest_distance(charge=0.5, k=1)
@@ -204,6 +335,38 @@ for i, param in enumerate(params):
                     xi_kk=xi_kk,
                     varxi_kk=varxi_kk,
                     covmat_kk=covmat_kk)
+            
+            os.makedirs(f"{DATA_DIR}/TrainPosPos", exist_ok=True)
+            np.savez(f"{DATA_DIR}/TrainPosPos/train_{i}_s{s}_seed_{seed}_pos_pos_corr.npz",
+                    theta=theta,
+                    xi_pp=xi_pp,
+                    varxi_pp=varxi_pp,
+                    covmat_pp=covmat_pp)
+            os.makedirs(f"{DATA_DIR}/TrainNegNeg", exist_ok=True)
+            np.savez(f"{DATA_DIR}/TrainNegNeg/train_{i}_s{s}_seed_{seed}_neg_neg_corr.npz",
+                    theta=theta,    
+                    xi_nn=xi_nn,
+                    varxi_nn=varxi_nn,
+                    covmat_nn=covmat_nn)
+            os.makedirs(f"{DATA_DIR}/TrainPosNeg", exist_ok=True)
+            np.savez(f"{DATA_DIR}/TrainPosNeg/train_{i}_s{s}_seed_{seed}_pos_neg_corr.npz",
+                    theta=theta,
+                    xi_pn=xi_pn,
+                    varxi_pn=varxi_pn,
+                    covmat_pn=covmat_pn)
+            os.makedirs(f"{DATA_DIR}/TrainPKs", exist_ok=True)
+            np.savez(f"{DATA_DIR}/TrainPKs/train_{i}_s{s}_seed_{seed}_pos_kappa_corr.npz",
+                    theta=theta,
+                    xi_pk=xi_pk,
+                    varxi_pk=varxi_pk,
+                    covmat_pk=covmat_pk)
+            os.makedirs(f"{DATA_DIR}/TrainNKs", exist_ok=True)
+            np.savez(f"{DATA_DIR}/TrainNKs/train_{i}_s{s}_seed_{seed}_neg_kappa_corr.npz",
+                    theta=theta,
+                    xi_nk=xi_nk,
+                    varxi_nk=varxi_nk,
+                    covmat_nk=covmat_nk)
+            
 
             os.makedirs(f"{DATA_DIR}/TrainNNs", exist_ok=True)
             np.savez(f"{DATA_DIR}/TrainNNs/train_{i}_s{s}_seed_{seed}_NNs_combined.npz",
@@ -217,6 +380,21 @@ for i, param in enumerate(params):
                 all_xi_kk_s15.append(xi_kk)
                 all_varxi_kk_s15.append(varxi_kk)
                 all_covmat_kk_s15.append(covmat_kk)
+                all_xi_pp_s15.append(xi_pp)
+                all_varxi_pp_s15.append(varxi_pp)
+                all_covmat_pp_s15.append(covmat_pp)
+                all_xi_nn_s15.append(xi_nn)
+                all_varxi_nn_s15.append(varxi_nn)
+                all_covmat_nn_s15.append(covmat_nn)
+                all_xi_pn_s15.append(xi_pn)
+                all_varxi_pn_s15.append(varxi_pn)
+                all_covmat_pn_s15.append(covmat_pn)
+                all_xi_pk_s15.append(xi_pk)
+                all_varxi_pk_s15.append(varxi_pk)
+                all_covmat_pk_s15.append(covmat_pk)
+                all_xi_nk_s15.append(xi_nk)
+                all_varxi_nk_s15.append(varxi_nk)
+                all_covmat_nk_s15.append(covmat_nk) 
                 all_nn_combined_s15.append(nn_combined)
             elif s == 30:
                 all_kappa_pdf_s30.append(hist)
@@ -225,6 +403,21 @@ for i, param in enumerate(params):
                 all_xi_kk_s30.append(xi_kk)
                 all_varxi_kk_s30.append(varxi_kk)
                 all_covmat_kk_s30.append(covmat_kk)
+                all_xi_pp_s30.append(xi_pp)
+                all_varxi_pp_s30.append(varxi_pp)
+                all_covmat_pp_s30.append(covmat_pp)
+                all_xi_nn_s30.append(xi_nn)
+                all_varxi_nn_s30.append(varxi_nn)
+                all_covmat_nn_s30.append(covmat_nn)
+                all_xi_pn_s30.append(xi_pn)
+                all_varxi_pn_s30.append(varxi_pn)
+                all_covmat_pn_s30.append(covmat_pn)
+                all_xi_pk_s30.append(xi_pk)
+                all_varxi_pk_s30.append(varxi_pk)
+                all_covmat_pk_s30.append(covmat_pk)
+                all_xi_nk_s30.append(xi_nk)
+                all_varxi_nk_s30.append(varxi_nk)
+                all_covmat_nk_s30.append(covmat_nk)
                 all_nn_combined_s30.append(nn_combined)
             elif s == 90:
                 all_kappa_pdf_s90.append(hist)
@@ -233,15 +426,77 @@ for i, param in enumerate(params):
                 all_xi_kk_s90.append(xi_kk)
                 all_varxi_kk_s90.append(varxi_kk)
                 all_covmat_kk_s90.append(covmat_kk)
+                all_xi_pp_s90.append(xi_pp)
+                all_varxi_pp_s90.append(varxi_pp)
+                all_covmat_pp_s90.append(covmat_pp)
+                all_xi_nn_s90.append(xi_nn)
+                all_varxi_nn_s90.append(varxi_nn)
+                all_covmat_nn_s90.append(covmat_nn)
+                all_xi_pn_s90.append(xi_pn)
+                all_varxi_pn_s90.append(varxi_pn)
+                all_covmat_pn_s90.append(covmat_pn)
+                all_xi_pk_s90.append(xi_pk)
+                all_varxi_pk_s90.append(varxi_pk)
+                all_covmat_pk_s90.append(covmat_pk)
+                all_xi_nk_s90.append(xi_nk)
+                all_varxi_nk_s90.append(varxi_nk)
+                all_covmat_nk_s90.append(covmat_nk)
                 all_nn_combined_s90.append(nn_combined)
     
     # Calculate averages over all seeds for each smoothing scale
     bin_centers = 0.5 * (bin_edges[:-1] + bin_edges[1:])
     
-    for s, (kappa_pdf_list, kappa_pos_list, kappa_neg_list, xi_kk_list, varxi_kk_list, covmat_kk_list, nn_list) in [
-        (15, (all_kappa_pdf_s15, all_kappa_pos_cum_s15, all_kappa_neg_cum_s15, all_xi_kk_s15, all_varxi_kk_s15, all_covmat_kk_s15, all_nn_combined_s15)),
-        (30, (all_kappa_pdf_s30, all_kappa_pos_cum_s30, all_kappa_neg_cum_s30, all_xi_kk_s30, all_varxi_kk_s30, all_covmat_kk_s30, all_nn_combined_s30)),
-        (90, (all_kappa_pdf_s90, all_kappa_pos_cum_s90, all_kappa_neg_cum_s90, all_xi_kk_s90, all_varxi_kk_s90, all_covmat_kk_s90, all_nn_combined_s90))
+    for s, (
+        kappa_pdf_list,
+        kappa_pos_list,
+        kappa_neg_list,
+        xi_kk_list,
+        varxi_kk_list,
+        covmat_kk_list,
+        nn_list,
+        xi_pp_list,
+        varxi_pp_list,
+        covmat_pp_list,
+        xi_nn_list,
+        varxi_nn_list,
+        covmat_nn_list,
+        xi_pn_list,
+        varxi_pn_list,
+        covmat_pn_list,
+        xi_pk_list,
+        varxi_pk_list,
+        covmat_pk_list,
+        xi_nk_list,
+        varxi_nk_list,
+        covmat_nk_list,
+    ) in [
+        (15, (
+            all_kappa_pdf_s15, all_kappa_pos_cum_s15, all_kappa_neg_cum_s15,
+            all_xi_kk_s15, all_varxi_kk_s15, all_covmat_kk_s15, all_nn_combined_s15,
+            all_xi_pp_s15, all_varxi_pp_s15, all_covmat_pp_s15,
+            all_xi_nn_s15, all_varxi_nn_s15, all_covmat_nn_s15,
+            all_xi_pn_s15, all_varxi_pn_s15, all_covmat_pn_s15,
+            all_xi_pk_s15, all_varxi_pk_s15, all_covmat_pk_s15,
+            all_xi_nk_s15, all_varxi_nk_s15, all_covmat_nk_s15,
+        )),
+        (30, (
+            all_kappa_pdf_s30, all_kappa_pos_cum_s30, all_kappa_neg_cum_s30,
+            all_xi_kk_s30, all_varxi_kk_s30, all_covmat_kk_s30, all_nn_combined_s30,
+            all_xi_pp_s30, all_varxi_pp_s30, all_covmat_pp_s30,
+            all_xi_nn_s30, all_varxi_nn_s30, all_covmat_nn_s30,
+            all_xi_pn_s30, all_varxi_pn_s30, all_covmat_pn_s30,
+            all_xi_pk_s30, all_varxi_pk_s30, all_covmat_pk_s30,
+            all_xi_nk_s30, all_varxi_nk_s30, all_covmat_nk_s30,
+        )),
+        (90, (
+            all_kappa_pdf_s90, all_kappa_pos_cum_s90, all_kappa_neg_cum_s90,
+            all_xi_kk_s90, all_varxi_kk_s90, all_covmat_kk_s90, all_nn_combined_s90,
+            all_xi_pp_s90, all_varxi_pp_s90, all_covmat_pp_s90,
+            all_xi_nn_s90, all_varxi_nn_s90, all_covmat_nn_s90,
+            all_xi_pn_s90, all_varxi_pn_s90, all_covmat_pn_s90,
+            all_xi_pk_s90, all_varxi_pk_s90, all_covmat_pk_s90,
+            all_xi_nk_s90, all_varxi_nk_s90, all_covmat_nk_s90,
+        )),
     ]:
         kappa_pdf_avg = np.mean(kappa_pdf_list, axis=0)
         kappa_pos_cum_avg = np.mean(kappa_pos_list, axis=0)
@@ -250,6 +505,21 @@ for i, param in enumerate(params):
         varxi_kk_avg = np.mean(varxi_kk_list, axis=0)
         covmat_kk_avg = np.mean(covmat_kk_list, axis=0)
         nn_combined_avg = np.mean(nn_list, axis=0)
+        xi_pp_avg = np.mean(xi_pp_list, axis=0)
+        varxi_pp_avg = np.mean(varxi_pp_list, axis=0)
+        covmat_pp_avg = np.mean(covmat_pp_list, axis=0)
+        xi_nn_avg = np.mean(xi_nn_list, axis=0)
+        varxi_nn_avg = np.mean(varxi_nn_list, axis=0)
+        covmat_nn_avg = np.mean(covmat_nn_list, axis=0)
+        xi_pn_avg = np.mean(xi_pn_list, axis=0)
+        varxi_pn_avg = np.mean(varxi_pn_list, axis=0)
+        covmat_pn_avg = np.mean(covmat_pn_list, axis=0)
+        xi_pk_avg = np.mean(xi_pk_list, axis=0)
+        varxi_pk_avg = np.mean(varxi_pk_list, axis=0)
+        covmat_pk_avg = np.mean(covmat_pk_list, axis=0)
+        xi_nk_avg = np.mean(xi_nk_list, axis=0)
+        varxi_nk_avg = np.mean(varxi_nk_list, axis=0)
+        covmat_nk_avg = np.mean(covmat_nk_list, axis=0)
 
         # Save averaged results   
         os.makedirs(f"{DATA_DIR}/TrainPDFs", exist_ok=True)
@@ -276,3 +546,38 @@ for i, param in enumerate(params):
         os.makedirs(f"{DATA_DIR}/TrainNNs", exist_ok=True)
         np.savez(f"{DATA_DIR}/TrainNNs/train_{i}_s{s}_NNs_combined.npz",
                 nn_combined=nn_combined_avg)
+
+        os.makedirs(f"{DATA_DIR}/TrainPosPos", exist_ok=True)
+        np.savez(f"{DATA_DIR}/TrainPosPos/train_{i}_s{s}_pos_pos_corr.npz",
+            theta=theta,
+            xi_pp=xi_pp_avg,
+            varxi_pp=varxi_pp_avg,
+            covmat_pp=covmat_pp_avg)
+
+        os.makedirs(f"{DATA_DIR}/TrainNegNeg", exist_ok=True)
+        np.savez(f"{DATA_DIR}/TrainNegNeg/train_{i}_s{s}_neg_neg_corr.npz",
+            theta=theta,
+            xi_nn=xi_nn_avg,
+            varxi_nn=varxi_nn_avg,
+            covmat_nn=covmat_nn_avg)
+
+        os.makedirs(f"{DATA_DIR}/TrainPosNeg", exist_ok=True)
+        np.savez(f"{DATA_DIR}/TrainPosNeg/train_{i}_s{s}_pos_neg_corr.npz",
+            theta=theta,
+            xi_pn=xi_pn_avg,
+            varxi_pn=varxi_pn_avg,
+            covmat_pn=covmat_pn_avg)
+
+        os.makedirs(f"{DATA_DIR}/TrainPKs", exist_ok=True)
+        np.savez(f"{DATA_DIR}/TrainPKs/train_{i}_s{s}_pos_kappa_corr.npz",
+            theta=theta,
+            xi_pk=xi_pk_avg,
+            varxi_pk=varxi_pk_avg,
+            covmat_pk=covmat_pk_avg)
+
+        os.makedirs(f"{DATA_DIR}/TrainNKs", exist_ok=True)
+        np.savez(f"{DATA_DIR}/TrainNKs/train_{i}_s{s}_neg_kappa_corr.npz",
+            theta=theta,
+            xi_nk=xi_nk_avg,
+            varxi_nk=varxi_nk_avg,
+            covmat_nk=covmat_nk_avg)

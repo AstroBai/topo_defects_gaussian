@@ -256,7 +256,8 @@ class DefectFinder:
             dr.process(cat1, cat_rand)
             thetas = dd.meanr
             xi, varxi = dd.calculateXi(rr=rr, dr=dr)
-            return thetas, xi, varxi
+            covmat = dd.cov
+            return thetas, xi, varxi, covmat
         
         else:
             # create random catalogs for both

@@ -9,6 +9,6 @@ cd Mock
 # python GetNNs.py
 python MakeCovariance.py
 cd ../Fisher
-# python GenData.py
+python GenData.py
 python PlotDerivs.py
 python FisherForecast.py

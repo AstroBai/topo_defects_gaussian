@@ -4,7 +4,7 @@ from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 n_realizations = 1000
 DATA_DIR = '/cephfs/jbai/DefectMockGaussian'
-def random_noise(data_vector, noise_level=0.00001):
+def random_noise(data_vector, noise_level=0.001):
     abs_values = np.abs(data_vector)
     positive_values = abs_values[abs_values > 0]
     if len(positive_values) > 0:
@@ -112,6 +112,116 @@ for sigma in sigmas:
     plt.title('Mean KK Correlation with Covariance Error Bars')
     plt.legend()
     plt.savefig(f"outfiles/Mean_KK_Correlation_with_Covariance_Error_Bars_s{s}.png")
+    plt.close()
+
+    # PosPos
+    pos_pos = []
+    for i in range(n_realizations):
+        data = np.load(f"{DATA_DIR}/Defects/realisation_{i}_s{s}_pos_pos_corr.npz")
+        theta = data['theta']
+        xi_pp = data['xi_pp']
+        pos_pos.append(xi_pp)
+    pos_pos = np.array(pos_pos)
+    pos_pos_mean = np.mean(pos_pos, axis=0)
+    np.save(f"PosPos_mean_s{s}.npy", pos_pos_mean)
+    cov_matrix_pos_pos = np.cov(pos_pos, rowvar=False)
+    np.save(f"CovPosPos_s{s}.npy", cov_matrix_pos_pos)
+    plt.figure(figsize=(8,6))
+    plt.errorbar(theta, pos_pos_mean, yerr=np.sqrt(np.diag(cov_matrix_pos_pos)), fmt='o', label='Mean +1/2 +1/2 Defect Correlation with error bars')
+    plt.xscale('log')
+    plt.xlabel('Theta (arcmin)')
+    plt.ylabel('+1/2 +1/2 Defect Correlation')
+    plt.title('Mean +1/2 +1/2 Defect Correlation with Covariance Error Bars')
+    plt.legend()
+    plt.savefig(f"outfiles/Mean_PosPos_Defect_Correlation_with_Covariance_Error_Bars_s{s}.png")
+    plt.close()
+
+    # NegNeg
+    neg_neg = []
+    for i in range(n_realizations):
+        data = np.load(f"{DATA_DIR}/Defects/realisation_{i}_s{s}_neg_neg_corr.npz")
+        theta = data['theta']
+        xi_nn = data['xi_nn']
+        neg_neg.append(xi_nn)
+    neg_neg = np.array(neg_neg)
+    neg_neg_mean = np.mean(neg_neg, axis=0)
+    np.save(f"NegNeg_mean_s{s}.npy", neg_neg_mean)
+    cov_matrix_neg_neg = np.cov(neg_neg, rowvar=False)
+    np.save(f"CovNegNeg_s{s}.npy", cov_matrix_neg_neg)
+    plt.figure(figsize=(8,6))
+    plt.errorbar(theta, neg_neg_mean, yerr=np.sqrt(np.diag(cov_matrix_neg_neg)), fmt='o', label='Mean -1/2 -1/2 Defect Correlation with error bars')
+    plt.xscale('log')
+    plt.xlabel('Theta (arcmin)')
+    plt.ylabel('-1/2 -1/2 Defect Correlation')
+    plt.title('Mean -1/2 -1/2 Defect Correlation with Covariance Error Bars')
+    plt.legend()
+    plt.savefig(f"outfiles/Mean_NegNeg_Defect_Correlation_with_Covariance_Error_Bars_s{s}.png")
+    plt.close()
+
+    # PosNeg
+    pos_neg = []
+    for i in range(n_realizations):
+        data = np.load(f"{DATA_DIR}/Defects/realisation_{i}_s{s}_pos_neg_corr.npz")
+        theta = data['theta']
+        xi_pn = data['xi_pn']
+        pos_neg.append(xi_pn)
+    pos_neg = np.array(pos_neg)
+    pos_neg_mean = np.mean(pos_neg, axis=0)
+    np.save(f"PosNeg_mean_s{s}.npy", pos_neg_mean)
+    cov_matrix_pos_neg = np.cov(pos_neg, rowvar=False)
+    np.save(f"CovPosNeg_s{s}.npy", cov_matrix_pos_neg)
+    plt.figure(figsize=(8,6))
+    plt.errorbar(theta, pos_neg_mean, yerr=np.sqrt(np.diag(cov_matrix_pos_neg)), fmt='o', label='Mean +1/2 -1/2 Defect Correlation with error bars')
+    plt.xscale('log')
+    plt.xlabel('Theta (arcmin)')
+    plt.ylabel('+1/2 -1/2 Defect Correlation')
+    plt.title('Mean +1/2 -1/2 Defect Correlation with Covariance Error Bars')
+    plt.legend()
+    plt.savefig(f"outfiles/Mean_PosNeg_Defect_Correlation_with_Covariance_Error_Bars_s{s}.png")
+    plt.close()
+
+    #Pos kappa
+    pk = []
+    for i in range(n_realizations):
+        data = np.load(f"{DATA_DIR}/Defects/realisation_{i}_s{s}_pos_kappa_corr.npz")
+        theta = data['theta']
+        xi_pk = data['xi_pk']
+        pk.append(xi_pk)
+    pk = np.array(pk)
+    pk_mean = np.mean(pk, axis=0)
+    np.save(f"PosKappa_mean_s{s}.npy", pk_mean)
+    cov_matrix_pk = np.cov(pk, rowvar=False)
+    np.save(f"CovPosKappa_s{s}.npy", cov_matrix_pk)
+    plt.figure(figsize=(8,6))
+    plt.errorbar(theta, pk_mean, yerr=np.sqrt(np.diag(cov_matrix_pk)), fmt='o', label='Mean +1/2 Defect-Kappa Correlation with error bars')
+    plt.xscale('log')
+    plt.xlabel('Theta (arcmin)')
+    plt.ylabel('+1/2 Defect-Kappa Correlation')
+    plt.title('Mean +1/2 Defect-Kappa Correlation with Covariance Error Bars')
+    plt.legend()
+    plt.savefig(f"outfiles/Mean_PosKappa_Correlation_with_Covariance_Error_Bars_s{s}.png")
+    plt.close()
+
+    #Neg kappa
+    nk = []
+    for i in range(n_realizations):
+        data = np.load(f"{DATA_DIR}/Defects/realisation_{i}_s{s}_neg_kappa_corr.npz")
+        theta = data['theta']
+        xi_nk = data['xi_nk']
+        nk.append(xi_nk)
+    nk = np.array(nk)
+    nk_mean = np.mean(nk, axis=0)
+    np.save(f"NegKappa_mean_s{s}.npy", nk_mean)
+    cov_matrix_nk = np.cov(nk, rowvar=False)
+    np.save(f"CovNegKappa_s{s}.npy", cov_matrix_nk)
+    plt.figure(figsize=(8,6))
+    plt.errorbar(theta, nk_mean, yerr=np.sqrt(np.diag(cov_matrix_nk)), fmt='o', label='Mean -1/2 Defect-Kappa Correlation with error bars')
+    plt.xscale('log')
+    plt.xlabel('Theta (arcmin)')
+    plt.ylabel('-1/2 Defect-Kappa Correlation')
+    plt.title('Mean -1/2 Defect-Kappa Correlation with Covariance Error Bars')
+    plt.legend()
+    plt.savefig(f"outfiles/Mean_NegKappa_Correlation_with_Covariance_Error_Bars_s{s}.png")
     plt.close()
 
     # NNs
