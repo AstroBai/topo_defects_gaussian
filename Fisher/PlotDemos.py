@@ -267,11 +267,33 @@ cov_kk_fid_s30 = np.load(f'{MOCK_DIR}/CovKK_s30.npy')
 kk_fid_s90 = np.load(f'{MOCK_DIR}/KK_mean_s90.npy')
 cov_kk_fid_s90 = np.load(f'{MOCK_DIR}/CovKK_s90.npy')
 
+pp_fid_s15 = np.load(f'{MOCK_DIR}/PosPos_mean_s15.npy')
+cov_pp_fid_s15 = np.load(f'{MOCK_DIR}/CovPosPos_s15.npy')
+nn_fid_s15 = np.load(f'{MOCK_DIR}/NegNeg_mean_s15.npy')
+cov_nn_fid_s15 = np.load(f'{MOCK_DIR}/CovNegNeg_s15.npy')
+pn_fid_s15 = np.load(f'{MOCK_DIR}/PosNeg_mean_s15.npy')
+cov_pn_fid_s15 = np.load(f'{MOCK_DIR}/CovPosNeg_s15.npy')
+pp_fid_s30 = np.load(f'{MOCK_DIR}/PosPos_mean_s30.npy')
+cov_pp_fid_s30 = np.load(f'{MOCK_DIR}/CovPosPos_s30.npy')
+nn_fid_s30 = np.load(f'{MOCK_DIR}/NegNeg_mean_s30.npy')
+cov_nn_fid_s30 = np.load(f'{MOCK_DIR}/CovNegNeg_s30.npy')
+pn_fid_s30 = np.load(f'{MOCK_DIR}/PosNeg_mean_s30.npy')
+cov_pn_fid_s30 = np.load(f'{MOCK_DIR}/CovPosNeg_s30.npy')
+pp_fid_s90 = np.load(f'{MOCK_DIR}/PosPos_mean_s90.npy')
+cov_pp_fid_s90 = np.load(f'{MOCK_DIR}/CovPosPos_s90.npy')
+nn_fid_s90 = np.load(f'{MOCK_DIR}/NegNeg_mean_s90.npy')
+cov_nn_fid_s90 = np.load(f'{MOCK_DIR}/CovNegNeg_s90.npy')
+pn_fid_s90 = np.load(f'{MOCK_DIR}/PosNeg_mean_s90.npy')
+cov_pn_fid_s90 = np.load(f'{MOCK_DIR}/CovPosNeg_s90.npy')
+
+
 # plot derivs
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+from matplotlib.ticker import FixedLocator, FixedFormatter
 mpl.rcParams['xtick.direction'] = 'in'
 mpl.rcParams['ytick.direction'] = 'in'
+mpl.rcParams['font.size'] = 8
 
 # compare cdf+ cdf-
 from scipy.interpolate import interp1d
@@ -299,6 +321,27 @@ plt.legend(loc='upper left')
 plt.text(0.9, 0.1, 'Gaussian', ha='right', va='bottom', transform=plt.gca().transAxes, fontsize=12)
 # plt.grid(True, alpha=0.3)
 plt.savefig('outfiles/compare_cdf.png', dpi=300, bbox_inches='tight')
+plt.close()
+
+# compare cdf no normal, and no pdf
+plt.figure(figsize=(4, 3))
+bin_edges = np.linspace(-0.005, 0.005, 11)
+bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
+# Create interpolation functions
+interp_pos = interp1d(bin_centers, dpdfs_pos_fid_s90, kind='quadratic', fill_value=np.nan)
+interp_neg = interp1d(bin_centers, dpdfs_neg_fid_s90, kind='quadratic', fill_value=np.nan)
+interp_cdf = interp1d(bin_centers, np.cumsum(pdfs_fid_s90), kind='quadratic', fill_value=np.nan)
+# Create 100 bins for plotting
+bin_centers_fine = np.linspace(bin_centers[0], bin_centers[-1], 100)    
+plt.plot(bin_centers_fine, interp_pos(bin_centers_fine), label='DCDF +', c=color_map(0))
+plt.plot(bin_centers_fine, interp_neg(bin_centers_fine), label='DCDF -', c=color_map(1), linestyle='-.')
+plt.xlabel(r'$\kappa$')
+plt.ylabel('Cumulative Distribution')
+# plt.title('Comparison of CDFs without Normalisation')
+plt.legend(loc='upper left')
+plt.text(0.9, 0.1, 'Gaussian', ha='right', va='bottom', transform=plt.gca().transAxes, fontsize=12)
+# plt.grid(True, alpha=0.3)
+plt.savefig('outfiles/compare_cdf_nonormal.png', dpi=300, bbox_inches='tight')
 plt.close()
 
 # compare 1,2,4,8 NN pos same/opp 
@@ -393,4 +436,37 @@ plt.tick_params(axis='both', which='both', length=0)
 plt.savefig('outfiles/corr_matrix_cdf.png', dpi=300, bbox_inches='tight')
 plt.close()
 
-
+# compare pp/nn/pn xi at s15, s30, s90
+scales = ['s15', 's30', 's90']
+pp_fids = [pp_fid_s15, pp_fid_s30, pp_fid_s90]
+cov_pp_fids = [cov_pp_fid_s15, cov_pp_fid_s30, cov_pp_fid_s90]
+nn_fids = [nn_fid_s15, nn_fid_s30, nn_fid_s90]
+cov_nn_fids = [cov_nn_fid_s15, cov_nn_fid_s30, cov_nn_fid_s90]
+pn_fids = [pn_fid_s15, pn_fid_s30, pn_fid_s90]
+cov_pn_fids = [cov_pn_fid_s15, cov_pn_fid_s30, cov_pn_fid_s90]
+bins = [np.linspace(15, 600, 30), np.linspace(30, 600, 30), np.linspace(90, 600, 30)]
+fig, axes = plt.subplots(1, 3, figsize=(9, 3), sharey=True)
+for i in range(3):
+    ax = axes[i]
+    bin_centers = bins[i]
+    ax.plot(bin_centers, pp_fids[i], label='PP', color=color_map(0))
+    ax.fill_between(bin_centers, pp_fids[i] - np.sqrt(np.diag(cov_pp_fids[i])), pp_fids[i] + np.sqrt(np.diag(cov_pp_fids[i])), color=color_map(0), alpha=0.3)
+    ax.plot(bin_centers, nn_fids[i], label='NN', color=color_map(1))
+    ax.fill_between(bin_centers, nn_fids[i] - np.sqrt(np.diag(cov_nn_fids[i])), nn_fids[i] + np.sqrt(np.diag(cov_nn_fids[i])), color=color_map(1), alpha=0.3)
+    ax.plot(bin_centers, pn_fids[i], label='PN', color=color_map(2))
+    ax.fill_between(bin_centers, pn_fids[i] - np.sqrt(np.diag(cov_pn_fids[i])), pn_fids[i] + np.sqrt(np.diag(cov_pn_fids[i])), color=color_map(2), alpha=0.3)
+    ax.axhline(0, color='grey', linestyle='--', linewidth=1)
+    ax.axhline(-1, color='red', linestyle='-.', linewidth=1)
+    ax.set_xlabel('Distance (arcmin)')
+    ax.set_xscale('log')
+    ax.xaxis.set_major_locator(FixedLocator([100, 500]))
+    ax.xaxis.set_major_formatter(FixedFormatter(['100', '500']))
+    ax.xaxis.set_minor_locator(FixedLocator([]))
+    if i == 0:
+        ax.set_ylabel(r'$\xi$')
+    ax.set_title(f'Scale: {scales[i]}')
+    ax.legend()
+plt.subplots_adjust(wspace=0)
+# plt.tight_layout()
+plt.savefig('outfiles/compare_xi_pp_nn_pn.png', dpi=300, bbox_inches='tight')
+plt.close()

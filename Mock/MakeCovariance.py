@@ -20,6 +20,7 @@ dpdf_all_scales = []
 nn_all_scales = []
 kk_all_scales = []
 defects_all_scales = []
+dcorr_all_scales = []
 for sigma in sigmas:
     s = int(np.degrees(sigma)*60)
 
@@ -117,7 +118,7 @@ for sigma in sigmas:
     # PosPos
     pos_pos = []
     for i in range(n_realizations):
-        data = np.load(f"{DATA_DIR}/Defects/realisation_{i}_s{s}_pos_pos_corr.npz")
+        data = np.load(f"{DATA_DIR}/PosPos/realisation_{i}_s{s}_pos_pos_corr.npz")
         theta = data['theta']
         xi_pp = data['xi_pp']
         pos_pos.append(xi_pp)
@@ -139,7 +140,7 @@ for sigma in sigmas:
     # NegNeg
     neg_neg = []
     for i in range(n_realizations):
-        data = np.load(f"{DATA_DIR}/Defects/realisation_{i}_s{s}_neg_neg_corr.npz")
+        data = np.load(f"{DATA_DIR}/NegNeg/realisation_{i}_s{s}_neg_neg_corr.npz")
         theta = data['theta']
         xi_nn = data['xi_nn']
         neg_neg.append(xi_nn)
@@ -161,7 +162,7 @@ for sigma in sigmas:
     # PosNeg
     pos_neg = []
     for i in range(n_realizations):
-        data = np.load(f"{DATA_DIR}/Defects/realisation_{i}_s{s}_pos_neg_corr.npz")
+        data = np.load(f"{DATA_DIR}/PosNeg/realisation_{i}_s{s}_pos_neg_corr.npz")
         theta = data['theta']
         xi_pn = data['xi_pn']
         pos_neg.append(xi_pn)
@@ -183,7 +184,7 @@ for sigma in sigmas:
     #Pos kappa
     pk = []
     for i in range(n_realizations):
-        data = np.load(f"{DATA_DIR}/Defects/realisation_{i}_s{s}_pos_kappa_corr.npz")
+        data = np.load(f"{DATA_DIR}/PKs/realisation_{i}_s{s}_pos_kappa_corr.npz")
         theta = data['theta']
         xi_pk = data['xi_pk']
         pk.append(xi_pk)
@@ -205,7 +206,7 @@ for sigma in sigmas:
     #Neg kappa
     nk = []
     for i in range(n_realizations):
-        data = np.load(f"{DATA_DIR}/Defects/realisation_{i}_s{s}_neg_kappa_corr.npz")
+        data = np.load(f"{DATA_DIR}/NKs/realisation_{i}_s{s}_neg_kappa_corr.npz")
         theta = data['theta']
         xi_nk = data['xi_nk']
         nk.append(xi_nk)
@@ -223,6 +224,8 @@ for sigma in sigmas:
     plt.legend()
     plt.savefig(f"outfiles/Mean_NegKappa_Correlation_with_Covariance_Error_Bars_s{s}.png")
     plt.close()
+
+    
 
     # NNs
     nn_pos_same1 = []
@@ -364,6 +367,14 @@ for sigma in sigmas:
     cov_matrix_cdf_combined = np.cov(cdf_combined, rowvar=False)
     np.save(f"CovCDF_combined_s{s}.npy", cov_matrix_cdf_combined)
 
+    dcorr_combined = np.hstack((pos_pos, neg_neg, pos_neg))
+    dcorr_all_scales.append(np.hstack((pos_pos, neg_neg, pos_neg)))
+    cov_matrix_dcorr_combined = np.cov(dcorr_combined, rowvar=False)
+    np.save(f"CovDCorr_combined_s{s}.npy", cov_matrix_dcorr_combined)
+
+
+
+
 
 pdf_all_scales = np.hstack(pdf_all_scales)
 print("PDF all scales shape:", pdf_all_scales.shape)
@@ -392,6 +403,13 @@ kk_all_scales_mean = np.mean(kk_all_scales, axis=0)
 kk_all_scales_cov = np.cov(kk_all_scales, rowvar=False)
 np.save("KK_all_scales_mean.npy", kk_all_scales_mean)
 np.save("KK_all_scales_cov.npy", kk_all_scales_cov)
+
+dcorr_all_scales = np.hstack(dcorr_all_scales)
+print("DCorr all scales shape:", dcorr_all_scales.shape)
+dcorr_all_scales_mean = np.mean(dcorr_all_scales, axis=0)
+dcorr_all_scales_cov = np.cov(dcorr_all_scales, rowvar=False)
+np.save("DCorr_all_scales_mean.npy", dcorr_all_scales_mean)
+np.save("DCorr_all_scales_cov.npy", dcorr_all_scales_cov)
 
 defects_all_scales = np.hstack(defects_all_scales)
 print("Defects all scales shape:", defects_all_scales.shape)
