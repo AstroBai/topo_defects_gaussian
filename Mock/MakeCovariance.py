@@ -2,17 +2,82 @@
 import numpy as np  
 from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
+from scipy.stats import gaussian_kde
+import os
+
+def plot_ridgeline(data_matrix, title, filename_suffix, bin_indices=None):
+    """
+    Plots a vertical ridgeline plot (joyplot) for the given data matrix.
+    data_matrix: shape (n_samples, n_bins)
+    """
+    n_samples, n_bins = data_matrix.shape
+    
+    # Select bins (max 20 for visibility)
+    if bin_indices is None:
+        if n_bins > 20:
+             bin_indices = np.linspace(0, n_bins-1, 20, dtype=int)
+        else:
+            bin_indices = np.arange(n_bins)
+    
+    selected_data = data_matrix[:, bin_indices]
+    n_plot_bins = len(bin_indices)
+    
+    # Swap figsize dimensions for vertical orientation (bins on x-axis)
+    # Width grows with number of bins
+    fig, ax = plt.subplots(figsize=(max(6, n_plot_bins * 0.5), 6))
+    
+    overlap = 0.5
+    colors = plt.cm.viridis(np.linspace(0, 1, n_plot_bins))
+
+    for i, bin_idx in enumerate(bin_indices):
+        x_data = selected_data[:, i]
+        # Handle constant data (zero variance)
+        if np.var(x_data) == 0:
+            continue
+            
+        kde = gaussian_kde(x_data)
+        # Grid along the value axis (now Y-axis)
+        y_grid = np.linspace(x_data.min(), x_data.max(), 100)
+        # Density becomes width along X-axis
+        x_density = kde(y_grid)
+        
+        if x_density.max() > 0:
+            x_density = x_density / x_density.max() * (1 + overlap)
+        
+        baseline = i
+        # Fill horizontally between x=baseline and x=baseline+density
+        ax.fill_betweenx(y_grid, baseline, baseline + x_density, color=colors[i], alpha=0.7, zorder=n_plot_bins-i)
+        ax.plot(baseline + x_density, y_grid, color='white', lw=1, zorder=n_plot_bins-i)
+
+    # Set labels
+    ax.set_xticks(np.arange(len(bin_indices)))
+    ax.set_xticklabels([f"Bin {b}" for b in bin_indices], rotation=90)
+    ax.set_title(title)
+    ax.set_xlabel("Bin Index")
+    ax.set_ylabel("Value")
+    
+    # Adjust spines
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    # Keep left/bottom spines for value reading
+    ax.spines['left'].set_visible(True)
+    ax.spines['bottom'].set_visible(True)
+    
+    plt.tight_layout()
+    os.makedirs("outfiles/Ridgelines", exist_ok=True)
+    plt.savefig(f"outfiles/Ridgelines/{filename_suffix}.png", dpi=300)
+    plt.close()
 n_realizations = 1000
 DATA_DIR = '/cephfs/jbai/DefectMockGaussian'
-def random_noise(data_vector, noise_level=0.001):
-    abs_values = np.abs(data_vector)
-    positive_values = abs_values[abs_values > 0]
-    if len(positive_values) > 0:
-        noise_sigma = noise_level * np.min(positive_values)
-    else:
-        noise_sigma = noise_level
-    noise = np.random.normal(0, noise_sigma, size=data_vector.shape)
-    return data_vector + noise
+# def random_noise(data_vector, noise_level=0.001):
+#     abs_values = np.abs(data_vector)
+#     positive_values = abs_values[abs_values > 0]
+#     if len(positive_values) > 0:
+#         noise_sigma = noise_level * np.min(positive_values)
+#     else:
+#         noise_sigma = noise_level
+#     noise = np.random.normal(0, noise_sigma, size=data_vector.shape)
+#     return data_vector + noise
 
 sigmas = [np.radians(15/60), np.radians(30/60), np.radians(90/60)]
 pdf_all_scales = []
@@ -29,7 +94,7 @@ for sigma in sigmas:
     for i in range(n_realizations):
         data = np.load(f"{DATA_DIR}/PDFs/realisation_{i}_s{s}_kappa_pdf.npz")
         hist = data['hist']
-        hist = random_noise(hist)
+        # hist = random_noise(hist)
         bin_centers = 0.5 * (data['bin_edges'][:-1] + data['bin_edges'][1:])
         pdfs.append(hist)
     pdfs = np.array(pdfs)
@@ -39,14 +104,14 @@ for sigma in sigmas:
     cov_matrix = np.cov(pdfs, rowvar=False)
     np.save(f"PDF_mean_s{s}.npy", pdfs_mean)
     np.save(f"CovPDF_s{s}.npy", cov_matrix)
-    plt.figure(figsize=(8,6))
-    plt.errorbar(bin_centers, pdfs_mean, yerr=np.sqrt(np.diag(cov_matrix)), fmt='o', label='Mean PDF with error bars')
-    plt.xlabel('Kappa')
-    plt.ylabel('Probability Density')
-    plt.title('Mean Kappa PDF with Covariance Error Bars')
-    plt.legend()
-    plt.savefig(f"outfiles/Mean_Kappa_PDF_with_Covariance_Error_Bars_s{s}.png")
-    plt.close()
+    # plt.figure(figsize=(8,6))
+    # plt.errorbar(bin_centers, pdfs_mean, yerr=np.sqrt(np.diag(cov_matrix)), fmt='o', label='Mean PDF with error bars')
+    # plt.xlabel('Kappa')
+    # plt.ylabel('Probability Density')
+    # plt.title('Mean Kappa PDF with Covariance Error Bars')
+    # plt.legend()
+    # plt.savefig(f"outfiles/Mean_Kappa_PDF_with_Covariance_Error_Bars_s{s}.png")
+    # plt.close()
 
     # defect pdf +1/2
     pdfs_pos = []
@@ -60,14 +125,14 @@ for sigma in sigmas:
     cov_matrix_pos = np.cov(pdfs_pos, rowvar=False)
     np.save(f"CovDPDF_pos_s{s}.npy", cov_matrix_pos)
     np.save(f"DPDF_pos_mean_s{s}.npy", pdfs_pos_mean)
-    plt.figure(figsize=(8,6))
-    plt.errorbar(bin_centers, pdfs_pos_mean, yerr=np.sqrt(np.diag(cov_matrix_pos)), fmt='o', label='Mean Defect +1/2 PDF with error bars')
-    plt.xlabel('Kappa')
-    plt.ylabel('Probability Density')
-    plt.title('Mean Defect +1/2 Kappa PDF with Covariance Error Bars')
-    plt.legend()
-    plt.savefig(f"outfiles/Mean_Defect_Positive_Half_Kappa_PDF_with_Covariance_Error_Bars_s{s}.png")
-    plt.close()
+    # plt.figure(figsize=(8,6))
+    # plt.errorbar(bin_centers, pdfs_pos_mean, yerr=np.sqrt(np.diag(cov_matrix_pos)), fmt='o', label='Mean Defect +1/2 PDF with error bars')
+    # plt.xlabel('Kappa')
+    # plt.ylabel('Probability Density')
+    # plt.title('Mean Defect +1/2 Kappa PDF with Covariance Error Bars')
+    # plt.legend()
+    # plt.savefig(f"outfiles/Mean_Defect_Positive_Half_Kappa_PDF_with_Covariance_Error_Bars_s{s}.png")
+    # plt.close()
 
     # defect pdf -1/2
     pdfs_neg = []
@@ -81,14 +146,14 @@ for sigma in sigmas:
     cov_matrix_neg = np.cov(pdfs_neg, rowvar=False)
     np.save(f"CovDPDF_neg_s{s}.npy", cov_matrix_neg)
     np.save(f"DPDF_neg_mean_s{s}.npy", pdfs_neg_mean)
-    plt.figure(figsize=(8,6))
-    plt.errorbar(bin_centers, pdfs_neg_mean, yerr=np.sqrt(np.diag(cov_matrix_neg)), fmt='o', label='Mean Defect -1/2 PDF with error bars')
-    plt.xlabel('Kappa')
-    plt.ylabel('Probability Density')
-    plt.title('Mean Defect -1/2 Kappa PDF with Covariance Error Bars')
-    plt.legend()
-    plt.savefig(f"outfiles/Mean_Defect_Negative_Half_Kappa_PDF_with_Covariance_Error_Bars_s{s}.png")
-    plt.close()
+    # plt.figure(figsize=(8,6))
+    # plt.errorbar(bin_centers, pdfs_neg_mean, yerr=np.sqrt(np.diag(cov_matrix_neg)), fmt='o', label='Mean Defect -1/2 PDF with error bars')
+    # plt.xlabel('Kappa')
+    # plt.ylabel('Probability Density')
+    # plt.title('Mean Defect -1/2 Kappa PDF with Covariance Error Bars')
+    # plt.legend()
+    # plt.savefig(f"outfiles/Mean_Defect_Negative_Half_Kappa_PDF_with_Covariance_Error_Bars_s{s}.png")
+    # plt.close()
 
 
     # KK
@@ -105,15 +170,15 @@ for sigma in sigmas:
     np.save(f"KK_mean_s{s}.npy", kk_mean)
     cov_matrix_kk = np.cov(kk, rowvar=False)
     np.save(f"CovKK_s{s}.npy", cov_matrix_kk)
-    plt.figure(figsize=(8,6))
-    plt.errorbar(theta, kk_mean, yerr=np.sqrt(np.diag(cov_matrix_kk)), fmt='o', label='Mean KK Correlation with error bars')
-    plt.xscale('log')
-    plt.xlabel('Theta (arcmin)')
-    plt.ylabel('KK Correlation')
-    plt.title('Mean KK Correlation with Covariance Error Bars')
-    plt.legend()
-    plt.savefig(f"outfiles/Mean_KK_Correlation_with_Covariance_Error_Bars_s{s}.png")
-    plt.close()
+    # plt.figure(figsize=(8,6))
+    # plt.errorbar(theta, kk_mean, yerr=np.sqrt(np.diag(cov_matrix_kk)), fmt='o', label='Mean KK Correlation with error bars')
+    # plt.xscale('log')
+    # plt.xlabel('Theta (arcmin)')
+    # plt.ylabel('KK Correlation')
+    # plt.title('Mean KK Correlation with Covariance Error Bars')
+    # plt.legend()
+    # plt.savefig(f"outfiles/Mean_KK_Correlation_with_Covariance_Error_Bars_s{s}.png")
+    # plt.close()
 
     # PosPos
     pos_pos = []
@@ -127,15 +192,15 @@ for sigma in sigmas:
     np.save(f"PosPos_mean_s{s}.npy", pos_pos_mean)
     cov_matrix_pos_pos = np.cov(pos_pos, rowvar=False)
     np.save(f"CovPosPos_s{s}.npy", cov_matrix_pos_pos)
-    plt.figure(figsize=(8,6))
-    plt.errorbar(theta, pos_pos_mean, yerr=np.sqrt(np.diag(cov_matrix_pos_pos)), fmt='o', label='Mean +1/2 +1/2 Defect Correlation with error bars')
-    plt.xscale('log')
-    plt.xlabel('Theta (arcmin)')
-    plt.ylabel('+1/2 +1/2 Defect Correlation')
-    plt.title('Mean +1/2 +1/2 Defect Correlation with Covariance Error Bars')
-    plt.legend()
-    plt.savefig(f"outfiles/Mean_PosPos_Defect_Correlation_with_Covariance_Error_Bars_s{s}.png")
-    plt.close()
+    # plt.figure(figsize=(8,6))
+    # plt.errorbar(theta, pos_pos_mean, yerr=np.sqrt(np.diag(cov_matrix_pos_pos)), fmt='o', label='Mean +1/2 +1/2 Defect Correlation with error bars')
+    # plt.xscale('log')
+    # plt.xlabel('Theta (arcmin)')
+    # plt.ylabel('+1/2 +1/2 Defect Correlation')
+    # plt.title('Mean +1/2 +1/2 Defect Correlation with Covariance Error Bars')
+    # plt.legend()
+    # plt.savefig(f"outfiles/Mean_PosPos_Defect_Correlation_with_Covariance_Error_Bars_s{s}.png")
+    # plt.close()
 
     # NegNeg
     neg_neg = []
@@ -149,15 +214,15 @@ for sigma in sigmas:
     np.save(f"NegNeg_mean_s{s}.npy", neg_neg_mean)
     cov_matrix_neg_neg = np.cov(neg_neg, rowvar=False)
     np.save(f"CovNegNeg_s{s}.npy", cov_matrix_neg_neg)
-    plt.figure(figsize=(8,6))
-    plt.errorbar(theta, neg_neg_mean, yerr=np.sqrt(np.diag(cov_matrix_neg_neg)), fmt='o', label='Mean -1/2 -1/2 Defect Correlation with error bars')
-    plt.xscale('log')
-    plt.xlabel('Theta (arcmin)')
-    plt.ylabel('-1/2 -1/2 Defect Correlation')
-    plt.title('Mean -1/2 -1/2 Defect Correlation with Covariance Error Bars')
-    plt.legend()
-    plt.savefig(f"outfiles/Mean_NegNeg_Defect_Correlation_with_Covariance_Error_Bars_s{s}.png")
-    plt.close()
+    # plt.figure(figsize=(8,6))
+    # plt.errorbar(theta, neg_neg_mean, yerr=np.sqrt(np.diag(cov_matrix_neg_neg)), fmt='o', label='Mean -1/2 -1/2 Defect Correlation with error bars')
+    # plt.xscale('log')
+    # plt.xlabel('Theta (arcmin)')
+    # plt.ylabel('-1/2 -1/2 Defect Correlation')
+    # plt.title('Mean -1/2 -1/2 Defect Correlation with Covariance Error Bars')
+    # plt.legend()
+    # plt.savefig(f"outfiles/Mean_NegNeg_Defect_Correlation_with_Covariance_Error_Bars_s{s}.png")
+    # plt.close()
 
     # PosNeg
     pos_neg = []
@@ -171,15 +236,15 @@ for sigma in sigmas:
     np.save(f"PosNeg_mean_s{s}.npy", pos_neg_mean)
     cov_matrix_pos_neg = np.cov(pos_neg, rowvar=False)
     np.save(f"CovPosNeg_s{s}.npy", cov_matrix_pos_neg)
-    plt.figure(figsize=(8,6))
-    plt.errorbar(theta, pos_neg_mean, yerr=np.sqrt(np.diag(cov_matrix_pos_neg)), fmt='o', label='Mean +1/2 -1/2 Defect Correlation with error bars')
-    plt.xscale('log')
-    plt.xlabel('Theta (arcmin)')
-    plt.ylabel('+1/2 -1/2 Defect Correlation')
-    plt.title('Mean +1/2 -1/2 Defect Correlation with Covariance Error Bars')
-    plt.legend()
-    plt.savefig(f"outfiles/Mean_PosNeg_Defect_Correlation_with_Covariance_Error_Bars_s{s}.png")
-    plt.close()
+    # plt.figure(figsize=(8,6))
+    # plt.errorbar(theta, pos_neg_mean, yerr=np.sqrt(np.diag(cov_matrix_pos_neg)), fmt='o', label='Mean +1/2 -1/2 Defect Correlation with error bars')
+    # plt.xscale('log')
+    # plt.xlabel('Theta (arcmin)')
+    # plt.ylabel('+1/2 -1/2 Defect Correlation')
+    # plt.title('Mean +1/2 -1/2 Defect Correlation with Covariance Error Bars')
+    # plt.legend()
+    # plt.savefig(f"outfiles/Mean_PosNeg_Defect_Correlation_with_Covariance_Error_Bars_s{s}.png")
+    # plt.close()
 
     #Pos kappa
     pk = []
@@ -193,15 +258,15 @@ for sigma in sigmas:
     np.save(f"PosKappa_mean_s{s}.npy", pk_mean)
     cov_matrix_pk = np.cov(pk, rowvar=False)
     np.save(f"CovPosKappa_s{s}.npy", cov_matrix_pk)
-    plt.figure(figsize=(8,6))
-    plt.errorbar(theta, pk_mean, yerr=np.sqrt(np.diag(cov_matrix_pk)), fmt='o', label='Mean +1/2 Defect-Kappa Correlation with error bars')
-    plt.xscale('log')
-    plt.xlabel('Theta (arcmin)')
-    plt.ylabel('+1/2 Defect-Kappa Correlation')
-    plt.title('Mean +1/2 Defect-Kappa Correlation with Covariance Error Bars')
-    plt.legend()
-    plt.savefig(f"outfiles/Mean_PosKappa_Correlation_with_Covariance_Error_Bars_s{s}.png")
-    plt.close()
+    # plt.figure(figsize=(8,6))
+    # plt.errorbar(theta, pk_mean, yerr=np.sqrt(np.diag(cov_matrix_pk)), fmt='o', label='Mean +1/2 Defect-Kappa Correlation with error bars')
+    # plt.xscale('log')
+    # plt.xlabel('Theta (arcmin)')
+    # plt.ylabel('+1/2 Defect-Kappa Correlation')
+    # plt.title('Mean +1/2 Defect-Kappa Correlation with Covariance Error Bars')
+    # plt.legend()
+    # plt.savefig(f"outfiles/Mean_PosKappa_Correlation_with_Covariance_Error_Bars_s{s}.png")
+    # plt.close()
 
     #Neg kappa
     nk = []
@@ -215,15 +280,15 @@ for sigma in sigmas:
     np.save(f"NegKappa_mean_s{s}.npy", nk_mean)
     cov_matrix_nk = np.cov(nk, rowvar=False)
     np.save(f"CovNegKappa_s{s}.npy", cov_matrix_nk)
-    plt.figure(figsize=(8,6))
-    plt.errorbar(theta, nk_mean, yerr=np.sqrt(np.diag(cov_matrix_nk)), fmt='o', label='Mean -1/2 Defect-Kappa Correlation with error bars')
-    plt.xscale('log')
-    plt.xlabel('Theta (arcmin)')
-    plt.ylabel('-1/2 Defect-Kappa Correlation')
-    plt.title('Mean -1/2 Defect-Kappa Correlation with Covariance Error Bars')
-    plt.legend()
-    plt.savefig(f"outfiles/Mean_NegKappa_Correlation_with_Covariance_Error_Bars_s{s}.png")
-    plt.close()
+    # plt.figure(figsize=(8,6))
+    # plt.errorbar(theta, nk_mean, yerr=np.sqrt(np.diag(cov_matrix_nk)), fmt='o', label='Mean -1/2 Defect-Kappa Correlation with error bars')
+    # plt.xscale('log')
+    # plt.xlabel('Theta (arcmin)')
+    # plt.ylabel('-1/2 Defect-Kappa Correlation')
+    # plt.title('Mean -1/2 Defect-Kappa Correlation with Covariance Error Bars')
+    # plt.legend()
+    # plt.savefig(f"outfiles/Mean_NegKappa_Correlation_with_Covariance_Error_Bars_s{s}.png")
+    # plt.close()
 
     
 
@@ -246,22 +311,22 @@ for sigma in sigmas:
     nn_neg_opp8 = []
     for i in range(n_realizations):
         data = np.load(f"{DATA_DIR}/NNs/realisation_{i}_s{s}_NNs.npz")
-        nn_pos_same1.append(random_noise(data['nn_pos_same1_cum']))
-        nn_neg_same1.append(random_noise(data['nn_neg_same1_cum']))
-        nn_pos_opp1.append(random_noise(data['nn_pos_opp1_cum']))
-        nn_neg_opp1.append(random_noise(data['nn_neg_opp1_cum']))
-        nn_pos_same2.append(random_noise(data['nn_pos_same2_cum']))
-        nn_neg_same2.append(random_noise(data['nn_neg_same2_cum']))
-        nn_pos_opp2.append(random_noise(data['nn_pos_opp2_cum']))
-        nn_neg_opp2.append(random_noise(data['nn_neg_opp2_cum']))
-        nn_pos_same4.append(random_noise(data['nn_pos_same4_cum']))
-        nn_neg_same4.append(random_noise(data['nn_neg_same4_cum']))
-        nn_pos_opp4.append(random_noise(data['nn_pos_opp4_cum']))
-        nn_neg_opp4.append(random_noise(data['nn_neg_opp4_cum']))
-        nn_pos_same8.append(random_noise(data['nn_pos_same8_cum']))
-        nn_neg_same8.append(random_noise(data['nn_neg_same8_cum']))
-        nn_pos_opp8.append(random_noise(data['nn_pos_opp8_cum']))
-        nn_neg_opp8.append(random_noise(data['nn_neg_opp8_cum']))
+        nn_pos_same1.append(data['nn_pos_same1_cum'])
+        nn_neg_same1.append(data['nn_neg_same1_cum'])
+        nn_pos_opp1.append(data['nn_pos_opp1_cum'])
+        nn_neg_opp1.append(data['nn_neg_opp1_cum'])
+        nn_pos_same2.append(data['nn_pos_same2_cum'])
+        nn_neg_same2.append(data['nn_neg_same2_cum'])
+        nn_pos_opp2.append(data['nn_pos_opp2_cum'])
+        nn_neg_opp2.append(data['nn_neg_opp2_cum'])
+        nn_pos_same4.append(data['nn_pos_same4_cum'])
+        nn_neg_same4.append(data['nn_neg_same4_cum'])
+        nn_pos_opp4.append(data['nn_pos_opp4_cum'])
+        nn_neg_opp4.append(data['nn_neg_opp4_cum'])
+        nn_pos_same8.append(data['nn_pos_same8_cum'])
+        nn_neg_same8.append(data['nn_neg_same8_cum'])
+        nn_pos_opp8.append(data['nn_pos_opp8_cum'])
+        nn_neg_opp8.append(data['nn_neg_opp8_cum'])
     nn_pos_same1 = np.array(nn_pos_same1)
     nn_neg_same1 = np.array(nn_neg_same1)
     nn_pos_opp1 = np.array(nn_pos_opp1)
@@ -326,32 +391,54 @@ for sigma in sigmas:
     nn_all_scales.append(nn_combined)
     cov_matrix_nn_combined = np.cov(nn_combined, rowvar=False)
     np.save(f"CovNNs_combined_s{s}.npy", cov_matrix_nn_combined)
-    plt.figure(figsize=(8,6))
-    plt.errorbar(np.arange(nn_pos_same1.shape[1]), np.mean(nn_pos_same1, axis=0), yerr=np.sqrt(np.diag(cov_matrix_nns['cov_nn_pos_same1'])), fmt='o', label='Mean NN Pos Same 1 with error bars')
-    plt.xlabel('Bin Index')
-    plt.ylabel('Cumulative Number Count')
-    plt.title('Mean NN Pos Same 1 with Covariance Error Bars')
-    plt.legend()
-    plt.savefig(f"outfiles/Mean_NN_Pos_Same_1_with_Covariance_Error_Bars_s{s}.png")
-    plt.close()
+    # plt.figure(figsize=(8,6))
+    # plt.errorbar(np.arange(nn_pos_same1.shape[1]), np.mean(nn_pos_same1, axis=0), yerr=np.sqrt(np.diag(cov_matrix_nns['cov_nn_pos_same1'])), fmt='o', label='Mean NN Pos Same 1 with error bars')
+    # plt.xlabel('Bin Index')
+    # plt.ylabel('Cumulative Number Count')
+    # plt.title('Mean NN Pos Same 1 with Covariance Error Bars')
+    # plt.legend()
+    # plt.savefig(f"outfiles/Mean_NN_Pos_Same_1_with_Covariance_Error_Bars_s{s}.png")
+    # plt.close()
 
-    plt.figure(figsize=(8,6))
-    plt.errorbar(np.arange(nn_neg_opp4.shape[1]), np.mean(nn_neg_opp4, axis=0), yerr=np.sqrt(np.diag(cov_matrix_nns['cov_nn_neg_opp4'])), fmt='o', label='Mean NN Neg Opp 4 with error bars')
-    plt.xlabel('Bin Index')
-    plt.ylabel('Cumulative Number Count')
-    plt.title('Mean NN Neg Opp 4 with Covariance Error Bars')
-    plt.legend()
-    plt.savefig(f"outfiles/Mean_NN_Neg_Opp_4_with_Covariance_Error_Bars_s{s}.png")
-    plt.close()
+    # plt.figure(figsize=(8,6))
+    # plt.errorbar(np.arange(nn_neg_opp4.shape[1]), np.mean(nn_neg_opp4, axis=0), yerr=np.sqrt(np.diag(cov_matrix_nns['cov_nn_neg_opp4'])), fmt='o', label='Mean NN Neg Opp 4 with error bars')
+    # plt.xlabel('Bin Index')
+    # plt.ylabel('Cumulative Number Count')
+    # plt.title('Mean NN Neg Opp 4 with Covariance Error Bars')
+    # plt.legend()
+    # plt.savefig(f"outfiles/Mean_NN_Neg_Opp_4_with_Covariance_Error_Bars_s{s}.png")
+    # plt.close()
 
-    plt.figure(figsize=(8,6))   
-    plt.errorbar(np.arange(nn_pos_same8.shape[1]), np.mean(nn_pos_same8, axis=0), yerr=np.sqrt(np.diag(cov_matrix_nns['cov_nn_pos_same8'])), fmt='o', label='Mean NN Pos Same 8 with error bars')
-    plt.xlabel('Bin Index')
-    plt.ylabel('Cumulative Number Count')
-    plt.title('Mean NN Pos Same 8 with Covariance Error Bars')
-    plt.legend()
-    plt.savefig(f"outfiles/Mean_NN_Pos_Same_8_with_Covariance_Error_Bars_s{s}.png")
-    plt.close()
+    # plt.figure(figsize=(8,6))   
+    # plt.errorbar(np.arange(nn_pos_same8.shape[1]), np.mean(nn_pos_same8, axis=0), yerr=np.sqrt(np.diag(cov_matrix_nns['cov_nn_pos_same8'])), fmt='o', label='Mean NN Pos Same 8 with error bars')
+    # plt.xlabel('Bin Index')
+    # plt.ylabel('Cumulative Number Count')
+    # plt.title('Mean NN Pos Same 8 with Covariance Error Bars')
+    # plt.legend()
+    # plt.savefig(f"outfiles/Mean_NN_Pos_Same_8_with_Covariance_Error_Bars_s{s}.png")
+    # plt.close()
+
+    # Plot Ridgeline Distributions for all quantities
+    # quantities = {
+    #     'PDF': pdfs, 'PDF_Pos': pdfs_pos, 'PDF_Neg': pdfs_neg,
+    #     'KK': kk, 'PosPos': pos_pos, 'NegNeg': neg_neg, 'PosNeg': pos_neg,
+    #     'PosKappa': pk, 'NegKappa': nk,
+    #     'NN_Pos_Same_1': nn_pos_same1, 'NN_Neg_Same_1': nn_neg_same1,
+    #     'NN_Pos_Opp_1': nn_pos_opp1, 'NN_Neg_Opp_1': nn_neg_opp1,
+    #     'NN_Pos_Same_2': nn_pos_same2, 'NN_Neg_Same_2': nn_neg_same2,
+    #     'NN_Pos_Opp_2': nn_pos_opp2, 'NN_Neg_Opp_2': nn_neg_opp2,
+    #     'NN_Pos_Same_4': nn_pos_same4, 'NN_Neg_Same_4': nn_neg_same4,
+    #     'NN_Pos_Opp_4': nn_pos_opp4, 'NN_Neg_Opp_4': nn_neg_opp4,
+    #     'NN_Pos_Same_8': nn_pos_same8, 'NN_Neg_Same_8': nn_neg_same8,
+    #     'NN_Pos_Opp_8': nn_pos_opp8, 'NN_Neg_Opp_8': nn_neg_opp8
+    # }
+    
+    # print(f"Plotting ridgeline distributions for s={s}...")
+    # for name, data_mat in quantities.items():
+    #     try:
+    #         plot_ridgeline(data_mat, f"Real Distribution of {name} (s{s})", f"{name}_ridgeline_s{s}")
+    #     except Exception as e:
+    #         print(f"Failed to plot ridgeline for {name}: {e}")
 
 
     # DPDF combined covariance
@@ -431,3 +518,6 @@ all_all_scales_mean = np.mean(all_all_scales, axis=0)
 all_all_scales_cov = np.cov(all_all_scales, rowvar=False)
 np.save("All_all_scales_mean.npy", all_all_scales_mean)
 np.save("All_all_scales_cov.npy", all_all_scales_cov)
+
+
+

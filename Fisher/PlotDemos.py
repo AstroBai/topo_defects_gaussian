@@ -295,6 +295,7 @@ mpl.rcParams['xtick.direction'] = 'in'
 mpl.rcParams['ytick.direction'] = 'in'
 mpl.rcParams['font.size'] = 8
 
+
 # compare cdf+ cdf-
 from scipy.interpolate import interp1d
 color_map = plt.get_cmap('tab10')
@@ -310,12 +311,12 @@ interp_cdf = interp1d(bin_centers, np.cumsum(pdfs_fid_s90)/np.cumsum(pdfs_fid_s9
 # Create 100 bins for plotting
 bin_centers_fine = np.linspace(bin_centers[0], bin_centers[-1], 100)
 
-plt.plot(bin_centers_fine, interp_pos(bin_centers_fine), label='DCDF +', c=color_map(0))
-plt.plot(bin_centers_fine, interp_neg(bin_centers_fine), label='DCDF -', c=color_map(1), linestyle='-.')
-plt.plot(bin_centers_fine, interp_cdf(bin_centers_fine), label='CDF All Pixels', c='grey', linestyle='--')
+plt.plot(bin_centers_fine, interp_pos(bin_centers_fine), label=r'$C^{\rm P}(\kappa)$', c=color_map(0))
+plt.plot(bin_centers_fine, interp_neg(bin_centers_fine), label=r'$C^{\rm N}(\kappa)$', c=color_map(1), linestyle='-.')
+plt.plot(bin_centers_fine, interp_cdf(bin_centers_fine), label=r'$C^\text{All Pixels}(\kappa)$', c='grey', linestyle='--')
 
 plt.xlabel(r'$\kappa$')
-plt.ylabel('Normalised Cumulative Distribution')
+plt.ylabel(r'$\text{CDF} (\kappa) \text{ (Normalised)}$')
 # plt.title('Comparison of CDFs')
 plt.legend(loc='upper left')
 plt.text(0.9, 0.1, 'Gaussian', ha='right', va='bottom', transform=plt.gca().transAxes, fontsize=12)
@@ -333,10 +334,10 @@ interp_neg = interp1d(bin_centers, dpdfs_neg_fid_s90, kind='quadratic', fill_val
 interp_cdf = interp1d(bin_centers, np.cumsum(pdfs_fid_s90), kind='quadratic', fill_value=np.nan)
 # Create 100 bins for plotting
 bin_centers_fine = np.linspace(bin_centers[0], bin_centers[-1], 100)    
-plt.plot(bin_centers_fine, interp_pos(bin_centers_fine), label='DCDF +', c=color_map(0))
-plt.plot(bin_centers_fine, interp_neg(bin_centers_fine), label='DCDF -', c=color_map(1), linestyle='-.')
+plt.plot(bin_centers_fine, interp_pos(bin_centers_fine), label=r'$C^{\rm P}(\kappa)$', c=color_map(0))
+plt.plot(bin_centers_fine, interp_neg(bin_centers_fine), label=r'$C^{\rm N}(\kappa)$', c=color_map(1), linestyle='-.')
 plt.xlabel(r'$\kappa$')
-plt.ylabel('Cumulative Distribution')
+plt.ylabel(r'$\text{CDF} (\kappa)$')
 # plt.title('Comparison of CDFs without Normalisation')
 plt.legend(loc='upper left')
 plt.text(0.9, 0.1, 'Gaussian', ha='right', va='bottom', transform=plt.gca().transAxes, fontsize=12)
@@ -367,16 +368,16 @@ bin_edges2_fine = np.linspace(bin_edges2[0], bin_edges2[-1], 100)
 bin_edges4_fine = np.linspace(bin_edges4[0], bin_edges4[-1], 100)
 bin_edges8_fine = np.linspace(bin_edges8[0], bin_edges8[-1], 100)
 
-plt.plot(bin_edges1_fine[5:], interp_1nn_same(bin_edges1_fine[5:]), label='1NN ++', c=color_map(0))
-plt.plot(bin_edges1_fine[5:], interp_1nn_opp(bin_edges1_fine[5:]), label='1NN +-', c=color_map(0), linestyle='--')
-plt.plot(bin_edges2_fine[10:], interp_2nn_same(bin_edges2_fine[10:]), label='2NN ++', c=color_map(1))
-plt.plot(bin_edges2_fine[10:], interp_2nn_opp(bin_edges2_fine[10:]), label='2NN +-', c=color_map(1), linestyle='--')
-plt.plot(bin_edges4_fine[20:], interp_4nn_same(bin_edges4_fine[20:]), label='4NN ++', c=color_map(2))
-plt.plot(bin_edges4_fine[20:], interp_4nn_opp(bin_edges4_fine[20:]), label='4NN +-', c=color_map(2), linestyle='--')
-plt.plot(bin_edges8_fine[30:], interp_8nn_same(bin_edges8_fine[30:]), label='8NN ++', c=color_map(3))
-plt.plot(bin_edges8_fine[30:], interp_8nn_opp(bin_edges8_fine[30:]), label='8NN +-', c=color_map(3), linestyle='--')
-plt.xlabel('Distance (arcmin)')
-plt.ylabel('Cumulative Number Distribution')
+plt.plot(bin_edges1_fine[5:], interp_1nn_same(bin_edges1_fine[5:]), label='1NN P-P', c=color_map(0))
+plt.plot(bin_edges1_fine[5:], interp_1nn_opp(bin_edges1_fine[5:]), label='1NN P-N', c=color_map(0), linestyle='--')
+plt.plot(bin_edges2_fine[10:], interp_2nn_same(bin_edges2_fine[10:]), label='2NN P-P', c=color_map(1))
+plt.plot(bin_edges2_fine[10:], interp_2nn_opp(bin_edges2_fine[10:]), label='2NN P-N', c=color_map(1), linestyle='--')
+plt.plot(bin_edges4_fine[20:], interp_4nn_same(bin_edges4_fine[20:]), label='4NN P-P', c=color_map(2))
+plt.plot(bin_edges4_fine[20:], interp_4nn_opp(bin_edges4_fine[20:]), label='4NN P-N', c=color_map(2), linestyle='--')
+plt.plot(bin_edges8_fine[30:], interp_8nn_same(bin_edges8_fine[30:]), label='8NN P-P', c=color_map(3))
+plt.plot(bin_edges8_fine[30:], interp_8nn_opp(bin_edges8_fine[30:]), label='8NN P-N', c=color_map(3), linestyle='--')
+plt.xlabel(r'$\theta$ [arcmin]')
+plt.ylabel(r'$\text{CDF} (\theta)$')
 # plt.title('Comparison of kNNs')
 plt.legend()
 # plt.grid(True, alpha=0.3)
@@ -384,57 +385,57 @@ plt.savefig('outfiles/compare_knn_cdf.png', dpi=300, bbox_inches='tight')
 plt.close()
 
 # compare ++, +-, --, -+ for 2NN at s90
-plt.figure(figsize=(4.8, 3))
-bin_edges2 = np.linspace(30, 1125, 10)
+# plt.figure(figsize=(4.8, 3))
+# bin_edges2 = np.linspace(30, 1125, 10)
 
-# Create interpolation functions for 2NN types
-interp_2nn_pp = interp1d(bin_edges2, nn_pos_same2_s90, kind='quadratic', fill_value=np.nan)
-interp_2nn_pn = interp1d(bin_edges2, nn_pos_opp2_s90, kind='quadratic', fill_value=np.nan)
-interp_2nn_nn = interp1d(bin_edges2, nn_neg_same2_s90, kind='quadratic', fill_value=np.nan)
-interp_2nn_np = interp1d(bin_edges2, nn_neg_opp2_s90, kind='quadratic', fill_value=np.nan)
+# # Create interpolation functions for 2NN types
+# interp_2nn_pp = interp1d(bin_edges2, nn_pos_same2_s90, kind='quadratic', fill_value=np.nan)
+# interp_2nn_pn = interp1d(bin_edges2, nn_pos_opp2_s90, kind='quadratic', fill_value=np.nan)
+# interp_2nn_nn = interp1d(bin_edges2, nn_neg_same2_s90, kind='quadratic', fill_value=np.nan)
+# interp_2nn_np = interp1d(bin_edges2, nn_neg_opp2_s90, kind='quadratic', fill_value=np.nan)
 
-# Create 100 bins for plotting
-bin_edges2_fine = np.linspace(bin_edges2[0], bin_edges2[-1], 100)
+# # Create 100 bins for plotting
+# bin_edges2_fine = np.linspace(bin_edges2[0], bin_edges2[-1], 100)
 
-plt.plot(bin_edges2_fine[6:], interp_2nn_pp(bin_edges2_fine[6:]), label='2NN ++', c=color_map(0))
-plt.plot(bin_edges2_fine[6:], interp_2nn_pn(bin_edges2_fine[6:]), label='2NN +-', c=color_map(0), linestyle='--')
-plt.plot(bin_edges2_fine[6:], interp_2nn_nn(bin_edges2_fine[6:]), label='2NN --', c=color_map(1))
-plt.plot(bin_edges2_fine[6:], interp_2nn_np(bin_edges2_fine[6:]), label='2NN -+', c=color_map(1), linestyle='--')
-plt.xlabel('Distance (arcmin)')
-plt.ylabel('Cumulative Number Distribution')
-# plt.title('Comparison of 2NN types at 90 arcmin')
-plt.legend(loc='upper left')
-plt.text(0.9, 0.1, 'Full-sky', ha='right', va='bottom', transform=plt.gca().transAxes, fontsize=12)
-# plt.grid(True, alpha=0.3)
-plt.savefig('outfiles/compare_2nn_types_cdf.png', dpi=300)
-plt.close()
+# plt.plot(bin_edges2_fine[6:], interp_2nn_pp(bin_edges2_fine[6:]), label='2NN P-P', c=color_map(0))
+# plt.plot(bin_edges2_fine[6:], interp_2nn_pn(bin_edges2_fine[6:]), label='2NN P-N', c=color_map(0), linestyle='--')
+# plt.plot(bin_edges2_fine[6:], interp_2nn_nn(bin_edges2_fine[6:]), label='2NN N-N', c=color_map(1))
+# plt.plot(bin_edges2_fine[6:], interp_2nn_np(bin_edges2_fine[6:]), label='2NN N-P', c=color_map(1), linestyle='--')
+# plt.xlabel('Distance [arcmin]')
+# plt.ylabel('Cumulative Number Distribution')
+# # plt.title('Comparison of 2NN types at 90 arcmin')
+# plt.legend(loc='upper left')
+# plt.text(0.9, 0.1, 'Full-sky', ha='right', va='bottom', transform=plt.gca().transAxes, fontsize=12)
+# # plt.grid(True, alpha=0.3)
+# plt.savefig('outfiles/compare_2nn_types_cdf.png', dpi=300)
+# plt.close()
 
 
 # dpdf, pdf cov
 
-all_and_pdf_cov = np.load(f'{MOCK_DIR}/Defects_PDF_all_scales_cov.npy')
-# take first 20 and last 10
-cdf_cov = all_and_pdf_cov[np.ix_(list(range(20)) + list(range(all_and_pdf_cov.shape[0]-10, all_and_pdf_cov.shape[0])), list(range(20)) + list(range(all_and_pdf_cov.shape[0]-10, all_and_pdf_cov.shape[0])))]
+# all_and_pdf_cov = np.load(f'{MOCK_DIR}/Defects_PDF_all_scales_cov.npy')
+# # take first 20 and last 10
+# cdf_cov = all_and_pdf_cov[np.ix_(list(range(20)) + list(range(all_and_pdf_cov.shape[0]-10, all_and_pdf_cov.shape[0])), list(range(20)) + list(range(all_and_pdf_cov.shape[0]-10, all_and_pdf_cov.shape[0])))]
 
-plt.figure(figsize=(4, 3))
-# normalize covariance to correlation matrix
-d = np.sqrt(np.diag(cdf_cov))
-corr = cdf_cov / np.outer(d, d)
-plt.imshow(corr, cmap='RdBu', vmin=-1, vmax=1)
-plt.colorbar(label='Correlation Coefficient')
-# plt.title('Correlation Matrix (DCDF + PDF)')
-# add lines to separate different parts
-plt.axvline(x=9.5, color='black', linestyle='--', linewidth=1)
-plt.axhline(y=9.5, color='black', linestyle='--', linewidth=1)
-plt.axvline(x=19.5, color='black', linestyle='--', linewidth=1)
-plt.axhline(y=19.5, color='black', linestyle='--', linewidth=1)
+# plt.figure(figsize=(4, 3))
+# # normalize covariance to correlation matrix
+# d = np.sqrt(np.diag(cdf_cov))
+# corr = cdf_cov / np.outer(d, d)
+# plt.imshow(corr, cmap='RdBu', vmin=-1, vmax=1)
+# plt.colorbar(label='Correlation Coefficient')
+# # plt.title('Correlation Matrix (DCDF + PDF)')
+# # add lines to separate different parts
+# plt.axvline(x=9.5, color='black', linestyle='--', linewidth=1)
+# plt.axhline(y=9.5, color='black', linestyle='--', linewidth=1)
+# plt.axvline(x=19.5, color='black', linestyle='--', linewidth=1)
+# plt.axhline(y=19.5, color='black', linestyle='--', linewidth=1)
 
-# ticks
-plt.xticks([5, 15, 25], [r'DCDF+', r'DCDF-', r'PDF'])
-plt.yticks([5, 15, 25], [r'DCDF+', r'DCDF-', r'PDF'])
-plt.tick_params(axis='both', which='both', length=0)
-plt.savefig('outfiles/corr_matrix_cdf.png', dpi=300, bbox_inches='tight')
-plt.close()
+# # ticks
+# plt.xticks([5, 15, 25], [r'DCDF+', r'DCDF-', r'PDF'])
+# plt.yticks([5, 15, 25], [r'DCDF+', r'DCDF-', r'PDF'])
+# plt.tick_params(axis='both', which='both', length=0)
+# plt.savefig('outfiles/corr_matrix_cdf.png', dpi=300, bbox_inches='tight')
+# plt.close()
 
 # compare pp/nn/pn xi at s15, s30, s90
 scales = ['s15', 's30', 's90']
@@ -449,24 +450,30 @@ fig, axes = plt.subplots(1, 3, figsize=(9, 3), sharey=True)
 for i in range(3):
     ax = axes[i]
     bin_centers = bins[i]
-    ax.plot(bin_centers, pp_fids[i], label='PP', color=color_map(0))
+    ax.plot(bin_centers, pp_fids[i], label='P-P', color=color_map(0))
     ax.fill_between(bin_centers, pp_fids[i] - np.sqrt(np.diag(cov_pp_fids[i])), pp_fids[i] + np.sqrt(np.diag(cov_pp_fids[i])), color=color_map(0), alpha=0.3)
-    ax.plot(bin_centers, nn_fids[i], label='NN', color=color_map(1))
+    ax.plot(bin_centers, nn_fids[i], label='N-N', color=color_map(1))
     ax.fill_between(bin_centers, nn_fids[i] - np.sqrt(np.diag(cov_nn_fids[i])), nn_fids[i] + np.sqrt(np.diag(cov_nn_fids[i])), color=color_map(1), alpha=0.3)
-    ax.plot(bin_centers, pn_fids[i], label='PN', color=color_map(2))
+    ax.plot(bin_centers, pn_fids[i], label='P-N', color=color_map(2))
     ax.fill_between(bin_centers, pn_fids[i] - np.sqrt(np.diag(cov_pn_fids[i])), pn_fids[i] + np.sqrt(np.diag(cov_pn_fids[i])), color=color_map(2), alpha=0.3)
     ax.axhline(0, color='grey', linestyle='--', linewidth=1)
     ax.axhline(-1, color='red', linestyle='-.', linewidth=1)
-    ax.set_xlabel('Distance (arcmin)')
+    ax.set_xlabel(r'$\theta$ [arcmin]')
     ax.set_xscale('log')
     ax.xaxis.set_major_locator(FixedLocator([100, 500]))
     ax.xaxis.set_major_formatter(FixedFormatter(['100', '500']))
     ax.xaxis.set_minor_locator(FixedLocator([]))
     if i == 0:
-        ax.set_ylabel(r'$\xi$')
-    ax.set_title(f'Scale: {scales[i]}')
-    ax.legend()
+        ax.set_ylabel(r'$\xi(\theta)$')
+    if i == 0:
+        ax.set_title(r'$\theta_G$ = 15 arcmin')
+    elif i == 1:
+        ax.set_title(r'$\theta_G$ = 30 arcmin')
+    else:
+        ax.set_title(r'$\theta_G$ = 90 arcmin')
 plt.subplots_adjust(wspace=0)
 # plt.tight_layout()
+handles, labels = axes[0].get_legend_handles_labels()
+fig.legend(handles, labels, loc='upper center', ncol=3, bbox_to_anchor=(0.5, 1.05))
 plt.savefig('outfiles/compare_xi_pp_nn_pn.png', dpi=300, bbox_inches='tight')
 plt.close()
