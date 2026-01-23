@@ -297,27 +297,19 @@ mpl.rcParams['font.size'] = 8
 
 
 # compare cdf+ cdf-
-from scipy.interpolate import interp1d
 color_map = plt.get_cmap('tab10')
 plt.figure(figsize=(4, 3))
-bin_edges = np.linspace(-0.005, 0.005, 11)
+bin_edges = np.linspace(-0.008, 0.008, 11)
 bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 
-# Create interpolation functions
-interp_pos = interp1d(bin_centers, dpdfs_pos_fid_s90/dpdfs_pos_fid_s90[-1], kind='quadratic', fill_value=np.nan)
-interp_neg = interp1d(bin_centers, dpdfs_neg_fid_s90/dpdfs_neg_fid_s90[-1], kind='quadratic', fill_value=np.nan)
-interp_cdf = interp1d(bin_centers, np.cumsum(pdfs_fid_s90)/np.cumsum(pdfs_fid_s90)[-1], kind='quadratic', fill_value=np.nan)
-
-# Create 100 bins for plotting
-bin_centers_fine = np.linspace(bin_centers[0], bin_centers[-1], 100)
-
-plt.plot(bin_centers_fine, interp_pos(bin_centers_fine), label=r'$C^{\rm P}(\kappa)$', c=color_map(0))
-plt.plot(bin_centers_fine, interp_neg(bin_centers_fine), label=r'$C^{\rm N}(\kappa)$', c=color_map(1), linestyle='-.')
-plt.plot(bin_centers_fine, interp_cdf(bin_centers_fine), label=r'$C^\text{All Pixels}(\kappa)$', c='grey', linestyle='--')
+# removed interpolation
+plt.plot(bin_centers, dpdfs_pos_fid_s30/dpdfs_pos_fid_s30[-1], label=r'$C^{\rm P}(\kappa)$', c=color_map(0))
+plt.plot(bin_centers, dpdfs_neg_fid_s30/dpdfs_neg_fid_s30[-1], label=r'$C^{\rm N}(\kappa)$', c=color_map(1), linestyle='-.')
+plt.plot(bin_centers, np.cumsum(pdfs_fid_s30)/np.cumsum(pdfs_fid_s30)[-1], label=r'$C^\text{All Pixels}(\kappa)$', c='grey', linestyle='--')
 
 plt.xlabel(r'$\kappa$')
 plt.ylabel(r'$\text{CDF} (\kappa) \text{ (Normalised)}$')
-# plt.title('Comparison of CDFs')
+plt.title(r'$\theta_G$ = 30 arcmin')
 plt.legend(loc='upper left')
 plt.text(0.9, 0.1, 'Gaussian', ha='right', va='bottom', transform=plt.gca().transAxes, fontsize=12)
 # plt.grid(True, alpha=0.3)
@@ -328,17 +320,13 @@ plt.close()
 plt.figure(figsize=(4, 3))
 bin_edges = np.linspace(-0.005, 0.005, 11)
 bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
-# Create interpolation functions
-interp_pos = interp1d(bin_centers, dpdfs_pos_fid_s90, kind='quadratic', fill_value=np.nan)
-interp_neg = interp1d(bin_centers, dpdfs_neg_fid_s90, kind='quadratic', fill_value=np.nan)
-interp_cdf = interp1d(bin_centers, np.cumsum(pdfs_fid_s90), kind='quadratic', fill_value=np.nan)
-# Create 100 bins for plotting
-bin_centers_fine = np.linspace(bin_centers[0], bin_centers[-1], 100)    
-plt.plot(bin_centers_fine, interp_pos(bin_centers_fine), label=r'$C^{\rm P}(\kappa)$', c=color_map(0))
-plt.plot(bin_centers_fine, interp_neg(bin_centers_fine), label=r'$C^{\rm N}(\kappa)$', c=color_map(1), linestyle='-.')
+# removed interpolation
+plt.plot(bin_centers, dpdfs_pos_fid_s30, label=r'$C^{\rm P}(\kappa)$', c=color_map(0))
+plt.plot(bin_centers, dpdfs_neg_fid_s30, label=r'$C^{\rm N}(\kappa)$', c=color_map(1), linestyle='-.')
+plt.plot(bin_centers, np.cumsum(pdfs_fid_s30), label=r'$C^\text{All Pixels}(\kappa)$', c='grey', linestyle='--')
 plt.xlabel(r'$\kappa$')
 plt.ylabel(r'$\text{CDF} (\kappa)$')
-# plt.title('Comparison of CDFs without Normalisation')
+plt.title(r'$\theta_G$ = 30 arcmin')
 plt.legend(loc='upper left')
 plt.text(0.9, 0.1, 'Gaussian', ha='right', va='bottom', transform=plt.gca().transAxes, fontsize=12)
 # plt.grid(True, alpha=0.3)
@@ -347,38 +335,23 @@ plt.close()
 
 # compare 1,2,4,8 NN pos same/opp 
 plt.figure(figsize=(4, 3))
-bin_edges1 = np.linspace(30, 750, 10)
-bin_edges2 = np.linspace(30, 1125, 10)
-bin_edges4 = np.linspace(30, 1500, 10)
-bin_edges8 = np.linspace(30, 1875, 10)
+bin_edges1 = np.linspace(30, 300, 10)
+bin_edges2 = np.linspace(30, 450, 10)
+bin_edges4 = np.linspace(30, 600, 10)
+bin_edges8 = np.linspace(30, 750, 10)
 
-# Create interpolation functions
-interp_1nn_same = interp1d(bin_edges1, nn_pos_same1_s90, kind='quadratic', fill_value=np.nan)
-interp_1nn_opp = interp1d(bin_edges1, nn_pos_opp1_s90, kind='quadratic', fill_value=np.nan)
-interp_2nn_same = interp1d(bin_edges2, nn_pos_same2_s90, kind='quadratic', fill_value=np.nan)
-interp_2nn_opp = interp1d(bin_edges2, nn_pos_opp2_s90, kind='quadratic', fill_value=np.nan)
-interp_4nn_same = interp1d(bin_edges4, nn_pos_same4_s90, kind='quadratic', fill_value=np.nan)
-interp_4nn_opp = interp1d(bin_edges4, nn_pos_opp4_s90, kind='quadratic', fill_value=np.nan)
-interp_8nn_same = interp1d(bin_edges8, nn_pos_same8_s90, kind='quadratic', fill_value=np.nan)
-interp_8nn_opp = interp1d(bin_edges8, nn_pos_opp8_s90, kind='quadratic', fill_value=np.nan)
-
-# Create 100 bins for plotting
-bin_edges1_fine = np.linspace(bin_edges1[0], bin_edges1[-1], 100)
-bin_edges2_fine = np.linspace(bin_edges2[0], bin_edges2[-1], 100)
-bin_edges4_fine = np.linspace(bin_edges4[0], bin_edges4[-1], 100)
-bin_edges8_fine = np.linspace(bin_edges8[0], bin_edges8[-1], 100)
-
-plt.plot(bin_edges1_fine[5:], interp_1nn_same(bin_edges1_fine[5:]), label='1NN P-P', c=color_map(0))
-plt.plot(bin_edges1_fine[5:], interp_1nn_opp(bin_edges1_fine[5:]), label='1NN P-N', c=color_map(0), linestyle='--')
-plt.plot(bin_edges2_fine[10:], interp_2nn_same(bin_edges2_fine[10:]), label='2NN P-P', c=color_map(1))
-plt.plot(bin_edges2_fine[10:], interp_2nn_opp(bin_edges2_fine[10:]), label='2NN P-N', c=color_map(1), linestyle='--')
-plt.plot(bin_edges4_fine[20:], interp_4nn_same(bin_edges4_fine[20:]), label='4NN P-P', c=color_map(2))
-plt.plot(bin_edges4_fine[20:], interp_4nn_opp(bin_edges4_fine[20:]), label='4NN P-N', c=color_map(2), linestyle='--')
-plt.plot(bin_edges8_fine[30:], interp_8nn_same(bin_edges8_fine[30:]), label='8NN P-P', c=color_map(3))
-plt.plot(bin_edges8_fine[30:], interp_8nn_opp(bin_edges8_fine[30:]), label='8NN P-N', c=color_map(3), linestyle='--')
+# removed interpolation
+plt.plot(bin_edges1, nn_pos_same1_s30, label='1NN P-P', c=color_map(0))
+plt.plot(bin_edges1, nn_pos_opp1_s30, label='1NN P-N', c=color_map(0), linestyle='--')
+plt.plot(bin_edges2[1:], nn_pos_same2_s30[1:], label='2NN P-P', c=color_map(1))
+plt.plot(bin_edges2[1:], nn_pos_opp2_s30[1:], label='2NN P-N', c=color_map(1), linestyle='--')
+plt.plot(bin_edges4[2:], nn_pos_same4_s30[2:], label='4NN P-P', c=color_map(2))
+plt.plot(bin_edges4[2:], nn_pos_opp4_s30[2:], label='4NN P-N', c=color_map(2), linestyle='--')
+plt.plot(bin_edges8[3:], nn_pos_same8_s30[3:], label='8NN P-P', c=color_map(3))
+plt.plot(bin_edges8[3:], nn_pos_opp8_s30[3:], label='8NN P-N', c=color_map(3), linestyle='--')
 plt.xlabel(r'$\theta$ [arcmin]')
 plt.ylabel(r'$\text{CDF} (\theta)$')
-# plt.title('Comparison of kNNs')
+plt.title(r'$\theta_G$ = 30 arcmin')
 plt.legend()
 # plt.grid(True, alpha=0.3)
 plt.savefig('outfiles/compare_knn_cdf.png', dpi=300, bbox_inches='tight')
@@ -437,43 +410,74 @@ plt.close()
 # plt.savefig('outfiles/corr_matrix_cdf.png', dpi=300, bbox_inches='tight')
 # plt.close()
 
-# compare pp/nn/pn xi at s15, s30, s90
-scales = ['s15', 's30', 's90']
-pp_fids = [pp_fid_s15, pp_fid_s30, pp_fid_s90]
-cov_pp_fids = [cov_pp_fid_s15, cov_pp_fid_s30, cov_pp_fid_s90]
-nn_fids = [nn_fid_s15, nn_fid_s30, nn_fid_s90]
-cov_nn_fids = [cov_nn_fid_s15, cov_nn_fid_s30, cov_nn_fid_s90]
-pn_fids = [pn_fid_s15, pn_fid_s30, pn_fid_s90]
-cov_pn_fids = [cov_pn_fid_s15, cov_pn_fid_s30, cov_pn_fid_s90]
-bins = [np.linspace(15, 600, 30), np.linspace(30, 600, 30), np.linspace(90, 600, 30)]
-fig, axes = plt.subplots(1, 3, figsize=(9, 3), sharey=True)
-for i in range(3):
-    ax = axes[i]
-    bin_centers = bins[i]
-    ax.plot(bin_centers, pp_fids[i], label='P-P', color=color_map(0))
-    ax.fill_between(bin_centers, pp_fids[i] - np.sqrt(np.diag(cov_pp_fids[i])), pp_fids[i] + np.sqrt(np.diag(cov_pp_fids[i])), color=color_map(0), alpha=0.3)
-    ax.plot(bin_centers, nn_fids[i], label='N-N', color=color_map(1))
-    ax.fill_between(bin_centers, nn_fids[i] - np.sqrt(np.diag(cov_nn_fids[i])), nn_fids[i] + np.sqrt(np.diag(cov_nn_fids[i])), color=color_map(1), alpha=0.3)
-    ax.plot(bin_centers, pn_fids[i], label='P-N', color=color_map(2))
-    ax.fill_between(bin_centers, pn_fids[i] - np.sqrt(np.diag(cov_pn_fids[i])), pn_fids[i] + np.sqrt(np.diag(cov_pn_fids[i])), color=color_map(2), alpha=0.3)
-    ax.axhline(0, color='grey', linestyle='--', linewidth=1)
-    ax.axhline(-1, color='red', linestyle='-.', linewidth=1)
-    ax.set_xlabel(r'$\theta$ [arcmin]')
-    ax.set_xscale('log')
-    ax.xaxis.set_major_locator(FixedLocator([100, 500]))
-    ax.xaxis.set_major_formatter(FixedFormatter(['100', '500']))
-    ax.xaxis.set_minor_locator(FixedLocator([]))
-    if i == 0:
-        ax.set_ylabel(r'$\xi(\theta)$')
-    if i == 0:
-        ax.set_title(r'$\theta_G$ = 15 arcmin')
-    elif i == 1:
-        ax.set_title(r'$\theta_G$ = 30 arcmin')
-    else:
-        ax.set_title(r'$\theta_G$ = 90 arcmin')
+# # compare pp/nn/pn xi at s15, s30, s90
+# scales = ['s15', 's30', 's90']
+# pp_fids = [pp_fid_s15, pp_fid_s30, pp_fid_s90]
+# cov_pp_fids = [cov_pp_fid_s15, cov_pp_fid_s30, cov_pp_fid_s90]
+# nn_fids = [nn_fid_s15, nn_fid_s30, nn_fid_s90]
+# cov_nn_fids = [cov_nn_fid_s15, cov_nn_fid_s30, cov_nn_fid_s90]
+# pn_fids = [pn_fid_s15, pn_fid_s30, pn_fid_s90]
+# cov_pn_fids = [cov_pn_fid_s15, cov_pn_fid_s30, cov_pn_fid_s90]
+# bins = [np.linspace(15, 600, 30), np.linspace(30, 600, 30), np.linspace(90, 600, 30)]
+# fig, axes = plt.subplots(1, 3, figsize=(9, 3), sharey=True)
+# for i in range(3):
+#     ax = axes[i]
+#     bin_centers = bins[i]
+#     # Standard Error of Mean: sigma / sqrt(N)
+#     err_pp = np.sqrt(np.diag(cov_pp_fids[i])) / np.sqrt(n_seeds)
+#     err_nn = np.sqrt(np.diag(cov_nn_fids[i])) / np.sqrt(n_seeds)
+#     err_pn = np.sqrt(np.diag(cov_pn_fids[i])) / np.sqrt(n_seeds)
+
+#     ax.plot(bin_centers, pp_fids[i], label='P-P', color=color_map(0))
+#     ax.fill_between(bin_centers, pp_fids[i] - err_pp, pp_fids[i] + err_pp, color=color_map(0), alpha=0.3)
+#     ax.plot(bin_centers, nn_fids[i], label='N-N', color=color_map(1))
+#     ax.fill_between(bin_centers, nn_fids[i] - err_nn, nn_fids[i] + err_nn, color=color_map(1), alpha=0.3)
+#     ax.plot(bin_centers, pn_fids[i], label='P-N', color=color_map(2))
+#     ax.fill_between(bin_centers, pn_fids[i] - err_pn, pn_fids[i] + err_pn, color=color_map(2), alpha=0.3)
+#     ax.axhline(0, color='grey', linestyle='--', linewidth=1)
+#     ax.axhline(-1, color='red', linestyle='-.', linewidth=1)
+#     ax.set_xlabel(r'$\theta$ [arcmin]')
+#     ax.set_xscale('log')
+#     ax.xaxis.set_major_locator(FixedLocator([100, 500]))
+#     ax.xaxis.set_major_formatter(FixedFormatter(['100', '500']))
+#     ax.xaxis.set_minor_locator(FixedLocator([]))
+#     if i == 0:
+#         ax.set_ylabel(r'$\xi(\theta)$')
+#     if i == 0:
+#         ax.set_title(r'$\theta_G$ = 15 arcmin')
+#     elif i == 1:
+#         ax.set_title(r'$\theta_G$ = 30 arcmin')
+#     else:
+#         ax.set_title(r'$\theta_G$ = 90 arcmin')
+# plt.subplots_adjust(wspace=0)
+# # plt.tight_layout()
+# handles, labels = axes[0].get_legend_handles_labels()
+# fig.legend(handles, labels, loc='upper center', ncol=3, bbox_to_anchor=(0.5, 1.05))
+# plt.savefig('outfiles/compare_xi_pp_nn_pn.png', dpi=300, bbox_inches='tight')
+# plt.close()
+
+# compare pp/nn/pn xi at s30 only
+plt.figure(figsize=(4, 3))
+bin_centers = np.linspace(30, 600, 30)
+
+err_pp_s30 = np.sqrt(np.diag(cov_pp_fid_s30)) / np.sqrt(n_seeds)
+err_nn_s30 = np.sqrt(np.diag(cov_nn_fid_s30)) / np.sqrt(n_seeds)
+err_pn_s30 = np.sqrt(np.diag(cov_pn_fid_s30)) / np.sqrt(n_seeds)
+
+plt.plot(bin_centers, pp_fid_s30, label='P-P', color=color_map(0))
+plt.fill_between(bin_centers, pp_fid_s30 - err_pp_s30, pp_fid_s30 + err_pp_s30, color=color_map(0), alpha=0.3)
+plt.plot(bin_centers, nn_fid_s30, label='N-N', color=color_map(1))
+plt.fill_between(bin_centers, nn_fid_s30 - err_nn_s30, nn_fid_s30 + err_nn_s30, color=color_map(1), alpha=0.3)
+plt.plot(bin_centers, pn_fid_s30, label='P-N', color=color_map(2))
+plt.fill_between(bin_centers, pn_fid_s30 - err_pn_s30, pn_fid_s30 + err_pn_s30, color=color_map(2), alpha=0.3)
+plt.axhline(0, color='grey', linestyle='--', linewidth=1)
+plt.axhline(-1, color='red', linestyle='-.', linewidth=1)
+plt.xlabel(r'$\theta$ [arcmin]')
+plt.xscale('log')
+plt.xticks([100, 500])
+plt.ylabel(r'$\xi(\theta)$')
+plt.title(r'$\theta_G$ = 30 arcmin')
 plt.subplots_adjust(wspace=0)
-# plt.tight_layout()
-handles, labels = axes[0].get_legend_handles_labels()
-fig.legend(handles, labels, loc='upper center', ncol=3, bbox_to_anchor=(0.5, 1.05))
+plt.legend()
 plt.savefig('outfiles/compare_xi_pp_nn_pn.png', dpi=300, bbox_inches='tight')
 plt.close()
