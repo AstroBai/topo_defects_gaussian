@@ -577,7 +577,7 @@ mpl.rcParams['xtick.direction'] = 'in'
 mpl.rcParams['ytick.direction'] = 'in'
 mpl.rcParams['font.size'] = 8
 
-N_fid = 500
+N_fid = 1000
 N_deriv = n_seeds
 
 # # pdfs, 1x3, share y axis
@@ -793,17 +793,21 @@ ax = axes[0]
 
 # PP Omega_m
 y = deriv_nns_combined_s30_mean[40:50]
-y_err = np.sqrt(np.diag(deriv_nns_combined_s30_cov[40:50, 40:50])) / np.sqrt(n_seeds)
+y_err = np.sqrt(np.diag(deriv_nns_combined_s30_cov[40:50, 40:50]))
+y_mean_err = y_err / np.sqrt(n_seeds)
 
 ax.plot(bin_centers, y, c='C0', ls='-', label=r'$\partial C^{\rm PP}_{\rm 2NN}(\theta) / \partial \Omega_{\rm m}$')
 ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C0')
+ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C0')
 
 # PP sigma_8
 y = deriv_nns_combined_s30_mean[200:210]
-y_err = np.sqrt(np.diag(deriv_nns_combined_s30_cov[200:210, 200:210])) / np.sqrt(n_seeds)
+y_err = np.sqrt(np.diag(deriv_nns_combined_s30_cov[200:210, 200:210]))
+y_mean_err = y_err / np.sqrt(n_seeds)
 
 ax.plot(bin_centers, y, c='C1', ls='-', label=r'$\partial C^{\rm PP}_{\rm 2NN}(\theta) / \partial \sigma_8$')
 ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C1')
+ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C1')
 
 # NN Omega_m
 y = deriv_nns_combined_s30_mean[50:60]
@@ -822,17 +826,21 @@ ax = axes[1]
 
 # PN Omega_m
 y = deriv_nns_combined_s30_mean[60:70]
-y_err = np.sqrt(np.diag(deriv_nns_combined_s30_cov[60:70, 60:70])) / np.sqrt(n_seeds)
+y_err = np.sqrt(np.diag(deriv_nns_combined_s30_cov[60:70, 60:70]))
+y_mean_err = y_err / np.sqrt(n_seeds)
 
 ax.plot(bin_centers, y, c='C0', ls='-', label=r'$\partial C^{\rm PN}_{\rm 2NN}(\theta) / \partial \Omega_{\rm m}$')
 ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C0')
+ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C0')
 
 # PN sigma_8
 y = deriv_nns_combined_s30_mean[220:230]
-y_err = np.sqrt(np.diag(deriv_nns_combined_s30_cov[220:230, 220:230])) / np.sqrt(n_seeds)
+y_err = np.sqrt(np.diag(deriv_nns_combined_s30_cov[220:230, 220:230]))
+y_mean_err = y_err / np.sqrt(n_seeds)
 
 ax.plot(bin_centers, y, c='C1', ls='-', label=r'$\partial C^{\rm PN}_{\rm 2NN}(\theta) / \partial \sigma_8$')
 ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C1')
+ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C1')
 
 # NP Omega_m
 y = deriv_nns_combined_s30_mean[70:80]
@@ -947,16 +955,20 @@ bin_centers = np.logspace(np.log10(30), np.log10(600), 30)
 # xi_pp
 ax = axes[0]
 y = deriv_pp_corrs_s30_mean[0:30]
-y_err = np.sqrt(np.diag(deriv_pp_corrs_s30_cov[0:30, 0:30])) / np.sqrt(n_seeds)
+y_err = np.sqrt(np.diag(deriv_pp_corrs_s30_cov[0:30, 0:30]))
+y_mean_err = y_err / np.sqrt(n_seeds)
 
 ax.plot(bin_centers, y, c='C0', ls='-', label=r'$\partial \xi (\theta) / \partial \Omega_{\rm m}$')
-ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.3, color='C0')
+ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C0')
+ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C0')
 
 y = deriv_pp_corrs_s30_mean[30:60]
-y_err = np.sqrt(np.diag(deriv_pp_corrs_s30_cov[30:60, 30:60])) / np.sqrt(n_seeds)
+y_err = np.sqrt(np.diag(deriv_pp_corrs_s30_cov[30:60, 30:60])) 
+y_mean_err = y_err / np.sqrt(n_seeds)
 
 ax.plot(bin_centers, y, c='C1', ls='-', label=r'$\partial \xi (\theta) / \partial \sigma_8$')
-ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.3, color='C1')
+ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C1')
+ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C1')
 # ax.set_ylim(-1, 1)
 ax.set_title(r'$\partial \xi^{\rm PP}(\theta) / \partial p$')
 # ax.set_xscale('log')
@@ -966,16 +978,19 @@ ax.axhline(0, color='gray', linestyle='--', linewidth=0.8)
 # xi_nn
 ax = axes[1]
 y = deriv_nn_corrs_s30_mean[0:30]
-y_err = np.sqrt(np.diag(deriv_nn_corrs_s30_cov[0:30, 0:30])) / np.sqrt(n_seeds)
+y_err = np.sqrt(np.diag(deriv_nn_corrs_s30_cov[0:30, 0:30]))
+y_mean_err = y_err / np.sqrt(n_seeds)
 
 ax.plot(bin_centers, y, c='C0', ls='-')
-ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.3, color='C0')
+ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C0')
+ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C0')
 
 y = deriv_nn_corrs_s30_mean[30:60]
-y_err = np.sqrt(np.diag(deriv_nn_corrs_s30_cov[30:60, 30:60])) / np.sqrt(n_seeds)
+y_err = np.sqrt(np.diag(deriv_nn_corrs_s30_cov[30:60, 30:60])) 
 
 ax.plot(bin_centers, y, c='C1', ls='-')
-ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.3, color='C1')
+ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C1')
+ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C1')
 # ax.set_ylim(-1, 1)
 ax.set_title(r'$\partial \xi^{\rm NN}(\theta) / \partial p$')
 # ax.set_xscale('log')
@@ -984,16 +999,19 @@ ax.axhline(0, color='gray', linestyle='--', linewidth=0.8)
 # xi_pn
 ax = axes[2]
 y = deriv_pn_corrs_s30_mean[0:30]
-y_err = np.sqrt(np.diag(deriv_pn_corrs_s30_cov[0:30, 0:30])) / np.sqrt(n_seeds)
+y_err = np.sqrt(np.diag(deriv_pn_corrs_s30_cov[0:30, 0:30]))
+y_mean_err = y_err / np.sqrt(n_seeds)
 
 ax.plot(bin_centers, y, c='C0', ls='-')
-ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.3, color='C0')
+ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C0')
+ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C0')
 
 y = deriv_pn_corrs_s30_mean[30:60]
-y_err = np.sqrt(np.diag(deriv_pn_corrs_s30_cov[30:60, 30:60])) / np.sqrt(n_seeds)
+y_err = np.sqrt(np.diag(deriv_pn_corrs_s30_cov[30:60, 30:60])) 
 
 ax.plot(bin_centers, y, c='C1', ls='-')
-ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.3, color='C1')
+ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C1')
+ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C1')
 
 ax.set_title(r'$\partial \xi^{\rm PN}(\theta) / \partial p$')
 # ax.set_xscale('log')
