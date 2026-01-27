@@ -290,7 +290,90 @@ for sigma in sigmas:
     # plt.savefig(f"outfiles/Mean_NegKappa_Correlation_with_Covariance_Error_Bars_s{s}.png")
     # plt.close()
 
-    
+    # pos-peak
+    pos_peak = []
+    for i in range(n_realizations):
+        data = np.load(f"{DATA_DIR}/PosPeak/realisation_{i}_s{s}_pos_peak_corr.npz")
+        theta = data['theta']
+        pos_peak.append(data['xi'])
+    pos_peak = np.array(pos_peak)
+    pos_peak_mean = np.mean(pos_peak, axis=0)
+    np.save(f"PosPeak_mean_s{s}.npy", pos_peak_mean)
+    cov_matrix_pos_peak = np.cov(pos_peak, rowvar=False)
+    np.save(f"CovPosPeak_s{s}.npy", cov_matrix_pos_peak)
+    plt.figure(figsize=(8,6))
+    plt.errorbar(theta, pos_peak_mean, yerr=np.sqrt(np.diag(cov_matrix_pos_peak)), fmt='o', label='Mean +1/2 Defect-Peak Correlation')
+    plt.xscale('log')
+    plt.xlabel('Theta (arcmin)')
+    plt.ylabel('+1/2 Defect-Peak Correlation')
+    plt.title('Mean +1/2 Defect-Peak Correlation with Covariance Error Bars')
+    plt.legend()
+    plt.savefig(f"outfiles/Mean_PosPeak_Correlation_with_Covariance_Error_Bars_s{s}.png")
+    plt.close()
+
+    # pos-minima
+    pos_min = []
+    for i in range(n_realizations):
+        data = np.load(f"{DATA_DIR}/PosMin/realisation_{i}_s{s}_pos_min_corr.npz")
+        theta = data['theta']
+        pos_min.append(data['xi'])
+    pos_min = np.array(pos_min)
+    pos_min_mean = np.mean(pos_min, axis=0)
+    np.save(f"PosMin_mean_s{s}.npy", pos_min_mean)
+    cov_matrix_pos_min = np.cov(pos_min, rowvar=False)
+    np.save(f"CovPosMin_s{s}.npy", cov_matrix_pos_min)
+    plt.figure(figsize=(8,6))
+    plt.errorbar(theta, pos_min_mean, yerr=np.sqrt(np.diag(cov_matrix_pos_min)), fmt='o', label='Mean +1/2 Defect-Minima Correlation')
+    plt.xscale('log')
+    plt.xlabel('Theta (arcmin)')
+    plt.ylabel('+1/2 Defect-Minima Correlation')
+    plt.title('Mean +1/2 Defect-Minima Correlation with Covariance Error Bars')
+    plt.legend()
+    plt.savefig(f"outfiles/Mean_PosMin_Correlation_with_Covariance_Error_Bars_s{s}.png")
+    plt.close()
+
+    # neg-peak
+    neg_peak = []
+    for i in range(n_realizations):
+        data = np.load(f"{DATA_DIR}/NegPeak/realisation_{i}_s{s}_neg_peak_corr.npz")
+        theta = data['theta']
+        neg_peak.append(data['xi'])
+    neg_peak = np.array(neg_peak)
+    neg_peak_mean = np.mean(neg_peak, axis=0)
+    np.save(f"NegPeak_mean_s{s}.npy", neg_peak_mean)
+    cov_matrix_neg_peak = np.cov(neg_peak, rowvar=False)
+    np.save(f"CovNegPeak_s{s}.npy", cov_matrix_neg_peak)
+    plt.figure(figsize=(8,6))
+    plt.errorbar(theta, neg_peak_mean, yerr=np.sqrt(np.diag(cov_matrix_neg_peak)), fmt='o', label='Mean -1/2 Defect-Peak Correlation')
+    plt.xscale('log')
+    plt.xlabel('Theta (arcmin)')
+    plt.ylabel('-1/2 Defect-Peak Correlation')
+    plt.title('Mean -1/2 Defect-Peak Correlation with Covariance Error Bars')
+    plt.legend()
+    plt.savefig(f"outfiles/Mean_NegPeak_Correlation_with_Covariance_Error_Bars_s{s}.png")
+    plt.close()
+
+    # neg-minima
+    neg_min = []
+    for i in range(n_realizations):
+        data = np.load(f"{DATA_DIR}/NegMin/realisation_{i}_s{s}_neg_min_corr.npz")
+        theta = data['theta']
+        neg_min.append(data['xi'])
+    neg_min = np.array(neg_min)
+    neg_min_mean = np.mean(neg_min, axis=0)
+    np.save(f"NegMin_mean_s{s}.npy", neg_min_mean)
+    cov_matrix_neg_min = np.cov(neg_min, rowvar=False)
+    np.save(f"CovNegMin_s{s}.npy", cov_matrix_neg_min)
+    plt.figure(figsize=(8,6))
+    plt.errorbar(theta, neg_min_mean, yerr=np.sqrt(np.diag(cov_matrix_neg_min)), fmt='o', label='Mean -1/2 Defect-Minima Correlation')
+    plt.xscale('log')
+    plt.xlabel('Theta (arcmin)')
+    plt.ylabel('-1/2 Defect-Minima Correlation')
+    plt.title('Mean -1/2 Defect-Minima Correlation with Covariance Error Bars')
+    plt.legend()
+    plt.savefig(f"outfiles/Mean_NegMin_Correlation_with_Covariance_Error_Bars_s{s}.png")
+    plt.close()
+
 
     # NNs
     nn_pos_same1 = []
@@ -458,6 +541,9 @@ for sigma in sigmas:
     dcorr_all_scales.append(np.hstack((pos_pos, neg_neg, pos_neg)))
     cov_matrix_dcorr_combined = np.cov(dcorr_combined, rowvar=False)
     np.save(f"CovDCorr_combined_s{s}.npy", cov_matrix_dcorr_combined)
+
+
+    
 
 
 

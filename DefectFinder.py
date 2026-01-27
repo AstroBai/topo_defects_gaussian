@@ -467,6 +467,99 @@ class DefectFinder:
         n = total_defects / (4 * np.pi)  # number per steradian
         return n, n_pos, n_neg
 
+    def find_peaks(self, type='peaks', savepath=None):
+        if type == 'peaks':
+            npix = len(self.kappa_bar)
+            neighbors = hp.get_all_neighbours(self.nside, np.arange(npix))
+            
+            # Initialize neighbor values array, using -inf for invalid (boundary) neighbors
+            neighbor_vals = np.full(neighbors.shape, -np.inf)
+            valid_mask = neighbors != -1
+            neighbor_vals[valid_mask] = self.kappa_bar[neighbors[valid_mask]]
+            
+            # A pixel is a peak if its value is strictly greater than all its neighbors
+            is_peak = np.all(self.kappa_bar > neighbor_vals, axis=0)
+            
+            peak_indices = np.where(is_peak)[0]
+            peak_values = self.kappa_bar[peak_indices]
+            
+            self.peaks = dict(zip(peak_indices, peak_values))
+            
+            if savepath:
+                theta, phi = hp.pix2ang(self.nside, peak_indices)
+                ra = phi * 180/np.pi
+                dec = (np.pi/2 - theta) * 180/np.pi
+                
+                col1 = fits.Column(name='RA', array=ra, format='E')
+                col2 = fits.Column(name='DEC', array=dec, format='E')
+                col3 = fits.Column(name='KAPPA', array=peak_values, format='E')
+                cols = fits.ColDefs([col1, col2, col3])
+                hdu = fits.BinTableHDU.from_columns(cols)
+                hdu.writeto(f"{savepath}_{type}.fits", overwrite=True)
+                #print(f"Saved {len(peak_indices)} peaks to {savepath}")
+        
+        if type == 'minima':
+            npix = len(self.kappa_bar)
+            neighbors = hp.get_all_neighbours(self.nside, np.arange(npix))
+            
+            # Initialize neighbor values array, using -inf for invalid (boundary) neighbors
+            neighbor_vals = np.full(neighbors.shape, -np.inf)
+            valid_mask = neighbors != -1
+            neighbor_vals[valid_mask] = self.kappa_bar[neighbors[valid_mask]]
+            
+            # A pixel is a peak if its value is strictly greater than all its neighbors
+            is_peak = np.all(self.kappa_bar < neighbor_vals, axis=0)
+            
+            peak_indices = np.where(is_peak)[0]
+            peak_values = self.kappa_bar[peak_indices]
+            
+            self.peaks = dict(zip(peak_indices, peak_values))
+            
+            if savepath:
+                theta, phi = hp.pix2ang(self.nside, peak_indices)
+                ra = phi * 180/np.pi
+                dec = (np.pi/2 - theta) * 180/np.pi
+                
+                col1 = fits.Column(name='RA', array=ra, format='E')
+                col2 = fits.Column(name='DEC', array=dec, format='E')
+                col3 = fits.Column(name='KAPPA', array=peak_values, format='E')
+                cols = fits.ColDefs([col1, col2, col3])
+                hdu = fits.BinTableHDU.from_columns(cols)
+                hdu.writeto(f"{savepath}_{type}.fits", overwrite=True)
+                #print(f"Saved {len(peak_indices)} peaks to {savepath}")
+            return self.peaks
+
+    def defect_peak_correlation(self, charge_path, peak_path, min_sep=1, max_sep=100, n_bins=10):
+        cat_defects = treecorr.Catalog(charge_path, ra_col='RA', dec_col='DEC', ra_units='degrees', dec_units='degrees')
+        cat_peaks = treecorr.Catalog(peak_path, ra_col='RA', dec_col='DEC', ra_units='degrees', dec_units='degrees')
+        
+        # Create random catalogs
+        n_random1 = cat_defects.nobj * 100
+        ra_random1 = np.random.uniform(0, 360, n_random1)
+        dec_random1 = np.degrees(np.arcsin(np.random.uniform(-1, 1, n_random1)))
+        cat_rand1 = treecorr.Catalog(ra=ra_random1, dec=dec_random1, ra_units='degrees', dec_units='degrees')
+        
+        n_random2 = cat_peaks.nobj * 100
+        ra_random2 = np.random.uniform(0, 360, n_random2)
+        dec_random2 = np.degrees(np.arcsin(np.random.uniform(-1, 1, n_random2)))
+        cat_rand2 = treecorr.Catalog(ra=ra_random2, dec=dec_random2, ra_units='degrees', dec_units='degrees')
+        
+        dd = treecorr.NNCorrelation(min_sep=min_sep, max_sep=max_sep, nbins=n_bins, sep_units='arcmin', bin_type='Log')
+        rr = treecorr.NNCorrelation(min_sep=min_sep, max_sep=max_sep, nbins=n_bins, sep_units='arcmin', bin_type='Log')
+        d1r2 = treecorr.NNCorrelation(min_sep=min_sep, max_sep=max_sep, nbins=n_bins, sep_units='arcmin', bin_type='Log')
+        r1d2 = treecorr.NNCorrelation(min_sep=min_sep, max_sep=max_sep, nbins=n_bins, sep_units='arcmin', bin_type='Log')
+        
+        dd.process(cat_defects, cat_peaks)
+        rr.process(cat_rand1, cat_rand2)
+        d1r2.process(cat_defects, cat_rand2)
+        r1d2.process(cat_peaks, cat_rand1)
+        
+        thetas = dd.meanr
+        xi, varxi = dd.calculateXi(rr=rr, dr=d1r2, rd=r1d2)
+        covmat = dd.cov
+        return thetas, xi, varxi, covmat
+
+
 
 
 

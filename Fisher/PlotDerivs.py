@@ -61,6 +61,12 @@ nk_corrs_s15 = []
 nk_corrs_s30 = []
 nk_corrs_s90 = []
 
+# Initialize new lists for Peak/Minima correlations
+ppk_corrs_s15, ppk_corrs_s30, ppk_corrs_s90 = [], [], []
+pmn_corrs_s15, pmn_corrs_s30, pmn_corrs_s90 = [], [], []
+npk_corrs_s15, npk_corrs_s30, npk_corrs_s90 = [], [], []
+nmn_corrs_s15, nmn_corrs_s30, nmn_corrs_s90 = [], [], []
+
 nn_combined_s15 = []
 nn_combined_s30 = []
 nn_combined_s90 = []
@@ -126,6 +132,36 @@ for seed in range(n_seeds):
         nk_corrs_s30.append((data_nk['xi_nk']))
         data_nk = np.load(f"{DATA_DIR}/TrainNKs/train_{i}_s90_seed_{seed}_neg_kappa_corr.npz")
         nk_corrs_s90.append((data_nk['xi_nk']))
+        
+        # Load Defect-Peak/Minima
+        data_ppk = np.load(f"{DATA_DIR}/TrainPosPeak/train_{i}_s15_seed_{seed}_pos_peak_corr.npz")
+        ppk_corrs_s15.append(data_ppk['xi'])
+        data_ppk = np.load(f"{DATA_DIR}/TrainPosPeak/train_{i}_s30_seed_{seed}_pos_peak_corr.npz")
+        ppk_corrs_s30.append(data_ppk['xi'])
+        data_ppk = np.load(f"{DATA_DIR}/TrainPosPeak/train_{i}_s90_seed_{seed}_pos_peak_corr.npz")
+        ppk_corrs_s90.append(data_ppk['xi'])
+
+        data_pmn = np.load(f"{DATA_DIR}/TrainPosMin/train_{i}_s15_seed_{seed}_pos_min_corr.npz")
+        pmn_corrs_s15.append(data_pmn['xi'])
+        data_pmn = np.load(f"{DATA_DIR}/TrainPosMin/train_{i}_s30_seed_{seed}_pos_min_corr.npz")
+        pmn_corrs_s30.append(data_pmn['xi'])
+        data_pmn = np.load(f"{DATA_DIR}/TrainPosMin/train_{i}_s90_seed_{seed}_pos_min_corr.npz")
+        pmn_corrs_s90.append(data_pmn['xi'])
+
+        data_npk = np.load(f"{DATA_DIR}/TrainNegPeak/train_{i}_s15_seed_{seed}_neg_peak_corr.npz")
+        npk_corrs_s15.append(data_npk['xi'])
+        data_npk = np.load(f"{DATA_DIR}/TrainNegPeak/train_{i}_s30_seed_{seed}_neg_peak_corr.npz")
+        npk_corrs_s30.append(data_npk['xi'])
+        data_npk = np.load(f"{DATA_DIR}/TrainNegPeak/train_{i}_s90_seed_{seed}_neg_peak_corr.npz")
+        npk_corrs_s90.append(data_npk['xi'])
+
+        data_nmn = np.load(f"{DATA_DIR}/TrainNegMin/train_{i}_s15_seed_{seed}_neg_min_corr.npz")
+        nmn_corrs_s15.append(data_nmn['xi'])
+        data_nmn = np.load(f"{DATA_DIR}/TrainNegMin/train_{i}_s30_seed_{seed}_neg_min_corr.npz")
+        nmn_corrs_s30.append(data_nmn['xi'])
+        data_nmn = np.load(f"{DATA_DIR}/TrainNegMin/train_{i}_s90_seed_{seed}_neg_min_corr.npz")
+        nmn_corrs_s90.append(data_nmn['xi'])
+        
         data_nn_combined = np.load(f"{DATA_DIR}/TrainNNs/train_{i}_s15_seed_{seed}_NNs_combined.npz")
         nn_combined_s15.append((data_nn_combined['nn_combined']))
         data_nn_combined = np.load(f"{DATA_DIR}/TrainNNs/train_{i}_s30_seed_{seed}_NNs_combined.npz")
@@ -161,6 +197,12 @@ pk_corrs_s90 = np.array(pk_corrs_s90)
 nk_corrs_s15 = np.array(nk_corrs_s15)
 nk_corrs_s30 = np.array(nk_corrs_s30)
 nk_corrs_s90 = np.array(nk_corrs_s90)
+
+ppk_corrs_s15, ppk_corrs_s30, ppk_corrs_s90 = np.array(ppk_corrs_s15), np.array(ppk_corrs_s30), np.array(ppk_corrs_s90)
+pmn_corrs_s15, pmn_corrs_s30, pmn_corrs_s90 = np.array(pmn_corrs_s15), np.array(pmn_corrs_s30), np.array(pmn_corrs_s90)
+npk_corrs_s15, npk_corrs_s30, npk_corrs_s90 = np.array(npk_corrs_s15), np.array(npk_corrs_s30), np.array(npk_corrs_s90)
+nmn_corrs_s15, nmn_corrs_s30, nmn_corrs_s90 = np.array(nmn_corrs_s15), np.array(nmn_corrs_s30), np.array(nmn_corrs_s90)
+
 nn_combined_s15 = np.array(nn_combined_s15)
 nn_combined_s30 = np.array(nn_combined_s30)
 nn_combined_s90 = np.array(nn_combined_s90)
@@ -195,6 +237,21 @@ pk_corrs_s90 = pk_corrs_s90.reshape(n_seeds, 4, -1)
 nk_corrs_s15 = nk_corrs_s15.reshape(n_seeds, 4, -1)
 nk_corrs_s30 = nk_corrs_s30.reshape(n_seeds, 4, -1)
 nk_corrs_s90 = nk_corrs_s90.reshape(n_seeds, 4, -1)
+
+# Reshape DPC arrays
+ppk_corrs_s15 = ppk_corrs_s15.reshape(n_seeds, 4, -1)
+ppk_corrs_s30 = ppk_corrs_s30.reshape(n_seeds, 4, -1)
+ppk_corrs_s90 = ppk_corrs_s90.reshape(n_seeds, 4, -1)
+pmn_corrs_s15 = pmn_corrs_s15.reshape(n_seeds, 4, -1)
+pmn_corrs_s30 = pmn_corrs_s30.reshape(n_seeds, 4, -1)
+pmn_corrs_s90 = pmn_corrs_s90.reshape(n_seeds, 4, -1)
+npk_corrs_s15 = npk_corrs_s15.reshape(n_seeds, 4, -1)
+npk_corrs_s30 = npk_corrs_s30.reshape(n_seeds, 4, -1)
+npk_corrs_s90 = npk_corrs_s90.reshape(n_seeds, 4, -1)
+nmn_corrs_s15 = nmn_corrs_s15.reshape(n_seeds, 4, -1)
+nmn_corrs_s30 = nmn_corrs_s30.reshape(n_seeds, 4, -1)
+nmn_corrs_s90 = nmn_corrs_s90.reshape(n_seeds, 4, -1)
+
 nn_combined_s15 = nn_combined_s15.reshape(n_seeds, 4, -1)
 nn_combined_s30 = nn_combined_s30.reshape(n_seeds, 4, -1)
 nn_combined_s90 = nn_combined_s90.reshape(n_seeds, 4, -1)
@@ -248,6 +305,10 @@ deriv_pk_corrs_s90 = []
 deriv_nk_corrs_s15 = []
 deriv_nk_corrs_s30 = []
 deriv_nk_corrs_s90 = []
+deriv_ppk_corrs_s15, deriv_ppk_corrs_s30, deriv_ppk_corrs_s90 = [], [], []
+deriv_pmn_corrs_s15, deriv_pmn_corrs_s30, deriv_pmn_corrs_s90 = [], [], []
+deriv_npk_corrs_s15, deriv_npk_corrs_s30, deriv_npk_corrs_s90 = [], [], []
+deriv_nmn_corrs_s15, deriv_nmn_corrs_s30, deriv_nmn_corrs_s90 = [], [], []
 for i in range(0, len(params), 2):
     print(i)
     # pdf derivatives
@@ -371,6 +432,19 @@ for i in range(0, len(params), 2):
     deriv_nk_corr = (xi_nk_plus - xi_nk_minus) / (2 * delta_params[list(fid.keys())[i//2]])
     deriv_nk_corrs_s90.append(deriv_nk_corr)
     
+    # DPC derivatives
+    for scale_idx, (corrs_list, deriv_list) in enumerate([
+        ([ppk_corrs_s15, ppk_corrs_s30, ppk_corrs_s90], [deriv_ppk_corrs_s15, deriv_ppk_corrs_s30, deriv_ppk_corrs_s90]),
+        ([pmn_corrs_s15, pmn_corrs_s30, pmn_corrs_s90], [deriv_pmn_corrs_s15, deriv_pmn_corrs_s30, deriv_pmn_corrs_s90]),
+        ([npk_corrs_s15, npk_corrs_s30, npk_corrs_s90], [deriv_npk_corrs_s15, deriv_npk_corrs_s30, deriv_npk_corrs_s90]),
+        ([nmn_corrs_s15, nmn_corrs_s30, nmn_corrs_s90], [deriv_nmn_corrs_s15, deriv_nmn_corrs_s30, deriv_nmn_corrs_s90]),
+    ]):
+        for s_idx in range(3):
+           xi_plus = corrs_list[s_idx][:,i+1,:]
+           xi_minus = corrs_list[s_idx][:,i,:]
+           deriv_val = (xi_plus - xi_minus) / (2 * delta_params[list(fid.keys())[i//2]])
+           deriv_list[s_idx].append(deriv_val)
+    
     nn_combined_plus = nn_combined_s15[:,i+1,:]
     nn_combined_minus = nn_combined_s15[:,i,:]
     deriv_nn_combined = (nn_combined_plus - nn_combined_minus) / (2 * delta_params[list(fid.keys())[i//2]]) 
@@ -421,6 +495,11 @@ deriv_pk_corrs_s90 = np.array(deriv_pk_corrs_s90)
 deriv_nk_corrs_s15 = np.array(deriv_nk_corrs_s15)
 deriv_nk_corrs_s30 = np.array(deriv_nk_corrs_s30)
 deriv_nk_corrs_s90 = np.array(deriv_nk_corrs_s90)
+
+deriv_ppk_corrs_s15, deriv_ppk_corrs_s30, deriv_ppk_corrs_s90 = np.array(deriv_ppk_corrs_s15), np.array(deriv_ppk_corrs_s30), np.array(deriv_ppk_corrs_s90)
+deriv_pmn_corrs_s15, deriv_pmn_corrs_s30, deriv_pmn_corrs_s90 = np.array(deriv_pmn_corrs_s15), np.array(deriv_pmn_corrs_s30), np.array(deriv_pmn_corrs_s90)
+deriv_npk_corrs_s15, deriv_npk_corrs_s30, deriv_npk_corrs_s90 = np.array(deriv_npk_corrs_s15), np.array(deriv_npk_corrs_s30), np.array(deriv_npk_corrs_s90)
+deriv_nmn_corrs_s15, deriv_nmn_corrs_s30, deriv_nmn_corrs_s90 = np.array(deriv_nmn_corrs_s15), np.array(deriv_nmn_corrs_s30), np.array(deriv_nmn_corrs_s90)
 
 deriv_nns_combined_s15 = np.array(deriv_nns_combined_s15)
 deriv_nns_combined_s30 = np.array(deriv_nns_combined_s30)
@@ -554,6 +633,24 @@ deriv_nk_corrs_s30_cov = np.cov(deriv_nk_corrs_s30_reshaped, rowvar=False)
 deriv_nk_corrs_s90_reshaped = deriv_nk_corrs_s90.transpose(1, 0, 2).reshape(100, -1)
 deriv_nk_corrs_s90_mean = np.mean(deriv_nk_corrs_s90_reshaped, axis=0)
 deriv_nk_corrs_s90_cov = np.cov(deriv_nk_corrs_s90_reshaped, rowvar=False)
+
+# DPC s30 statistics
+deriv_ppk_corrs_s30_reshaped = deriv_ppk_corrs_s30.transpose(1, 0, 2).reshape(100, -1)
+deriv_ppk_corrs_s30_mean = np.mean(deriv_ppk_corrs_s30_reshaped, axis=0)
+deriv_ppk_corrs_s30_cov = np.cov(deriv_ppk_corrs_s30_reshaped, rowvar=False)
+
+deriv_pmn_corrs_s30_reshaped = deriv_pmn_corrs_s30.transpose(1, 0, 2).reshape(100, -1)
+deriv_pmn_corrs_s30_mean = np.mean(deriv_pmn_corrs_s30_reshaped, axis=0)
+deriv_pmn_corrs_s30_cov = np.cov(deriv_pmn_corrs_s30_reshaped, rowvar=False)
+
+deriv_npk_corrs_s30_reshaped = deriv_npk_corrs_s30.transpose(1, 0, 2).reshape(100, -1)
+deriv_npk_corrs_s30_mean = np.mean(deriv_npk_corrs_s30_reshaped, axis=0)
+deriv_npk_corrs_s30_cov = np.cov(deriv_npk_corrs_s30_reshaped, rowvar=False)
+
+deriv_nmn_corrs_s30_reshaped = deriv_nmn_corrs_s30.transpose(1, 0, 2).reshape(100, -1)
+deriv_nmn_corrs_s30_mean = np.mean(deriv_nmn_corrs_s30_reshaped, axis=0)
+deriv_nmn_corrs_s30_cov = np.cov(deriv_nmn_corrs_s30_reshaped, rowvar=False)
+
 
 # Calculate statistics for NNs combined
 deriv_nns_combined_s15_reshaped = deriv_nns_combined_s15.transpose(1, 0, 2).reshape(100, -1)
@@ -971,7 +1068,7 @@ ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C1')
 ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C1')
 # ax.set_ylim(-1, 1)
 ax.set_title(r'$\partial \xi^{\rm PP}(\theta) / \partial p$')
-# ax.set_xscale('log')
+ax.set_xscale('log')
 ax.set_xlabel(r'$\theta$ [arcmin]')
 ax.set_ylabel(r'$\partial \xi(\theta)/\partial p$')
 ax.axhline(0, color='gray', linestyle='--', linewidth=0.8)
@@ -993,7 +1090,7 @@ ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C1')
 ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C1')
 # ax.set_ylim(-1, 1)
 ax.set_title(r'$\partial \xi^{\rm NN}(\theta) / \partial p$')
-# ax.set_xscale('log')
+ax.set_xscale('log')
 ax.set_xlabel(r'$\theta$ [arcmin]')
 ax.axhline(0, color='gray', linestyle='--', linewidth=0.8)
 # xi_pn
@@ -1014,7 +1111,7 @@ ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C1')
 ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C1')
 
 ax.set_title(r'$\partial \xi^{\rm PN}(\theta) / \partial p$')
-# ax.set_xscale('log')
+ax.set_xscale('log')
 ax.set_xlabel(r'$\theta$ [arcmin]')
 ax.axhline(0, color='gray', linestyle='--', linewidth=0.8)
 handles, labels = axes[0].get_legend_handles_labels()
@@ -1022,4 +1119,47 @@ fig.legend(handles, labels, loc='upper center', ncol=2, bbox_to_anchor=(0.5, 1.1
 
 plt.subplots_adjust(wspace=0)
 plt.savefig('outfiles/derivs_corrs_s30.png', dpi=300, bbox_inches='tight')
+plt.close()
+
+# Plot DPC (Peak/Minima) derivatives for s30
+fig, axes = plt.subplots(2, 2, figsize=(6, 4))
+bin_centers = np.logspace(np.log10(30), np.log10(600), 30)
+titles = [r'Pos-Peak ($\xi^{\rm PPk}$)', r'Pos-Minima ($\xi^{\rm PMn}$)', r'Neg-Peak ($\xi^{\rm NPk}$)', r'Neg-Minima ($\xi^{\rm NMn}$)']
+means = [deriv_ppk_corrs_s30_mean, deriv_pmn_corrs_s30_mean, deriv_npk_corrs_s30_mean, deriv_nmn_corrs_s30_mean]
+covs = [deriv_ppk_corrs_s30_cov, deriv_pmn_corrs_s30_cov, deriv_npk_corrs_s30_cov, deriv_nmn_corrs_s30_cov]
+
+for i, ax in enumerate(axes.flatten()):
+    mean = means[i]
+    cov = covs[i]
+    
+    # Omega_m
+    y = mean[0:30]
+    y_err = np.sqrt(np.diag(cov[0:30, 0:30]))
+    y_mean_err = y_err / np.sqrt(n_seeds)
+
+    ax.plot(bin_centers, y, c='C0', ls='-', label=r'$\partial \xi / \partial \Omega_{\rm m}$')
+    ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C0')
+    ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C0')
+
+    # sigma_8
+    y = mean[30:60]
+    y_err = np.sqrt(np.diag(cov[30:60, 30:60]))
+    y_mean_err = y_err / np.sqrt(n_seeds)
+
+    ax.plot(bin_centers, y, c='C1', ls='-', label=r'$\partial \xi / \partial \sigma_8$')
+    ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C1')
+    ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C1')
+    
+    ax.set_title(titles[i])
+    ax.set_xscale('log')
+    ax.set_xlim(30, 600)
+    ax.axhline(0, color='gray', linestyle='--', linewidth=0.8)
+    if i >= 2:
+        ax.set_xlabel(r'$\theta$ [arcmin]')
+
+handles, labels = axes[0,0].get_legend_handles_labels()
+fig.legend(handles, labels, loc='upper center', ncol=2, bbox_to_anchor=(0.5, 1.05))
+
+plt.subplots_adjust(hspace=0.3, wspace=0.2)
+plt.savefig('outfiles/derivs_dpc_s30.png', dpi=300, bbox_inches='tight')
 plt.close()

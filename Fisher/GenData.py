@@ -125,6 +125,23 @@ for i, param in enumerate(params):
     all_covmat_nk_s15 = []
     all_covmat_nk_s30 = []
     all_covmat_nk_s90 = []
+
+    # Initialize new lists for Peak/Minima correlations
+    all_xi_pos_peak_s15, all_varxi_pos_peak_s15, all_covmat_pos_peak_s15 = [], [], []
+    all_xi_pos_peak_s30, all_varxi_pos_peak_s30, all_covmat_pos_peak_s30 = [], [], []
+    all_xi_pos_peak_s90, all_varxi_pos_peak_s90, all_covmat_pos_peak_s90 = [], [], []
+
+    all_xi_pos_min_s15, all_varxi_pos_min_s15, all_covmat_pos_min_s15 = [], [], []
+    all_xi_pos_min_s30, all_varxi_pos_min_s30, all_covmat_pos_min_s30 = [], [], []
+    all_xi_pos_min_s90, all_varxi_pos_min_s90, all_covmat_pos_min_s90 = [], [], []
+
+    all_xi_neg_peak_s15, all_varxi_neg_peak_s15, all_covmat_neg_peak_s15 = [], [], []
+    all_xi_neg_peak_s30, all_varxi_neg_peak_s30, all_covmat_neg_peak_s30 = [], [], []
+    all_xi_neg_peak_s90, all_varxi_neg_peak_s90, all_covmat_neg_peak_s90 = [], [], []
+
+    all_xi_neg_min_s15, all_varxi_neg_min_s15, all_covmat_neg_min_s15 = [], [], []
+    all_xi_neg_min_s30, all_varxi_neg_min_s30, all_covmat_neg_min_s30 = [], [], []
+    all_xi_neg_min_s90, all_varxi_neg_min_s90, all_covmat_neg_min_s90 = [], [], []
     
     all_nn_combined_s15 = []
     all_nn_combined_s30 = []
@@ -252,6 +269,41 @@ for i, param in enumerate(params):
                 theta, xi_nk, varxi_nk, covmat_nk = df.defect_convergence_correlation(charge=-0.5,
                                                                             min_sep=90., max_sep=1000, n_bins=30)
                 
+
+            # pos-peak, pos-minima, neg-peak, neg-minima
+
+            savepath = f"{DATA_DIR}/TrainDefects/realisation_{i}_s{s}_seed_{seed}"
+            df.find_peaks(type='peaks', savepath=savepath)
+            df.find_peaks(type='minima', savepath=savepath)
+
+            if s == 15:
+                min_sep, max_sep, n_bins = 15., 600., 30
+            elif s == 30:
+                min_sep, max_sep, n_bins = 30., 600., 30
+            elif s == 90:
+                min_sep, max_sep, n_bins = 90., 600., 30
+                
+            defect_path_base = f"{DATA_DIR}/TrainDefects/realisation_{i}_s{s}_seed_{seed}_defects"
+
+            # Pos-Peak
+            theta, xi_pos_peak, varxi_pos_peak, covmat_pos_peak = df.defect_peak_correlation(charge_path=f"{defect_path_base}_charge_+0.5.fits", 
+                                                                peak_path=f"{savepath}_peaks.fits", 
+                                                                min_sep=min_sep, max_sep=max_sep, n_bins=n_bins)
+            
+            # Pos-Minima
+            theta, xi_pos_min, varxi_pos_min, covmat_pos_min = df.defect_peak_correlation(charge_path=f"{defect_path_base}_charge_+0.5.fits",
+                                                                peak_path=f"{savepath}_minima.fits",
+                                                                min_sep=min_sep, max_sep=max_sep, n_bins=n_bins)
+            
+            # Neg-Peak
+            theta, xi_neg_peak, varxi_neg_peak, covmat_neg_peak = df.defect_peak_correlation(charge_path=f"{defect_path_base}_charge_-0.5.fits",
+                                                                peak_path=f"{savepath}_peaks.fits",
+                                                                min_sep=min_sep, max_sep=max_sep, n_bins=n_bins)
+            
+            # Neg-Minima
+            theta, xi_neg_min, varxi_neg_min, covmat_neg_min = df.defect_peak_correlation(charge_path=f"{defect_path_base}_charge_-0.5.fits",
+                                                                peak_path=f"{savepath}_minima.fits",
+                                                                min_sep=min_sep, max_sep=max_sep, n_bins=n_bins)
 
             # NNs calculation
             nn_pos_same1 = df.nearest_distance(charge=0.5, k=1)
@@ -395,6 +447,20 @@ for i, param in enumerate(params):
                 all_xi_nk_s15.append(xi_nk)
                 all_varxi_nk_s15.append(varxi_nk)
                 all_covmat_nk_s15.append(covmat_nk) 
+
+                all_xi_pos_peak_s15.append(xi_pos_peak)
+                all_varxi_pos_peak_s15.append(varxi_pos_peak)
+                all_covmat_pos_peak_s15.append(covmat_pos_peak)
+                all_xi_pos_min_s15.append(xi_pos_min)
+                all_varxi_pos_min_s15.append(varxi_pos_min)
+                all_covmat_pos_min_s15.append(covmat_pos_min)
+                all_xi_neg_peak_s15.append(xi_neg_peak)
+                all_varxi_neg_peak_s15.append(varxi_neg_peak)
+                all_covmat_neg_peak_s15.append(covmat_neg_peak)
+                all_xi_neg_min_s15.append(xi_neg_min)
+                all_varxi_neg_min_s15.append(varxi_neg_min)
+                all_covmat_neg_min_s15.append(covmat_neg_min)
+
                 all_nn_combined_s15.append(nn_combined)
             elif s == 30:
                 all_kappa_pdf_s30.append(hist)
@@ -418,6 +484,20 @@ for i, param in enumerate(params):
                 all_xi_nk_s30.append(xi_nk)
                 all_varxi_nk_s30.append(varxi_nk)
                 all_covmat_nk_s30.append(covmat_nk)
+                
+                all_xi_pos_peak_s30.append(xi_pos_peak)
+                all_varxi_pos_peak_s30.append(varxi_pos_peak)
+                all_covmat_pos_peak_s30.append(covmat_pos_peak)
+                all_xi_pos_min_s30.append(xi_pos_min)
+                all_varxi_pos_min_s30.append(varxi_pos_min)
+                all_covmat_pos_min_s30.append(covmat_pos_min)
+                all_xi_neg_peak_s30.append(xi_neg_peak)
+                all_varxi_neg_peak_s30.append(varxi_neg_peak)
+                all_covmat_neg_peak_s30.append(covmat_neg_peak)
+                all_xi_neg_min_s30.append(xi_neg_min)
+                all_varxi_neg_min_s30.append(varxi_neg_min)
+                all_covmat_neg_min_s30.append(covmat_neg_min)
+
                 all_nn_combined_s30.append(nn_combined)
             elif s == 90:
                 all_kappa_pdf_s90.append(hist)
@@ -441,6 +521,20 @@ for i, param in enumerate(params):
                 all_xi_nk_s90.append(xi_nk)
                 all_varxi_nk_s90.append(varxi_nk)
                 all_covmat_nk_s90.append(covmat_nk)
+
+                all_xi_pos_peak_s90.append(xi_pos_peak)
+                all_varxi_pos_peak_s90.append(varxi_pos_peak)
+                all_covmat_pos_peak_s90.append(covmat_pos_peak)
+                all_xi_pos_min_s90.append(xi_pos_min)
+                all_varxi_pos_min_s90.append(varxi_pos_min)
+                all_covmat_pos_min_s90.append(covmat_pos_min)
+                all_xi_neg_peak_s90.append(xi_neg_peak)
+                all_varxi_neg_peak_s90.append(varxi_neg_peak)
+                all_covmat_neg_peak_s90.append(covmat_neg_peak)
+                all_xi_neg_min_s90.append(xi_neg_min)
+                all_varxi_neg_min_s90.append(varxi_neg_min)
+                all_covmat_neg_min_s90.append(covmat_neg_min)
+
                 all_nn_combined_s90.append(nn_combined)
     
     # Calculate averages over all seeds for each smoothing scale
@@ -469,6 +563,10 @@ for i, param in enumerate(params):
         xi_nk_list,
         varxi_nk_list,
         covmat_nk_list,
+        xi_pos_peak_list, varxi_pos_peak_list, covmat_pos_peak_list,
+        xi_pos_min_list, varxi_pos_min_list, covmat_pos_min_list,
+        xi_neg_peak_list, varxi_neg_peak_list, covmat_neg_peak_list,
+        xi_neg_min_list, varxi_neg_min_list, covmat_neg_min_list
     ) in [
         (15, (
             all_kappa_pdf_s15, all_kappa_pos_cum_s15, all_kappa_neg_cum_s15,
@@ -478,6 +576,10 @@ for i, param in enumerate(params):
             all_xi_pn_s15, all_varxi_pn_s15, all_covmat_pn_s15,
             all_xi_pk_s15, all_varxi_pk_s15, all_covmat_pk_s15,
             all_xi_nk_s15, all_varxi_nk_s15, all_covmat_nk_s15,
+            all_xi_pos_peak_s15, all_varxi_pos_peak_s15, all_covmat_pos_peak_s15,
+            all_xi_pos_min_s15, all_varxi_pos_min_s15, all_covmat_pos_min_s15,
+            all_xi_neg_peak_s15, all_varxi_neg_peak_s15, all_covmat_neg_peak_s15,
+            all_xi_neg_min_s15, all_varxi_neg_min_s15, all_covmat_neg_min_s15
         )),
         (30, (
             all_kappa_pdf_s30, all_kappa_pos_cum_s30, all_kappa_neg_cum_s30,
@@ -487,6 +589,10 @@ for i, param in enumerate(params):
             all_xi_pn_s30, all_varxi_pn_s30, all_covmat_pn_s30,
             all_xi_pk_s30, all_varxi_pk_s30, all_covmat_pk_s30,
             all_xi_nk_s30, all_varxi_nk_s30, all_covmat_nk_s30,
+            all_xi_pos_peak_s30, all_varxi_pos_peak_s30, all_covmat_pos_peak_s30,
+            all_xi_pos_min_s30, all_varxi_pos_min_s30, all_covmat_pos_min_s30,
+            all_xi_neg_peak_s30, all_varxi_neg_peak_s30, all_covmat_neg_peak_s30,
+            all_xi_neg_min_s30, all_varxi_neg_min_s30, all_covmat_neg_min_s30
         )),
         (90, (
             all_kappa_pdf_s90, all_kappa_pos_cum_s90, all_kappa_neg_cum_s90,
@@ -496,6 +602,10 @@ for i, param in enumerate(params):
             all_xi_pn_s90, all_varxi_pn_s90, all_covmat_pn_s90,
             all_xi_pk_s90, all_varxi_pk_s90, all_covmat_pk_s90,
             all_xi_nk_s90, all_varxi_nk_s90, all_covmat_nk_s90,
+            all_xi_pos_peak_s90, all_varxi_pos_peak_s90, all_covmat_pos_peak_s90,
+            all_xi_pos_min_s90, all_varxi_pos_min_s90, all_covmat_pos_min_s90,
+            all_xi_neg_peak_s90, all_varxi_neg_peak_s90, all_covmat_neg_peak_s90,
+            all_xi_neg_min_s90, all_varxi_neg_min_s90, all_covmat_neg_min_s90
         )),
     ]:
         kappa_pdf_avg = np.mean(kappa_pdf_list, axis=0)
@@ -520,6 +630,23 @@ for i, param in enumerate(params):
         xi_nk_avg = np.mean(xi_nk_list, axis=0)
         varxi_nk_avg = np.mean(varxi_nk_list, axis=0)
         covmat_nk_avg = np.mean(covmat_nk_list, axis=0)
+
+        # Average Peak/Minima results
+        xi_pos_peak_avg = np.mean(xi_pos_peak_list, axis=0)
+        varxi_pos_peak_avg = np.mean(varxi_pos_peak_list, axis=0)
+        covmat_pos_peak_avg = np.mean(covmat_pos_peak_list, axis=0)
+        
+        xi_pos_min_avg = np.mean(xi_pos_min_list, axis=0)
+        varxi_pos_min_avg = np.mean(varxi_pos_min_list, axis=0)
+        covmat_pos_min_avg = np.mean(covmat_pos_min_list, axis=0)
+        
+        xi_neg_peak_avg = np.mean(xi_neg_peak_list, axis=0)
+        varxi_neg_peak_avg = np.mean(varxi_neg_peak_list, axis=0)
+        covmat_neg_peak_avg = np.mean(covmat_neg_peak_list, axis=0)
+        
+        xi_neg_min_avg = np.mean(xi_neg_min_list, axis=0)
+        varxi_neg_min_avg = np.mean(varxi_neg_min_list, axis=0)
+        covmat_neg_min_avg = np.mean(covmat_neg_min_list, axis=0)
 
         # Save averaged results   
         os.makedirs(f"{DATA_DIR}/TrainPDFs", exist_ok=True)
@@ -581,3 +708,15 @@ for i, param in enumerate(params):
             xi_nk=xi_nk_avg,
             varxi_nk=varxi_nk_avg,
             covmat_nk=covmat_nk_avg)
+
+        os.makedirs(f"{DATA_DIR}/TrainPosPeak", exist_ok=True)
+        np.savez(f"{DATA_DIR}/TrainPosPeak/train_{i}_s{s}_pos_peak_corr.npz", theta=theta, xi=xi_pos_peak_avg, varxi=varxi_pos_peak_avg, covmat=covmat_pos_peak_avg)
+
+        os.makedirs(f"{DATA_DIR}/TrainPosMin", exist_ok=True)
+        np.savez(f"{DATA_DIR}/TrainPosMin/train_{i}_s{s}_pos_min_corr.npz", theta=theta, xi=xi_pos_min_avg, varxi=varxi_pos_min_avg, covmat=covmat_pos_min_avg)
+        
+        os.makedirs(f"{DATA_DIR}/TrainNegPeak", exist_ok=True)
+        np.savez(f"{DATA_DIR}/TrainNegPeak/train_{i}_s{s}_neg_peak_corr.npz", theta=theta, xi=xi_neg_peak_avg, varxi=varxi_neg_peak_avg, covmat=covmat_neg_peak_avg)
+
+        os.makedirs(f"{DATA_DIR}/TrainNegMin", exist_ok=True)
+        np.savez(f"{DATA_DIR}/TrainNegMin/train_{i}_s{s}_neg_min_corr.npz", theta=theta, xi=xi_neg_min_avg, varxi=varxi_neg_min_avg, covmat=covmat_neg_min_avg)
