@@ -21,7 +21,7 @@ class DefectFinder:
         self.shear_amp = np.sqrt(self.gamm1_bar**2 + self.gamm2_bar**2)
         self.nside = hp.npix2nside(len(self.phi_bar))
         resolution = hp.nside2resol(self.nside, arcmin=True)
-        #print(f"Loaded data with nside={self.nside}, resolution={resolution:.2f} arcmin")
+        # print(f"Loaded data with nside={self.nside}, resolution={resolution:.2f} arcmin")
 
     def load_defects(self, defect_datapath):
         """Load defects from a saved npz file."""
@@ -398,9 +398,9 @@ class DefectFinder:
         covmat = kk.cov
         return thetas, xi, varxi, covmat
         
-    def get_lens_potential(self):
+    def get_lens_potential(self, lmax=None):
         """Return the lensing potential field."""
-        self.psi = glass.from_convergence(self.kappa_bar, potential=True, lmax=int(self.nside/4))
+        self.psi = glass.from_convergence(self.kappa_bar, potential=True, lmax=lmax)
         return self.psi
 
     
@@ -410,20 +410,18 @@ class DefectFinder:
         self.ell = np.arange(len(self.cl_kappa))
         return self.ell, self.cl_kappa
 
-    
-    def lens_potential_power_spectrum(self):
+    def lens_potential_power_spectrum(self, lmax=None):
         """Compute the lensing potential power spectrum Cl."""
         if not hasattr(self, 'psi'):
-            self.get_lens_potential()
-        self.cl_psi = hp.anafast(self.psi, use_pixel_weights=True, datapath='/home/jbai/.astropy/healpy-data', lmax=int(self.nside/4))#* hp.sphtfunc.gauss_beam(np.radians(10.0), lmax=3*self.nside-1)**2  # 10 arcmin beam smoothing
+            self.get_lens_potential(lmax=lmax)
+        self.cl_psi = hp.anafast(self.psi, use_pixel_weights=True, datapath='/home/jbai/.astropy/healpy-data', lmax=lmax)
         self.ell = np.arange(len(self.cl_psi))
         return self.ell, self.cl_psi
 
-    
-    def potential_power_moments(self, n):
+    def potential_power_moments(self, n, lmax=None):
         """Compute the moments of the lensing potential power spectrum."""
         if not hasattr(self, 'cl_psi'):
-            self.lens_potential_power_spectrum()
+            self.lens_potential_power_spectrum(lmax=lmax)
         def legendre_derivative(ell, n):
             import math
             m = int(n/2)
@@ -439,9 +437,9 @@ class DefectFinder:
         moment = np.sum((2*self.ell+1)/(4*np.pi) * self.cl_psi * lgd_factorials)
         return moment
     
-    def number_estimation(self):
-        m6 = self.potential_power_moments(6)
-        m4 = self.potential_power_moments(4)
+    def number_estimation(self, lmax=None):
+        m6 = self.potential_power_moments(6, lmax=lmax)
+        m4 = self.potential_power_moments(4, lmax=lmax)
         self.d = np.abs(m6 / m4) * 3 / (10 * np.pi)
         return self.d
     
