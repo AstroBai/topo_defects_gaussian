@@ -100,71 +100,71 @@ for i in tqdm(range(1000), desc="Generating mock data"):
         #          varxi_kk=varxi_kk,
         #          covmat_kk=covmat_kk)
 
-        # if s == 15:
-        #     savepath = f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects"
-        #     theta, xi_pp, varxi_pp, covmat_pp = df.correlation_function(charge1_path=f"{savepath}_charge_+0.5.fits",
-        #                                                                 charge2_path=f"{savepath}_charge_+0.5.fits",
-        #                                                                 min_sep=15., max_sep=600, n_bins=30)
-        # elif s == 30:
-        #     savepath = f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects"
-        #     theta, xi_pp, varxi_pp, covmat_pp = df.correlation_function(charge1_path=f"{savepath}_charge_+0.5.fits",
-        #                                                                 charge2_path=f"{savepath}_charge_+0.5.fits",
-        #                                                                 min_sep=30., max_sep=600, n_bins=30)
-        # elif s == 90:
-        #     savepath = f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects"
-        #     theta, xi_pp, varxi_pp, covmat_pp = df.correlation_function(charge1_path=f"{savepath}_charge_+0.5.fits",
-        #                                                                 charge2_path=f"{savepath}_charge_+0.5.fits",
-        #                                                                 min_sep=90., max_sep=600, n_bins=30)
-        # os.makedirs(f"{DATA_DIR}/PosPos", exist_ok=True)
-        # np.savez(f"{DATA_DIR}/PosPos/realisation_{i}_s{s}_pos_pos_corr.npz",
-        #          theta=theta,
-        #          xi_pp=xi_pp,
-        #          varxi_pp=varxi_pp,
-        #          covmat_pp=covmat_pp)
+        if s == 15:
+            savepath = f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects"
+            theta, xi_pp, varxi_pp, covmat_pp = df.correlation_function(charge1_path=f"{savepath}_charge_+0.5.fits",
+                                                                        charge2_path=f"{savepath}_charge_+0.5.fits",
+                                                                        min_sep=15., max_sep=100, n_bins=10)
+        elif s == 30:
+            savepath = f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects"
+            theta, xi_pp, varxi_pp, covmat_pp = df.correlation_function(charge1_path=f"{savepath}_charge_+0.5.fits",
+                                                                        charge2_path=f"{savepath}_charge_+0.5.fits",
+                                                                        min_sep=30., max_sep=200, n_bins=10)
+        elif s == 90:
+            savepath = f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects"
+            theta, xi_pp, varxi_pp, covmat_pp = df.correlation_function(charge1_path=f"{savepath}_charge_+0.5.fits",
+                                                                        charge2_path=f"{savepath}_charge_+0.5.fits",
+                                                                        min_sep=90., max_sep=600, n_bins=10)
+        os.makedirs(f"{DATA_DIR}/PosPos", exist_ok=True)
+        np.savez(f"{DATA_DIR}/PosPos/realisation_{i}_s{s}_pos_pos_corr.npz",
+                 theta=theta,
+                 xi_pp=xi_pp,
+                 varxi_pp=varxi_pp,
+                 covmat_pp=covmat_pp)
         
-        # if s == 15:
-        #     savepath = f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects"
-        #     theta, xi_nn, varxi_nn, covmat_nn = df.correlation_function(charge1_path=f"{savepath}_charge_-0.5.fits",
-        #                                                                 charge2_path=f"{savepath}_charge_-0.5.fits",
-        #                                                                 min_sep=15., max_sep=600, n_bins=30)
-        # elif s == 30:
-        #     savepath = f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects"
-        #     theta, xi_nn, varxi_nn, covmat_nn = df.correlation_function(charge1_path=f"{savepath}_charge_-0.5.fits",
-        #                                                                 charge2_path=f"{savepath}_charge_-0.5.fits",
-        #                                                                 min_sep=30., max_sep=600, n_bins=30)
-        # elif s == 90:
-        #     savepath = f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects"
-        #     theta, xi_nn, varxi_nn, covmat_nn = df.correlation_function(charge1_path=f"{savepath}_charge_-0.5.fits",
-        #                                                                 charge2_path=f"{savepath}_charge_-0.5.fits",
-        #                                                                 min_sep=90., max_sep=600, n_bins=30)
-        # os.makedirs(f"{DATA_DIR}/NegNeg", exist_ok=True)
-        # np.savez(f"{DATA_DIR}/NegNeg/realisation_{i}_s{s}_neg_neg_corr.npz",
-        #          theta=theta,
-        #          xi_nn=xi_nn,
-        #          varxi_nn=varxi_nn,
-        #          covmat_nn=covmat_nn)
+        if s == 15:
+            savepath = f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects"
+            theta, xi_nn, varxi_nn, covmat_nn = df.correlation_function(charge1_path=f"{savepath}_charge_-0.5.fits",
+                                                                        charge2_path=f"{savepath}_charge_-0.5.fits",
+                                                                        min_sep=15., max_sep=100, n_bins=10)
+        elif s == 30:
+            savepath = f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects"
+            theta, xi_nn, varxi_nn, covmat_nn = df.correlation_function(charge1_path=f"{savepath}_charge_-0.5.fits",
+                                                                        charge2_path=f"{savepath}_charge_-0.5.fits",
+                                                                        min_sep=30., max_sep=200, n_bins=10)
+        elif s == 90:
+            savepath = f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects"
+            theta, xi_nn, varxi_nn, covmat_nn = df.correlation_function(charge1_path=f"{savepath}_charge_-0.5.fits",
+                                                                        charge2_path=f"{savepath}_charge_-0.5.fits",
+                                                                        min_sep=90., max_sep=600, n_bins=10)
+        os.makedirs(f"{DATA_DIR}/NegNeg", exist_ok=True)
+        np.savez(f"{DATA_DIR}/NegNeg/realisation_{i}_s{s}_neg_neg_corr.npz",
+                 theta=theta,
+                 xi_nn=xi_nn,
+                 varxi_nn=varxi_nn,
+                 covmat_nn=covmat_nn)
         
-        # if s == 15:
-        #     savepath = f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects"
-        #     theta, xi_pn, varxi_pn, covmat_pn = df.correlation_function(charge1_path=f"{savepath}_charge_+0.5.fits",
-        #                                                                 charge2_path=f"{savepath}_charge_-0.5.fits",
-        #                                                                 min_sep=15., max_sep=600, n_bins=30)
-        # elif s == 30:
-        #     savepath = f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects"
-        #     theta, xi_pn, varxi_pn, covmat_pn = df.correlation_function(charge1_path=f"{savepath}_charge_+0.5.fits",
-        #                                                                 charge2_path=f"{savepath}_charge_-0.5.fits",
-        #                                                                 min_sep=30., max_sep=600, n_bins=30)
-        # elif s == 90:
-        #     savepath = f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects"
-        #     theta, xi_pn, varxi_pn, covmat_pn = df.correlation_function(charge1_path=f"{savepath}_charge_+0.5.fits",
-        #                                                                 charge2_path=f"{savepath}_charge_-0.5.fits",
-        #                                                                 min_sep=90., max_sep=600, n_bins=30)
-        # os.makedirs(f"{DATA_DIR}/PosNeg", exist_ok=True)
-        # np.savez(f"{DATA_DIR}/PosNeg/realisation_{i}_s{s}_pos_neg_corr.npz",
-        #          theta=theta,
-        #          xi_pn=xi_pn,
-        #          varxi_pn=varxi_pn,
-        #          covmat_pn=covmat_pn)
+        if s == 15:
+            savepath = f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects"
+            theta, xi_pn, varxi_pn, covmat_pn = df.correlation_function(charge1_path=f"{savepath}_charge_+0.5.fits",
+                                                                        charge2_path=f"{savepath}_charge_-0.5.fits",
+                                                                        min_sep=15., max_sep=100, n_bins=10)
+        elif s == 30:
+            savepath = f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects"
+            theta, xi_pn, varxi_pn, covmat_pn = df.correlation_function(charge1_path=f"{savepath}_charge_+0.5.fits",
+                                                                        charge2_path=f"{savepath}_charge_-0.5.fits",
+                                                                        min_sep=30., max_sep=200, n_bins=10)
+        elif s == 90:
+            savepath = f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects"
+            theta, xi_pn, varxi_pn, covmat_pn = df.correlation_function(charge1_path=f"{savepath}_charge_+0.5.fits",
+                                                                        charge2_path=f"{savepath}_charge_-0.5.fits",
+                                                                        min_sep=90., max_sep=600, n_bins=10)
+        os.makedirs(f"{DATA_DIR}/PosNeg", exist_ok=True)
+        np.savez(f"{DATA_DIR}/PosNeg/realisation_{i}_s{s}_pos_neg_corr.npz",
+                 theta=theta,
+                 xi_pn=xi_pn,
+                 varxi_pn=varxi_pn,
+                 covmat_pn=covmat_pn)
         
         # if s == 15:
         #     theta, xi_pk, varxi_pk, covmat_pk = df.defect_convergence_correlation(charge=0.5,
@@ -200,43 +200,43 @@ for i in tqdm(range(1000), desc="Generating mock data"):
 
         # pos-peak, pos-minima, neg-peak, neg-minima
 
-        savepath = f"{DATA_DIR}/Defects/realisation_{i}_s{s}"
-        df.find_peaks(type='peaks', savepath=savepath)
-        df.find_peaks(type='minima', savepath=savepath)
+        # savepath = f"{DATA_DIR}/Defects/realisation_{i}_s{s}"
+        # df.find_peaks(type='peaks', savepath=savepath)
+        # df.find_peaks(type='minima', savepath=savepath)
 
-        if s == 15:
-            min_sep, max_sep, n_bins = 15., 600., 30
-        elif s == 30:
-            min_sep, max_sep, n_bins = 30., 600., 30
-        elif s == 90:
-            min_sep, max_sep, n_bins = 90., 600., 30
+        # if s == 15:
+        #     min_sep, max_sep, n_bins = 15., 600., 30
+        # elif s == 30:
+        #     min_sep, max_sep, n_bins = 30., 600., 30
+        # elif s == 90:
+        #     min_sep, max_sep, n_bins = 90., 600., 30
             
-        defect_path_base = f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects"
+        # defect_path_base = f"{DATA_DIR}/Defects/realisation_{i}_s{s}_defects"
 
-        # Pos-Peak
-        theta, xi, varxi, covmat = df.defect_peak_correlation(charge_path=f"{defect_path_base}_charge_+0.5.fits", 
-                                                              peak_path=f"{savepath}_peaks.fits", 
-                                                              min_sep=min_sep, max_sep=max_sep, n_bins=n_bins)
-        os.makedirs(f"{DATA_DIR}/PosPeak", exist_ok=True)
-        np.savez(f"{DATA_DIR}/PosPeak/realisation_{i}_s{s}_pos_peak_corr.npz", theta=theta, xi=xi, varxi=varxi, covmat=covmat)
+        # # Pos-Peak
+        # theta, xi, varxi, covmat = df.defect_peak_correlation(charge_path=f"{defect_path_base}_charge_+0.5.fits", 
+        #                                                       peak_path=f"{savepath}_peaks.fits", 
+        #                                                       min_sep=min_sep, max_sep=max_sep, n_bins=n_bins)
+        # os.makedirs(f"{DATA_DIR}/PosPeak", exist_ok=True)
+        # np.savez(f"{DATA_DIR}/PosPeak/realisation_{i}_s{s}_pos_peak_corr.npz", theta=theta, xi=xi, varxi=varxi, covmat=covmat)
         
-        # Pos-Minima
-        theta, xi, varxi, covmat = df.defect_peak_correlation(charge_path=f"{defect_path_base}_charge_+0.5.fits",
-                                                              peak_path=f"{savepath}_minima.fits",
-                                                              min_sep=min_sep, max_sep=max_sep, n_bins=n_bins)
-        os.makedirs(f"{DATA_DIR}/PosMin", exist_ok=True)
-        np.savez(f"{DATA_DIR}/PosMin/realisation_{i}_s{s}_pos_min_corr.npz", theta=theta, xi=xi, varxi=varxi, covmat=covmat)
+        # # Pos-Minima
+        # theta, xi, varxi, covmat = df.defect_peak_correlation(charge_path=f"{defect_path_base}_charge_+0.5.fits",
+        #                                                       peak_path=f"{savepath}_minima.fits",
+        #                                                       min_sep=min_sep, max_sep=max_sep, n_bins=n_bins)
+        # os.makedirs(f"{DATA_DIR}/PosMin", exist_ok=True)
+        # np.savez(f"{DATA_DIR}/PosMin/realisation_{i}_s{s}_pos_min_corr.npz", theta=theta, xi=xi, varxi=varxi, covmat=covmat)
         
-        # Neg-Peak
-        theta, xi, varxi, covmat = df.defect_peak_correlation(charge_path=f"{defect_path_base}_charge_-0.5.fits",
-                                                              peak_path=f"{savepath}_peaks.fits",
-                                                              min_sep=min_sep, max_sep=max_sep, n_bins=n_bins)
-        os.makedirs(f"{DATA_DIR}/NegPeak", exist_ok=True)
-        np.savez(f"{DATA_DIR}/NegPeak/realisation_{i}_s{s}_neg_peak_corr.npz", theta=theta, xi=xi, varxi=varxi, covmat=covmat)
+        # # Neg-Peak
+        # theta, xi, varxi, covmat = df.defect_peak_correlation(charge_path=f"{defect_path_base}_charge_-0.5.fits",
+        #                                                       peak_path=f"{savepath}_peaks.fits",
+        #                                                       min_sep=min_sep, max_sep=max_sep, n_bins=n_bins)
+        # os.makedirs(f"{DATA_DIR}/NegPeak", exist_ok=True)
+        # np.savez(f"{DATA_DIR}/NegPeak/realisation_{i}_s{s}_neg_peak_corr.npz", theta=theta, xi=xi, varxi=varxi, covmat=covmat)
         
-        # Neg-Minima
-        theta, xi, varxi, covmat = df.defect_peak_correlation(charge_path=f"{defect_path_base}_charge_-0.5.fits",
-                                                              peak_path=f"{savepath}_minima.fits",
-                                                              min_sep=min_sep, max_sep=max_sep, n_bins=n_bins)
-        os.makedirs(f"{DATA_DIR}/NegMin", exist_ok=True)
-        np.savez(f"{DATA_DIR}/NegMin/realisation_{i}_s{s}_neg_min_corr.npz", theta=theta, xi=xi, varxi=varxi, covmat=covmat)
+        # # Neg-Minima
+        # theta, xi, varxi, covmat = df.defect_peak_correlation(charge_path=f"{defect_path_base}_charge_-0.5.fits",
+        #                                                       peak_path=f"{savepath}_minima.fits",
+        #                                                       min_sep=min_sep, max_sep=max_sep, n_bins=n_bins)
+        # os.makedirs(f"{DATA_DIR}/NegMin", exist_ok=True)
+        # np.savez(f"{DATA_DIR}/NegMin/realisation_{i}_s{s}_neg_min_corr.npz", theta=theta, xi=xi, varxi=varxi, covmat=covmat)

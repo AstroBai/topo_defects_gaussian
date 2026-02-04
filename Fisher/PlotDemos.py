@@ -296,16 +296,41 @@ mpl.rcParams['ytick.direction'] = 'in'
 mpl.rcParams['font.size'] = 8
 
 
+def get_err(cov):
+    return np.sqrt(np.diag(cov)) / np.sqrt(n_seeds)
+
+def get_cumsum_err(cov):
+    n = cov.shape[0]
+    T = np.tril(np.ones((n, n)))
+    cov_cdf = T @ cov @ T.T
+    return np.sqrt(np.diag(cov_cdf)) / np.sqrt(n_seeds)
+
+
 # compare cdf+ cdf-
 color_map = plt.get_cmap('tab10')
 plt.figure(figsize=(4, 3))
 bin_edges = np.linspace(-0.008, 0.008, 11)
 bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 
+# Errors
+err_pos = get_err(cov_dpdfs_pos_s30)
+err_neg = get_err(cov_dpdfs_neg_s30)
+err_pdf_cdf = get_cumsum_err(cov_pdfs_fid_s30)
+
+norm_pos = dpdfs_pos_fid_s30[-1]
+norm_neg = dpdfs_neg_fid_s30[-1]
+cdf_pdf = np.cumsum(pdfs_fid_s30)
+norm_pdf = cdf_pdf[-1]
+
 # removed interpolation
-plt.plot(bin_centers, dpdfs_pos_fid_s30/dpdfs_pos_fid_s30[-1], label=r'$C^{\rm P}(\kappa)$', c=color_map(0))
-plt.plot(bin_centers, dpdfs_neg_fid_s30/dpdfs_neg_fid_s30[-1], label=r'$C^{\rm N}(\kappa)$', c=color_map(1), linestyle='-.')
-plt.plot(bin_centers, np.cumsum(pdfs_fid_s30)/np.cumsum(pdfs_fid_s30)[-1], label=r'$C^\text{All Pixels}(\kappa)$', c='grey', linestyle='--')
+plt.plot(bin_centers, dpdfs_pos_fid_s30/norm_pos, label=r'$C^{\rm P}(\kappa)$', c=color_map(0))
+plt.fill_between(bin_centers, (dpdfs_pos_fid_s30 - err_pos)/norm_pos, (dpdfs_pos_fid_s30 + err_pos)/norm_pos, color=color_map(0), alpha=0.3)
+
+plt.plot(bin_centers, dpdfs_neg_fid_s30/norm_neg, label=r'$C^{\rm N}(\kappa)$', c=color_map(1), linestyle='-.')
+# plt.fill_between(bin_centers, (dpdfs_neg_fid_s30 - err_neg)/norm_neg, (dpdfs_neg_fid_s30 + err_neg)/norm_neg, color=color_map(1), alpha=0.3)
+
+plt.plot(bin_centers, cdf_pdf/norm_pdf, label=r'$C^\text{All Pixels}(\kappa)$', c='grey', linestyle='--')
+plt.fill_between(bin_centers, (cdf_pdf - err_pdf_cdf)/norm_pdf, (cdf_pdf + err_pdf_cdf)/norm_pdf, color='grey', alpha=0.3)
 
 plt.xlabel(r'$\kappa$')
 plt.ylabel(r'$\text{CDF} (\kappa) \text{ (Normalised)}$')
@@ -322,8 +347,16 @@ bin_edges = np.linspace(-0.005, 0.005, 11)
 bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 # removed interpolation
 plt.plot(bin_centers, dpdfs_pos_fid_s30, label=r'$C^{\rm P}(\kappa)$', c=color_map(0))
+plt.fill_between(bin_centers, dpdfs_pos_fid_s30 - err_pos, dpdfs_pos_fid_s30 + err_pos, color=color_map(0), alpha=0.3)
+
 plt.plot(bin_centers, dpdfs_neg_fid_s30, label=r'$C^{\rm N}(\kappa)$', c=color_map(1), linestyle='-.')
-plt.plot(bin_centers, np.cumsum(pdfs_fid_s30), label=r'$C^\text{All Pixels}(\kappa)$', c='grey', linestyle='--')
+# plt.fill_between(bin_centers, dpdfs_neg_fid_s30 - err_neg, dpdfs_neg_fid_s30 + err_neg, color=color_map(1), alpha=0.3)
+
+# Normalize PDF to match the scale of positive defects CDF
+scaling_factor = norm_pos / norm_pdf
+plt.plot(bin_centers, cdf_pdf * scaling_factor, label=r'$C^\text{All Pixels}(\kappa)$', c='grey', linestyle='--')
+plt.fill_between(bin_centers, (cdf_pdf - err_pdf_cdf) * scaling_factor, (cdf_pdf + err_pdf_cdf) * scaling_factor, color='grey', alpha=0.3)
+
 plt.xlabel(r'$\kappa$')
 plt.ylabel(r'$\text{CDF} (\kappa)$')
 plt.title(r'$\theta_G$ = 30 arcmin')
@@ -341,14 +374,36 @@ bin_edges4 = np.linspace(30, 600, 10)
 bin_edges8 = np.linspace(30, 750, 10)
 
 # removed interpolation
+# Errors
+e_ps1 = get_err(cov_nn_pos_same1_s30)
+e_po1 = get_err(cov_nn_pos_opp1_s30)
+e_ps2 = get_err(cov_nn_pos_same2_s30)
+e_po2 = get_err(cov_nn_pos_opp2_s30)
+e_ps4 = get_err(cov_nn_pos_same4_s30)
+e_po4 = get_err(cov_nn_pos_opp4_s30)
+e_ps8 = get_err(cov_nn_pos_same8_s30)
+e_po8 = get_err(cov_nn_pos_opp8_s30)
+
 plt.plot(bin_edges1, nn_pos_same1_s30, label='1NN P-P', c=color_map(0))
+plt.fill_between(bin_edges1, nn_pos_same1_s30-e_ps1, nn_pos_same1_s30+e_ps1, color=color_map(0), alpha=0.3)
 plt.plot(bin_edges1, nn_pos_opp1_s30, label='1NN P-N', c=color_map(0), linestyle='--')
+plt.fill_between(bin_edges1, nn_pos_opp1_s30-e_po1, nn_pos_opp1_s30+e_po1, color=color_map(0), alpha=0.3)
+
 plt.plot(bin_edges2[1:], nn_pos_same2_s30[1:], label='2NN P-P', c=color_map(1))
+plt.fill_between(bin_edges2[1:], (nn_pos_same2_s30-e_ps2)[1:], (nn_pos_same2_s30+e_ps2)[1:], color=color_map(1), alpha=0.3)
 plt.plot(bin_edges2[1:], nn_pos_opp2_s30[1:], label='2NN P-N', c=color_map(1), linestyle='--')
+plt.fill_between(bin_edges2[1:], (nn_pos_opp2_s30-e_po2)[1:], (nn_pos_opp2_s30+e_po2)[1:], color=color_map(1), alpha=0.3)
+
 plt.plot(bin_edges4[2:], nn_pos_same4_s30[2:], label='4NN P-P', c=color_map(2))
+plt.fill_between(bin_edges4[2:], (nn_pos_same4_s30-e_ps4)[2:], (nn_pos_same4_s30+e_ps4)[2:], color=color_map(2), alpha=0.3)
 plt.plot(bin_edges4[2:], nn_pos_opp4_s30[2:], label='4NN P-N', c=color_map(2), linestyle='--')
+plt.fill_between(bin_edges4[2:], (nn_pos_opp4_s30-e_po4)[2:], (nn_pos_opp4_s30+e_po4)[2:], color=color_map(2), alpha=0.3)
+
 plt.plot(bin_edges8[3:], nn_pos_same8_s30[3:], label='8NN P-P', c=color_map(3))
+plt.fill_between(bin_edges8[3:], (nn_pos_same8_s30-e_ps8)[3:], (nn_pos_same8_s30+e_ps8)[3:], color=color_map(3), alpha=0.3)
 plt.plot(bin_edges8[3:], nn_pos_opp8_s30[3:], label='8NN P-N', c=color_map(3), linestyle='--')
+plt.fill_between(bin_edges8[3:], (nn_pos_opp8_s30-e_po8)[3:], (nn_pos_opp8_s30+e_po8)[3:], color=color_map(3), alpha=0.3)
+
 plt.xlabel(r'$\theta$ [arcmin]')
 plt.ylabel(r'$\text{CDF} (\theta)$')
 plt.title(r'$\theta_G$ = 30 arcmin')
@@ -458,23 +513,22 @@ plt.close()
 
 # compare pp/nn/pn xi at s30 only
 plt.figure(figsize=(4, 3))
-bin_centers = np.linspace(30, 600, 30)
+bin_centers = np.linspace(30, 200, 10)
 
 err_pp_s30 = np.sqrt(np.diag(cov_pp_fid_s30)) / np.sqrt(n_seeds)
 err_nn_s30 = np.sqrt(np.diag(cov_nn_fid_s30)) / np.sqrt(n_seeds)
 err_pn_s30 = np.sqrt(np.diag(cov_pn_fid_s30)) / np.sqrt(n_seeds)
 
 plt.plot(bin_centers, pp_fid_s30, label='P-P', color=color_map(0))
-# plt.fill_between(bin_centers, pp_fid_s30 - err_pp_s30, pp_fid_s30 + err_pp_s30, color=color_map(0), alpha=0.3)
+plt.fill_between(bin_centers, pp_fid_s30 - err_pp_s30, pp_fid_s30 + err_pp_s30, color=color_map(0), alpha=0.3)
 plt.plot(bin_centers, nn_fid_s30, label='N-N', color=color_map(1))
-# plt.fill_between(bin_centers, nn_fid_s30 - err_nn_s30, nn_fid_s30 + err_nn_s30, color=color_map(1), alpha=0.3)
+plt.fill_between(bin_centers, nn_fid_s30 - err_nn_s30, nn_fid_s30 + err_nn_s30, color=color_map(1), alpha=0.3)
 plt.plot(bin_centers, pn_fid_s30, label='P-N', color=color_map(2))
-# plt.fill_between(bin_centers, pn_fid_s30 - err_pn_s30, pn_fid_s30 + err_pn_s30, color=color_map(2), alpha=0.3)
+plt.fill_between(bin_centers, pn_fid_s30 - err_pn_s30, pn_fid_s30 + err_pn_s30, color=color_map(2), alpha=0.3)
 plt.axhline(0, color='grey', linestyle='--', linewidth=1)
 plt.axhline(-1, color='red', linestyle='-.', linewidth=1)
 plt.xlabel(r'$\theta$ [arcmin]')
 plt.xscale('log')
-plt.xticks([100, 500])
 plt.ylabel(r'$\xi(\theta)$')
 plt.title(r'$\theta_G$ = 30 arcmin')
 plt.subplots_adjust(wspace=0)

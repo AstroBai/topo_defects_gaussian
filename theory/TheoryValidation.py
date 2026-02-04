@@ -142,7 +142,7 @@ density_sim_std_list_lmax = []
 density_finder_list_lmax = []
 density_finder_std_list_lmax = []
 
-lmaxs_ratio = np.logspace(np.log10(1/4), np.log10(3), 10) 
+lmaxs_ratio = np.linspace(1/4, 3, 20)
 lmaxs = (256 * lmaxs_ratio).astype(int)
 for lmax in tqdm(lmaxs):
     cosmo_params = {
@@ -154,16 +154,16 @@ for lmax in tqdm(lmaxs):
     density_sim_ = []
     density_finder_ = []
     for seed in range(10):
-        # os.makedirs(DATA_DIR, exist_ok=True)
-        # kappa_bar_unsmoothed, kappa_bar, gamm1_bar, gamm2_bar, phi_bar = GenMap(cosmo_params, nside=256, lmax=int(lmax), Plot=False, Savepath=f"outfiles/shear_field_patch_hires_lmax{lmax}_seed{seed}.png", random_seed=seed)
-        # np.savez(f"{DATA_DIR}/ShearConvergenceMapData_lmax{lmax}_{seed}.npz",
-        #         kappa_bar_unsmoothed=kappa_bar_unsmoothed,
-        #         kappa_bar=kappa_bar,
-        #         gamm1_bar=gamm1_bar,
-        #         gamm2_bar=gamm2_bar,
-        #         phi_bar=phi_bar)
+        os.makedirs(DATA_DIR, exist_ok=True)
+        kappa_bar_unsmoothed, kappa_bar, gamm1_bar, gamm2_bar, phi_bar = GenMap(cosmo_params, nside=256, lmax=int(lmax), Plot=False, Savepath=f"outfiles/shear_field_patch_hires_lmax{lmax}_seed{seed}.png", random_seed=seed)
+        np.savez(f"{DATA_DIR}/ShearConvergenceMapData_lmax{lmax}_{seed}.npz",
+                kappa_bar_unsmoothed=kappa_bar_unsmoothed,
+                kappa_bar=kappa_bar,
+                gamm1_bar=gamm1_bar,
+                gamm2_bar=gamm2_bar,
+                phi_bar=phi_bar)
         df = DefectFinder(f"{DATA_DIR}/ShearConvergenceMapData_lmax{lmax}_{seed}.npz")
-        # df.find_defects(savepath=f"{DATA_DIR}/defects_data_lmax{lmax}_{seed}.npz", cluster=True)
+        df.find_defects(savepath=f"{DATA_DIR}/defects_data_lmax{lmax}_{seed}.npz", cluster=True)
         df.load_defects(f"{DATA_DIR}/defects_data_lmax{lmax}_{seed}.npz")
         df.save_defects(savepath=f"{DATA_DIR}/defects_data_lmax{lmax}_{seed}")
         density_sim = df.number_estimation(lmax=int(lmax))

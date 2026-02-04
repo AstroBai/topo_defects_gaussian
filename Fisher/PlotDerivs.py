@@ -894,7 +894,7 @@ y_err = np.sqrt(np.diag(deriv_nns_combined_s30_cov[40:50, 40:50]))
 y_mean_err = y_err / np.sqrt(n_seeds)
 
 ax.plot(bin_centers, y, c='C0', ls='-', label=r'$\partial C^{\rm PP}_{\rm 2NN}(\theta) / \partial \Omega_{\rm m}$')
-ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C0')
+# ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C0')
 ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C0')
 
 # PP sigma_8
@@ -903,7 +903,7 @@ y_err = np.sqrt(np.diag(deriv_nns_combined_s30_cov[200:210, 200:210]))
 y_mean_err = y_err / np.sqrt(n_seeds)
 
 ax.plot(bin_centers, y, c='C1', ls='-', label=r'$\partial C^{\rm PP}_{\rm 2NN}(\theta) / \partial \sigma_8$')
-ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C1')
+# ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C1')
 ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C1')
 
 # NN Omega_m
@@ -927,7 +927,7 @@ y_err = np.sqrt(np.diag(deriv_nns_combined_s30_cov[60:70, 60:70]))
 y_mean_err = y_err / np.sqrt(n_seeds)
 
 ax.plot(bin_centers, y, c='C0', ls='-', label=r'$\partial C^{\rm PN}_{\rm 2NN}(\theta) / \partial \Omega_{\rm m}$')
-ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C0')
+# ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C0')
 ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C0')
 
 # PN sigma_8
@@ -936,7 +936,7 @@ y_err = np.sqrt(np.diag(deriv_nns_combined_s30_cov[220:230, 220:230]))
 y_mean_err = y_err / np.sqrt(n_seeds)
 
 ax.plot(bin_centers, y, c='C1', ls='-', label=r'$\partial C^{\rm PN}_{\rm 2NN}(\theta) / \partial \sigma_8$')
-ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C1')
+# ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C1')
 ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C1')
 
 # NP Omega_m
@@ -1056,7 +1056,7 @@ y_err = np.sqrt(np.diag(deriv_pp_corrs_s30_cov[0:30, 0:30]))
 y_mean_err = y_err / np.sqrt(n_seeds)
 
 ax.plot(bin_centers, y, c='C0', ls='-', label=r'$\partial \xi (\theta) / \partial \Omega_{\rm m}$')
-ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C0')
+# ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C0')
 ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C0')
 
 y = deriv_pp_corrs_s30_mean[30:60]
@@ -1064,7 +1064,7 @@ y_err = np.sqrt(np.diag(deriv_pp_corrs_s30_cov[30:60, 30:60]))
 y_mean_err = y_err / np.sqrt(n_seeds)
 
 ax.plot(bin_centers, y, c='C1', ls='-', label=r'$\partial \xi (\theta) / \partial \sigma_8$')
-ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C1')
+# ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C1')
 ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C1')
 # ax.set_ylim(-1, 1)
 ax.set_title(r'$\partial \xi^{\rm PP}(\theta) / \partial p$')
@@ -1079,14 +1079,14 @@ y_err = np.sqrt(np.diag(deriv_nn_corrs_s30_cov[0:30, 0:30]))
 y_mean_err = y_err / np.sqrt(n_seeds)
 
 ax.plot(bin_centers, y, c='C0', ls='-')
-ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C0')
+# ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C0')
 ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C0')
 
 y = deriv_nn_corrs_s30_mean[30:60]
 y_err = np.sqrt(np.diag(deriv_nn_corrs_s30_cov[30:60, 30:60])) 
 
 ax.plot(bin_centers, y, c='C1', ls='-')
-ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C1')
+# ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C1')
 ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C1')
 # ax.set_ylim(-1, 1)
 ax.set_title(r'$\partial \xi^{\rm NN}(\theta) / \partial p$')
@@ -1100,14 +1100,14 @@ y_err = np.sqrt(np.diag(deriv_pn_corrs_s30_cov[0:30, 0:30]))
 y_mean_err = y_err / np.sqrt(n_seeds)
 
 ax.plot(bin_centers, y, c='C0', ls='-')
-ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C0')
+# ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C0')
 ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C0')
 
 y = deriv_pn_corrs_s30_mean[30:60]
 y_err = np.sqrt(np.diag(deriv_pn_corrs_s30_cov[30:60, 30:60])) 
 
 ax.plot(bin_centers, y, c='C1', ls='-')
-ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C1')
+# ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C1')
 ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C1')
 
 ax.set_title(r'$\partial \xi^{\rm PN}(\theta) / \partial p$')
@@ -1138,7 +1138,7 @@ for i, ax in enumerate(axes.flatten()):
     y_mean_err = y_err / np.sqrt(n_seeds)
 
     ax.plot(bin_centers, y, c='C0', ls='-', label=r'$\partial \xi / \partial \Omega_{\rm m}$')
-    ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C0')
+    # ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C0')
     ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C0')
 
     # sigma_8
@@ -1147,7 +1147,7 @@ for i, ax in enumerate(axes.flatten()):
     y_mean_err = y_err / np.sqrt(n_seeds)
 
     ax.plot(bin_centers, y, c='C1', ls='-', label=r'$\partial \xi / \partial \sigma_8$')
-    ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C1')
+    # ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C1')
     ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C1')
     
     ax.set_title(titles[i])

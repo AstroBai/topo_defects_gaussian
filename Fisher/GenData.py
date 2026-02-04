@@ -203,50 +203,50 @@ for i, param in enumerate(params):
                 savepath=f"{DATA_DIR}/TrainDefects/realisation_{i}_s{s}_seed_{seed}_defects"
                 theta, xi_pp, varxi_pp, covmat_pp = df.correlation_function(charge1_path=f"{savepath}_charge_+0.5.fits",
                                                                             charge2_path=f"{savepath}_charge_+0.5.fits",
-                                                                            min_sep=15., max_sep=600, n_bins=30)
+                                                                            min_sep=15., max_sep=100, n_bins=10)
             elif s == 30:
                 savepath=f"{DATA_DIR}/TrainDefects/realisation_{i}_s{s}_seed_{seed}_defects"
                 theta, xi_pp, varxi_pp, covmat_pp = df.correlation_function(charge1_path=f"{savepath}_charge_+0.5.fits",
                                                                             charge2_path=f"{savepath}_charge_+0.5.fits",
-                                                                            min_sep=30., max_sep=600, n_bins=30)
+                                                                            min_sep=30., max_sep=200, n_bins=10)
             elif s == 90:
                 savepath=f"{DATA_DIR}/TrainDefects/realisation_{i}_s{s}_seed_{seed}_defects"
                 theta, xi_pp, varxi_pp, covmat_pp = df.correlation_function(charge1_path=f"{savepath}_charge_+0.5.fits",
                                                                             charge2_path=f"{savepath}_charge_+0.5.fits",
-                                                                            min_sep=90., max_sep=600, n_bins=30)
+                                                                            min_sep=90., max_sep=600, n_bins=10)
             
             if s == 15:
                 savepath=f"{DATA_DIR}/TrainDefects/realisation_{i}_s{s}_seed_{seed}_defects"
                 theta, xi_nn, varxi_nn, covmat_nn = df.correlation_function(charge1_path=f"{savepath}_charge_-0.5.fits",
                                                                             charge2_path=f"{savepath}_charge_-0.5.fits",
-                                                                            min_sep=15., max_sep=600, n_bins=30)
+                                                                            min_sep=15., max_sep=100, n_bins=10)
             elif s == 30:
                 savepath=f"{DATA_DIR}/TrainDefects/realisation_{i}_s{s}_seed_{seed}_defects"
                 theta, xi_nn, varxi_nn, covmat_nn = df.correlation_function(charge1_path=f"{savepath}_charge_-0.5.fits",
                                                                             charge2_path=f"{savepath}_charge_-0.5.fits",
-                                                                            min_sep=30., max_sep=600, n_bins=30)
+                                                                            min_sep=30., max_sep=200, n_bins=10)
             elif s == 90:
                 savepath=f"{DATA_DIR}/TrainDefects/realisation_{i}_s{s}_seed_{seed}_defects"
                 theta, xi_nn, varxi_nn, covmat_nn = df.correlation_function(charge1_path=f"{savepath}_charge_-0.5.fits",
                                                                             charge2_path=f"{savepath}_charge_-0.5.fits",
-                                                                            min_sep=90., max_sep=600, n_bins=30)
+                                                                            min_sep=90., max_sep=600, n_bins=10)
 
             
             if s == 15:
                 savepath=f"{DATA_DIR}/TrainDefects/realisation_{i}_s{s}_seed_{seed}_defects"
                 theta, xi_pn, varxi_pn, covmat_pn = df.correlation_function(charge1_path=f"{savepath}_charge_+0.5.fits",
                                                                             charge2_path=f"{savepath}_charge_-0.5.fits",
-                                                                            min_sep=15., max_sep=600, n_bins=30)
+                                                                            min_sep=15., max_sep=100, n_bins=10)
             elif s == 30:
                 savepath=f"{DATA_DIR}/TrainDefects/realisation_{i}_s{s}_seed_{seed}_defects"
                 theta, xi_pn, varxi_pn, covmat_pn = df.correlation_function(charge1_path=f"{savepath}_charge_+0.5.fits",
                                                                             charge2_path=f"{savepath}_charge_-0.5.fits",
-                                                                            min_sep=30., max_sep=600, n_bins=30)
+                                                                            min_sep=30., max_sep=200, n_bins=10)
             elif s == 90:
                 savepath=f"{DATA_DIR}/TrainDefects/realisation_{i}_s{s}_seed_{seed}_defects"
                 theta, xi_pn, varxi_pn, covmat_pn = df.correlation_function(charge1_path=f"{savepath}_charge_+0.5.fits",
                                                                             charge2_path=f"{savepath}_charge_-0.5.fits",
-                                                                            min_sep=90., max_sep=600, n_bins=30)
+                                                                            min_sep=90., max_sep=600, n_bins=10)
 
             
             if s == 15:

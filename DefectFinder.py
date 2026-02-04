@@ -400,6 +400,8 @@ class DefectFinder:
         
     def get_lens_potential(self, lmax=None):
         """Return the lensing potential field."""
+        if lmax is None:
+            lmax = 3 * self.nside - 1
         self.psi = glass.from_convergence(self.kappa_bar, potential=True, lmax=lmax)
         return self.psi
 
@@ -414,6 +416,8 @@ class DefectFinder:
         """Compute the lensing potential power spectrum Cl."""
         if not hasattr(self, 'psi'):
             self.get_lens_potential(lmax=lmax)
+        if lmax is None:
+            lmax = 3 * self.nside - 1
         self.cl_psi = hp.anafast(self.psi, use_pixel_weights=True, datapath='/home/jbai/.astropy/healpy-data', lmax=lmax)
         self.ell = np.arange(len(self.cl_psi))
         return self.ell, self.cl_psi
