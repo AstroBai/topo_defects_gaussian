@@ -137,50 +137,88 @@ mpl.rcParams['ytick.direction'] = 'in'
 mpl.rcParams['font.size'] = 8
 color_map = plt.get_cmap('tab10')
 
+
+
+from scipy.ndimage import gaussian_filter
+lmaxs_ratio = np.linspace(1/4, 3, 20)
+lmaxs = (256 * lmaxs_ratio).astype(int)
+smoothing_scales = np.array([0, 2, 4, 8]) # in units of pixel
+
 density_sim_list_lmax = []
 density_sim_std_list_lmax = []
 density_finder_list_lmax = []
 density_finder_std_list_lmax = []
 
-lmaxs_ratio = np.linspace(1/4, 3, 20)
-lmaxs = (256 * lmaxs_ratio).astype(int)
-for lmax in tqdm(lmaxs):
-    cosmo_params = {
-        'Oc': 0.25,
-        'Ob': 0.05,
-        'h': 0.7,
-        'sigma8': 0.8
-    }
-    density_sim_ = []
-    density_finder_ = []
-    for seed in range(10):
-        os.makedirs(DATA_DIR, exist_ok=True)
-        kappa_bar_unsmoothed, kappa_bar, gamm1_bar, gamm2_bar, phi_bar = GenMap(cosmo_params, nside=256, lmax=int(lmax), Plot=False, Savepath=f"outfiles/shear_field_patch_hires_lmax{lmax}_seed{seed}.png", random_seed=seed)
-        np.savez(f"{DATA_DIR}/ShearConvergenceMapData_lmax{lmax}_{seed}.npz",
-                kappa_bar_unsmoothed=kappa_bar_unsmoothed,
-                kappa_bar=kappa_bar,
-                gamm1_bar=gamm1_bar,
-                gamm2_bar=gamm2_bar,
-                phi_bar=phi_bar)
-        df = DefectFinder(f"{DATA_DIR}/ShearConvergenceMapData_lmax{lmax}_{seed}.npz")
-        df.find_defects(savepath=f"{DATA_DIR}/defects_data_lmax{lmax}_{seed}.npz", cluster=True)
-        df.load_defects(f"{DATA_DIR}/defects_data_lmax{lmax}_{seed}.npz")
-        df.save_defects(savepath=f"{DATA_DIR}/defects_data_lmax{lmax}_{seed}")
-        density_sim = df.number_estimation(lmax=int(lmax))
-        print(density_sim)
-        density_finder, pos, neg = df.number()
-        print(density_finder)
-        density_sim_.append(density_sim)
-        density_finder_.append(density_finder)
+density_sim_list_smoothing = []
+density_sim_std_list_smoothing = []
+density_finder_list_smoothing = []
+density_finder_std_list_smoothing = []
 
-    density_sim_list_lmax.append(np.mean(density_sim_))
-    density_finder_list_lmax.append(np.mean(density_finder_))
-    density_sim_std_list_lmax.append(np.std(density_sim_))
-    density_finder_std_list_lmax.append(np.std(density_finder_))
+for smoothing_scale in smoothing_scales:
+    if smoothing_scale == 0:
+        for lmax in tqdm(lmaxs):
+            cosmo_params = {
+                'Oc': 0.25,
+                'Ob': 0.05,
+                'h': 0.7,
+                'sigma8': 0.8
+            }
+            density_sim_ = []
+            density_finder_ = []
+            for seed in range(10):
+                os.makedirs(DATA_DIR, exist_ok=True)
+                # kappa_bar_unsmoothed, kappa_bar, gamm1_bar, gamm2_bar, phi_bar = GenMap(cosmo_params, nside=256, lmax=int(lmax), Plot=False, Savepath=f"outfiles/shear_field_patch_hires_lmax{lmax}_seed{seed}.png", random_seed=seed)
+                # np.savez(f"{DATA_DIR}/ShearConvergenceMapData_lmax{lmax}_{seed}.npz",
+                #         kappa_bar_unsmoothed=kappa_bar_unsmoothed,
+                #         kappa_bar=kappa_bar,
+                #         gamm1_bar=gamm1_bar,
+                #         gamm2_bar=gamm2_bar,
+                #         phi_bar=phi_bar)
+                df = DefectFinder(f"{DATA_DIR}/ShearConvergenceMapData_lmax{lmax}_{seed}.npz")
+                df.find_defects(savepath=f"{DATA_DIR}/defects_data_lmax{lmax}_{seed}.npz", cluster=True)
+                df.load_defects(f"{DATA_DIR}/defects_data_lmax{lmax}_{seed}.npz")
+                df.save_defects(savepath=f"{DATA_DIR}/defects_data_lmax{lmax}_{seed}")
+                density_sim = df.number_estimation(lmax=int(lmax))
+                density_finder, pos, neg = df.number()
+                density_sim_.append(density_sim)
+                density_finder_.append(density_finder)
+
+            density_sim_list_lmax.append(np.mean(density_sim_))
+            density_finder_list_lmax.append(np.mean(density_finder_))
+            density_sim_std_list_lmax.append(np.std(density_sim_))
+            density_finder_std_list_lmax.append(np.std(density_finder_))
+    else:
+        for lmax in tqdm(lmaxs):
+            for seed in range(10):
+                df = DefectFinder(f"{DATA_DIR}/ShearConvergenceMapData_lmax{lmax}_{seed}.npz")
+                df.kappa_bar_unsmoothed = gaussian_filter(df.kappa_bar_unsmoothed, sigma=smoothing_scale)
+                df.kappa_bar = gaussian_filter(df.kappa_bar, sigma=smoothing_scale)
+                df.gamm1_bar = gaussian_filter(df.gamm1_bar, sigma=smoothing_scale)
+                df.gamm2_bar = gaussian_filter(df.gamm2_bar, sigma=smoothing_scale)
+                df.phi_bar = np.arctan2(df.gamm2_bar, df.gamm1_bar) / 2
+                df.find_defects(savepath=f"{DATA_DIR}/defects_data_lmax{lmax}_smoothing{smoothing_scale}_seed{seed}.npz", cluster=True)
+                df.load_defects(f"{DATA_DIR}/defects_data_lmax{lmax}_smoothing{smoothing_scale}_seed{seed}.npz")
+                df.save_defects(savepath=f"{DATA_DIR}/defects_data_lmax{lmax}_smoothing{smoothing_scale}_seed{seed}")
+                density_sim = df.number_estimation(lmax=int(lmax))
+                density_finder, pos, neg = df.number()
+                density_sim_.append(density_sim)
+                density_finder_.append(density_finder)  
+            density_sim_list_smoothing.append(np.mean(density_sim_))
+            density_finder_list_smoothing.append(np.mean(density_finder_))
+            density_sim_std_list_smoothing.append(np.std(density_sim_))
+            density_finder_std_list_smoothing.append(np.std(density_finder_))
+
+    
 
 plt.figure(figsize=(4, 3))
-plt.fill_between(lmaxs_ratio, np.array(density_sim_list_lmax) - np.array(density_sim_std_list_lmax), np.array(density_sim_list_lmax) + np.array(density_sim_std_list_lmax), alpha=0.3, label='Expected', color=color_map(2))
-plt.errorbar(lmaxs_ratio, density_finder_list_lmax, yerr=density_finder_std_list_lmax, label='Measured', fmt='o', markersize=3, color=color_map(2))
+plt.fill_between(lmaxs_ratio, np.array(density_sim_list_lmax) - np.array(density_sim_std_list_lmax), np.array(density_sim_list_lmax) + np.array(density_sim_std_list_lmax), alpha=0.3, label='Expected', color=color_map(0))
+plt.errorbar(lmaxs_ratio, density_finder_list_lmax, yerr=density_finder_std_list_lmax, label='Measured', fmt='o', markersize=3, color=color_map(0))
+plt.fill_between(lmaxs_ratio, np.array(density_sim_list_smoothing)[:20] - np.array(density_sim_std_list_smoothing)[:20], np.array(density_sim_list_smoothing)[:20] + np.array(density_sim_std_list_smoothing)[:20], alpha=0.3, label='Expected (Smoothed 2 pixels)', color=color_map(1))
+plt.errorbar(lmaxs_ratio, density_finder_list_smoothing[:20], yerr=density_finder_std_list_smoothing[:20], label='Measured (Smoothed 2 pixels)', fmt='o', markersize=3, color=color_map(1))
+plt.fill_between(lmaxs_ratio, np.array(density_sim_list_smoothing)[20:40] - np.array(density_sim_std_list_smoothing)[20:40], np.array(density_sim_list_smoothing)[20:40] + np.array(density_sim_std_list_smoothing)[20:40], alpha=0.3, label='Expected (Smoothed 4 pixels)', color=color_map(2))
+plt.errorbar(lmaxs_ratio, density_finder_list_smoothing[20:40], yerr=density_finder_std_list_smoothing[20:40], label='Measured (Smoothed 4 pixels)', fmt='o', markersize=3, color=color_map(2))
+plt.fill_between(lmaxs_ratio, np.array(density_sim_list_smoothing)[40:60] - np.array(density_sim_std_list_smoothing)[40:60], np.array(density_sim_list_smoothing)[40:60] + np.array(density_sim_std_list_smoothing)[40:60], alpha=0.3, label='Expected (Smoothed 8 pixels)', color=color_map(3))
+plt.errorbar(lmaxs_ratio, density_finder_list_smoothing[40:60], yerr=density_finder_std_list_smoothing[40:60], label='Measured (Smoothed 8 pixels)', fmt='o', markersize=3, color=color_map(3))
 # plt.xscale('log')
 # plt.yscale('log')
 plt.xlabel(r'$\ell_{\rm max}$')

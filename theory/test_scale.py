@@ -251,7 +251,7 @@ l2, = ax1.plot(Om_range, densities_Om_clean, color='C0', linestyle='--', label=r
 l3, = ax2.plot(s8_range, densities_s8_noisy, color='C1', linestyle='-', label=r'Noisy ($\sigma_8$)')
 l4, = ax2.plot(s8_range, densities_s8_clean, color='C1', linestyle='--', label=r'Noise-free ($\sigma_8$)')
 # Plot Pure Noise (Horizontal line)
-l5 = ax1.axhline(density_noise_val, color='k', linestyle=':', label='Noise only')
+l5 = ax1.axhline(density_noise_val, color='k', linestyle='-.', label='Noise only')
 
 # Setup Axes Labels
 ax1.set_xticks([0.1, 0.2, 0.3, 0.4, 0.5])
@@ -263,8 +263,8 @@ ax1.text(0.7, 0.1, r'$\ell_{\rm max} = 2500$', transform=ax1.transAxes, fontsize
 
 # Grid and Ticks
 # ax1.grid(True, linestyle=':', alpha=0.6)
-ax1.minorticks_on()
-ax2.minorticks_on()
+ax1.minorticks_off() # Change from on to off
+ax2.minorticks_off() # Change from on to off
 
 # Combined Legend
 lines = [l1, l2, l3, l4, l5]
