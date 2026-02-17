@@ -1369,7 +1369,7 @@ covariance_nns_s90 = np.linalg.inv(Fisher_nns_s90)
 print("NNS S90 COVARIANCE:", covariance_nns_s90)
 covariance_nns_all_scales = np.linalg.inv(Fisher_nns_all_scales)
 
-# 修复：补全 $，使用 \mathrm{all} 避免斜体，移除上标中不规范的 "-th"
+
 nns_s15_samples = GaussianND(mean, covariance_nns_s15, names=names, labels=labels, label=r"$C^{\mathrm{all}}_{1,2,4,8}(\theta), \ \theta_G=15'$")
 nns_s30_samples = GaussianND(mean, covariance_nns_s30, names=names, labels=labels, label=r"$C^{\mathrm{all}}_{1,2,4,8}(\theta), \ \theta_G=30'$")
 nns_s90_samples = GaussianND(mean, covariance_nns_s90, names=names, labels=labels, label=r"$C^{\mathrm{all}}_{1,2,4,8}(\theta), \ \theta_G=90'$")
@@ -1380,7 +1380,6 @@ covariance_dpdf_nn_combined_s30 = np.linalg.inv(Fisher_dpdf_nn_combined_s30)
 covariance_dpdf_nn_combined_s90 = np.linalg.inv(Fisher_dpdf_nn_combined_s90)
 covariance_dpdf_nn_combined_all_scales = np.linalg.inv(Fisher_dpdf_nn_combined_all_scales)
 
-# 修复：将 DCDF + kNN 放在文本模式，theta_G 放在数学模式
 dpdf_nn_combined_s15_samples = GaussianND(mean, covariance_dpdf_nn_combined_s15, names=names, labels=labels, label=r"DCDF + kNN, $\theta_G=15'$")
 dpdf_nn_combined_s30_samples = GaussianND(mean, covariance_dpdf_nn_combined_s30, names=names, labels=labels, label=r"DCDF + kNN, $\theta_G=30'$")
 dpdf_nn_combined_s90_samples = GaussianND(mean, covariance_dpdf_nn_combined_s90, names=names, labels=labels, label=r"DCDF + kNN, $\theta_G=90'$")
@@ -1466,11 +1465,11 @@ g.plot_2d([kk_all_scales_samples, pdf_all_scales_samples, dpdf_nn_combined_all_s
                 param1="Om", param2="sigma8",
                 filled=[False, False, False, False, False],
                 lims = [0.28, 0.32, 0.77, 0.83],
-                colors=[color_map(i) for i in range(3)] + ['red', 'black'],
+                colors=['black', 'red'] + [color_map(i) for i in range(3)],
                 lws=2,
                 # alphas=[0.7, 0.7, 1.0, 1.0],
                 ls=['solid', 'solid', 'solid', 'solid', 'dashed'])    
-g.add_legend([r'$\kappa\text{-2PCF}$, all scales', r'PDF, all scales', r'Defects, all scales', r'All HOWLS, all scales', r'All HOWLS + $\kappa\text{-2PCF}$, all scales'], legend_loc='upper right', fontsize=7)
+g.add_legend([r'$\kappa\text{-2PCF}$, all scales', r'PDF, all scales', r'Defects, all scales', r'Defects + PDF, all scales', r'Defects + PDF + $\kappa\text{-2PCF}$, all scales'], legend_loc='upper right', fontsize=7)
 g.add_text("Gaussian", 0.1, 0.1)
 g.export("outfiles/all_combined.png", dpi=300)
 
