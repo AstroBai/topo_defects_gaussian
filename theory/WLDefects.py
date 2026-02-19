@@ -81,74 +81,88 @@ if __name__ == "__main__":
     z = np.linspace(0, 3, 100)
     dndz = (z, z**2 * np.exp(-z))
     lmaxs = np.logspace(1, 5, 10).astype(int)
-    from tqdm import tqdm
-    import matplotlib.pyplot as plt
-    densities = []
-    for lmax in tqdm(lmaxs):
-        density = DefectDensity(cosmo, dndz, lmax)
-        densities.append(density)
-    densities = np.array(densities)
-    plt.figure(figsize=(8,6))
-    plt.loglog(lmaxs, densities, marker='o')
-    plt.xlabel(r"$\ell_{\mathrm{max}}$")
-    plt.ylabel("Defect Density")
-    plt.title("Topological Defect Density vs Max Multipole")
-    plt.grid()
-    plt.savefig("outfiles/defect_density_vs_lmax.png")
+    # from tqdm import tqdm
+    # import matplotlib.pyplot as plt
+    # densities = []
+    # for lmax in tqdm(lmaxs):
+    #     density = DefectDensity(cosmo, dndz, lmax)
+    #     densities.append(density)
+    # densities = np.array(densities)
+    # plt.figure(figsize=(8,6))
+    # plt.loglog(lmaxs, densities, marker='o')
+    # plt.xlabel(r"$\ell_{\mathrm{max}}$")
+    # plt.ylabel("Defect Density")
+    # plt.title("Topological Defect Density vs Max Multipole")
+    # plt.grid()
+    # plt.savefig("outfiles/defect_density_vs_lmax.png")
 
-    lmaxs = 2**np.linspace(5, 12, 8).astype(int)
-    plt.figure(figsize=(8,6))
-    for lmax in tqdm(lmaxs):
-        theta_arcmin = np.logspace(-1, 2, 20)
-        theta_rad = theta_arcmin * (np.pi / 180) / 60
-        densities_filter = []
-        for theta in theta_rad:
-            density = DefectDensity(cosmo, dndz, lmax, filter='gaussian', filter_angle=theta)
-            densities_filter.append(density)
-        densities_filter = np.array(densities_filter)
-        plt.loglog(theta_arcmin, densities_filter, label=f"lmax={lmax}")
-    plt.legend()
-    plt.xlabel("Filter Scale [arcmin]")
-    plt.ylabel("Defect Density")
-    plt.title("Topological Defect Density vs Filter Scale")
-    plt.grid()
-    plt.savefig("outfiles/defect_density_vs_filter_scale.png")
+    # lmaxs = 2**np.linspace(5, 12, 8).astype(int)
+    # plt.figure(figsize=(8,6))
+    # for lmax in tqdm(lmaxs):
+    #     theta_arcmin = np.logspace(-1, 2, 20)
+    #     theta_rad = theta_arcmin * (np.pi / 180) / 60
+    #     densities_filter = []
+    #     for theta in theta_rad:
+    #         density = DefectDensity(cosmo, dndz, lmax, filter='gaussian', filter_angle=theta)
+    #         densities_filter.append(density)
+    #     densities_filter = np.array(densities_filter)
+    #     plt.loglog(theta_arcmin, densities_filter, label=f"lmax={lmax}")
+    # plt.legend()
+    # plt.xlabel("Filter Scale [arcmin]")
+    # plt.ylabel("Defect Density")
+    # plt.title("Topological Defect Density vs Filter Scale")
+    # plt.grid()
+    # plt.savefig("outfiles/defect_density_vs_filter_scale.png")
 
-    lmax = 256*3
-    Oms = np.linspace(0.1, 0.5, 10)
-    plt.figure(figsize=(8,6))
-    for Om in Oms:
-        cosmo = ccl.Cosmology(Omega_c=Om-0.05, Omega_b=0.05, h=0.7, sigma8=0.8, n_s=0.96)
-        theta_arcmin = np.logspace(0, 3, 20)
-        theta_rad = theta_arcmin * (np.pi / 180) / 60
-        densities_om = []
-        for theta in theta_rad:
-            density = DefectDensity(cosmo, dndz, lmax, filter='gaussian', filter_angle=theta)
-            densities_om.append(density)
-        densities_om = np.array(densities_om)
-        plt.loglog(theta_arcmin, densities_om, label=f"Om={Om:.2f}")
-    plt.legend()
-    plt.xlabel("Filter Scale [arcmin]")
-    plt.ylabel("Defect Density")
-    plt.title("Topological Defect Density vs Filter Scale for Different Omega_m")
-    plt.grid()
-    plt.savefig("outfiles/defect_density_vs_filter_scale_omega_m.png")
+    # lmax = 256*3
+    # Oms = np.linspace(0.1, 0.5, 10)
+    # plt.figure(figsize=(8,6))
+    # for Om in Oms:
+    #     cosmo = ccl.Cosmology(Omega_c=Om-0.05, Omega_b=0.05, h=0.7, sigma8=0.8, n_s=0.96)
+    #     theta_arcmin = np.logspace(0, 3, 20)
+    #     theta_rad = theta_arcmin * (np.pi / 180) / 60
+    #     densities_om = []
+    #     for theta in theta_rad:
+    #         density = DefectDensity(cosmo, dndz, lmax, filter='gaussian', filter_angle=theta)
+    #         densities_om.append(density)
+    #     densities_om = np.array(densities_om)
+    #     plt.loglog(theta_arcmin, densities_om, label=f"Om={Om:.2f}")
+    # plt.legend()
+    # plt.xlabel("Filter Scale [arcmin]")
+    # plt.ylabel("Defect Density")
+    # plt.title("Topological Defect Density vs Filter Scale for Different Omega_m")
+    # plt.grid()
+    # plt.savefig("outfiles/defect_density_vs_filter_scale_omega_m.png")
 
-    sigma8s = np.linspace(0.6, 1.0, 10)
-    plt.figure(figsize=(8,6))
-    for sigma8 in sigma8s:
-        cosmo = ccl.Cosmology(Omega_c=0.25, Omega_b=0.05, h=0.7, sigma8=sigma8, n_s=0.96)
-        theta_arcmin = np.logspace(1.5, 3, 20)
-        theta_rad = theta_arcmin * (np.pi / 180) / 60
-        densities_s8 = []
-        for theta in theta_rad:
-            density = DefectDensity(cosmo, dndz, lmax, filter='gaussian', filter_angle=theta)
-            densities_s8.append(density)
-        densities_s8 = np.array(densities_s8)
-        plt.semilogx(theta_arcmin, densities_s8, label=f"sigma8={sigma8:.2f}")
-    plt.legend()
-    plt.xlabel("Filter Scale [arcmin]")
-    plt.ylabel("Defect Density")
-    plt.title("Topological Defect Density vs Filter Scale for Different Sigma8")
-    plt.grid()
-    plt.savefig("outfiles/defect_density_vs_filter_scale_sigma8.png")
+    # sigma8s = np.linspace(0.6, 1.0, 10)
+    # plt.figure(figsize=(8,6))
+    # for sigma8 in sigma8s:
+    #     cosmo = ccl.Cosmology(Omega_c=0.25, Omega_b=0.05, h=0.7, sigma8=sigma8, n_s=0.96)
+    #     theta_arcmin = np.logspace(1.5, 3, 20)
+    #     theta_rad = theta_arcmin * (np.pi / 180) / 60
+    #     densities_s8 = []
+    #     for theta in theta_rad:
+    #         density = DefectDensity(cosmo, dndz, lmax, filter='gaussian', filter_angle=theta)
+    #         densities_s8.append(density)
+    #     densities_s8 = np.array(densities_s8)
+    #     plt.semilogx(theta_arcmin, densities_s8, label=f"sigma8={sigma8:.2f}")
+    # plt.legend()
+    # plt.xlabel("Filter Scale [arcmin]")
+    # plt.ylabel("Defect Density")
+    # plt.title("Topological Defect Density vs Filter Scale for Different Sigma8")
+    # plt.grid()
+    # plt.savefig("outfiles/defect_density_vs_filter_scale_sigma8.png")
+
+    # 3rd order derivative w.r.t Omega_m at fiducial, w/o noise, at lmax=300 only for Om, use finite difference
+    def finite_diff_3rd_order(func, params, ell_max, h=1e-2):
+        params = np.array(params)
+        f_minus_2h = func(params - 2*h, ell_max)
+        f_minus_h = func(params - h, ell_max)
+        f_plus_h = func(params + h, ell_max)
+        f_plus_2h = func(params + 2*h, ell_max)
+        return (f_minus_2h - 2*f_minus_h + 2*f_plus_h - f_plus_2h) / (2 * h**3)
+    
+    params_fid = np.array([0.3, 0.8])
+    ell_max_test = 512
+    third_derivative_om = finite_diff_3rd_order(lambda p, ell: DefectDensity(ccl.Cosmology(Omega_c=p[0]-0.05, Omega_b=0.05, h=0.7, sigma8=0.8, n_s=0.96), dndz, ell), params_fid, ell_max_test)
+    print(f"3rd order derivative w.r.t Omega_m at params={params_fid}, ell_max={ell_max_test}: {third_derivative_om:.5e}")

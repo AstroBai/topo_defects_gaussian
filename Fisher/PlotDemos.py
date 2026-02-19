@@ -316,6 +316,7 @@ bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 err_pos = get_err(cov_dpdfs_pos_s30)
 err_neg = get_err(cov_dpdfs_neg_s30)
 err_pdf_cdf = get_cumsum_err(cov_pdfs_fid_s30)
+print(get_err(cov_dpdfs_pos_s15))
 
 norm_pos = dpdfs_pos_fid_s30[-1]
 norm_neg = dpdfs_neg_fid_s30[-1]
