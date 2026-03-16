@@ -366,6 +366,10 @@ plt.text(0.9, 0.1, 'Gaussian', ha='right', va='bottom', transform=plt.gca().tran
 # plt.grid(True, alpha=0.3)
 plt.savefig('outfiles/compare_cdf_nonormal.png', dpi=300, bbox_inches='tight')
 plt.close()
+print("Errors / Values for CDF P at s30:")
+for i in range(len(bin_centers)):
+    print(f"Bin center: {bin_centers[i]:.4f}, Value: {dpdfs_pos_fid_s30[i]:.4f}, Error: {err_pos[i]:.4f}, Error/Value: {err_pos[i]/dpdfs_pos_fid_s30[i]:.2f}")  
+
 
 # compare 1,2,4,8 NN pos same/opp 
 plt.figure(figsize=(4, 3))
@@ -385,24 +389,24 @@ e_po4 = get_err(cov_nn_pos_opp4_s30)
 e_ps8 = get_err(cov_nn_pos_same8_s30)
 e_po8 = get_err(cov_nn_pos_opp8_s30)
 
-plt.plot(bin_edges1, nn_pos_same1_s30, label='1NN P-P', c=color_map(0))
+plt.plot(bin_edges1, nn_pos_same1_s30, label='1NN pos-pos', c=color_map(0))
 plt.fill_between(bin_edges1, nn_pos_same1_s30-e_ps1, nn_pos_same1_s30+e_ps1, color=color_map(0), alpha=0.3)
-plt.plot(bin_edges1, nn_pos_opp1_s30, label='1NN P-N', c=color_map(0), linestyle='--')
+plt.plot(bin_edges1, nn_pos_opp1_s30, label='1NN pos-neg', c=color_map(0), linestyle='--')
 plt.fill_between(bin_edges1, nn_pos_opp1_s30-e_po1, nn_pos_opp1_s30+e_po1, color=color_map(0), alpha=0.3)
 
-plt.plot(bin_edges2[1:], nn_pos_same2_s30[1:], label='2NN P-P', c=color_map(1))
+plt.plot(bin_edges2[1:], nn_pos_same2_s30[1:], label='2NN pos-pos', c=color_map(1))
 plt.fill_between(bin_edges2[1:], (nn_pos_same2_s30-e_ps2)[1:], (nn_pos_same2_s30+e_ps2)[1:], color=color_map(1), alpha=0.3)
-plt.plot(bin_edges2[1:], nn_pos_opp2_s30[1:], label='2NN P-N', c=color_map(1), linestyle='--')
+plt.plot(bin_edges2[1:], nn_pos_opp2_s30[1:], label='2NN pos-neg', c=color_map(1), linestyle='--')
 plt.fill_between(bin_edges2[1:], (nn_pos_opp2_s30-e_po2)[1:], (nn_pos_opp2_s30+e_po2)[1:], color=color_map(1), alpha=0.3)
 
-plt.plot(bin_edges4[2:], nn_pos_same4_s30[2:], label='4NN P-P', c=color_map(2))
+plt.plot(bin_edges4[2:], nn_pos_same4_s30[2:], label='4NN pos-pos', c=color_map(2))
 plt.fill_between(bin_edges4[2:], (nn_pos_same4_s30-e_ps4)[2:], (nn_pos_same4_s30+e_ps4)[2:], color=color_map(2), alpha=0.3)
-plt.plot(bin_edges4[2:], nn_pos_opp4_s30[2:], label='4NN P-N', c=color_map(2), linestyle='--')
+plt.plot(bin_edges4[2:], nn_pos_opp4_s30[2:], label='4NN pos-neg', c=color_map(2), linestyle='--')
 plt.fill_between(bin_edges4[2:], (nn_pos_opp4_s30-e_po4)[2:], (nn_pos_opp4_s30+e_po4)[2:], color=color_map(2), alpha=0.3)
 
-plt.plot(bin_edges8[3:], nn_pos_same8_s30[3:], label='8NN P-P', c=color_map(3))
+plt.plot(bin_edges8[3:], nn_pos_same8_s30[3:], label='8NN pos-pos', c=color_map(3))
 plt.fill_between(bin_edges8[3:], (nn_pos_same8_s30-e_ps8)[3:], (nn_pos_same8_s30+e_ps8)[3:], color=color_map(3), alpha=0.3)
-plt.plot(bin_edges8[3:], nn_pos_opp8_s30[3:], label='8NN P-N', c=color_map(3), linestyle='--')
+plt.plot(bin_edges8[3:], nn_pos_opp8_s30[3:], label='8NN pos-neg', c=color_map(3), linestyle='--')
 plt.fill_between(bin_edges8[3:], (nn_pos_opp8_s30-e_po8)[3:], (nn_pos_opp8_s30+e_po8)[3:], color=color_map(3), alpha=0.3)
 
 plt.xlabel(r'$\theta$ [arcmin]')
@@ -412,6 +416,11 @@ plt.legend()
 # plt.grid(True, alpha=0.3)
 plt.savefig('outfiles/compare_knn_cdf.png', dpi=300, bbox_inches='tight')
 plt.close()
+# print errors / values
+print("Errors / Values for 1NN P-P at s30:")
+for i in range(len(bin_edges1)):
+    print(f"Bin edge: {bin_edges1[i]:.1f}, Value: {nn_pos_same1_s30[i]:.4f}, Error: {e_ps1[i]:.4f}, Error/Value: {e_ps1[i]/nn_pos_same1_s30[i]:.2f}")
+
 
 # compare ++, +-, --, -+ for 2NN at s90
 # plt.figure(figsize=(4.8, 3))
@@ -520,14 +529,14 @@ err_pp_s30 = np.sqrt(np.diag(cov_pp_fid_s30)) / np.sqrt(n_seeds)
 err_nn_s30 = np.sqrt(np.diag(cov_nn_fid_s30)) / np.sqrt(n_seeds)
 err_pn_s30 = np.sqrt(np.diag(cov_pn_fid_s30)) / np.sqrt(n_seeds)
 
-plt.plot(bin_centers, pp_fid_s30, label='P-P', color=color_map(0))
+plt.plot(bin_centers, pp_fid_s30, label='pos-pos', color=color_map(0))
 plt.fill_between(bin_centers, pp_fid_s30 - err_pp_s30, pp_fid_s30 + err_pp_s30, color=color_map(0), alpha=0.3)
-plt.plot(bin_centers, nn_fid_s30, label='N-N', color=color_map(1))
+plt.plot(bin_centers, nn_fid_s30, label='neg-neg', color=color_map(1))
 plt.fill_between(bin_centers, nn_fid_s30 - err_nn_s30, nn_fid_s30 + err_nn_s30, color=color_map(1), alpha=0.3)
-plt.plot(bin_centers, pn_fid_s30, label='P-N', color=color_map(2))
+plt.plot(bin_centers, pn_fid_s30, label='pos-neg', color=color_map(2))
 plt.fill_between(bin_centers, pn_fid_s30 - err_pn_s30, pn_fid_s30 + err_pn_s30, color=color_map(2), alpha=0.3)
 plt.axhline(0, color='grey', linestyle='--', linewidth=1)
-plt.axhline(-1, color='red', linestyle='-.', linewidth=1)
+# plt.axhline(-1, color='red', linestyle='-.', linewidth=1)
 plt.xlabel(r'$\theta$ [arcmin]')
 plt.xscale('log')
 plt.ylabel(r'$\xi(\theta)$')
@@ -536,3 +545,13 @@ plt.subplots_adjust(wspace=0)
 plt.legend()
 plt.savefig('outfiles/compare_xi_pp_nn_pn.png', dpi=300, bbox_inches='tight')
 plt.close()
+
+print("Errors / Values for P-N at s30:")
+for i in range(len(bin_centers)):
+    print(f"Bin center: {bin_centers[i]:.1f}, Value: {pn_fid_s30[i]:.4f}, Error: {err_pn_s30[i]:.4f}, Error/Value: {err_pn_s30[i]/pn_fid_s30[i]:.2f}")
+print("Errors / Values for N-N at s30:")
+for i in range(len(bin_centers)):   
+    print(f"Bin center: {bin_centers[i]:.1f}, Value: {nn_fid_s30[i]:.4f}, Error: {err_nn_s30[i]:.4f}, Error/Value: {err_nn_s30[i]/nn_fid_s30[i]:.2f}")  
+print("Errors / Values for P-P at s30:")
+for i in range(len(bin_centers)):
+    print(f"Bin center: {bin_centers[i]:.1f}, Value: {pp_fid_s30[i]:.4f}, Error: {err_pp_s30[i]:.4f}, Error/Value: {err_pp_s30[i]/pp_fid_s30[i]:.2f}")
