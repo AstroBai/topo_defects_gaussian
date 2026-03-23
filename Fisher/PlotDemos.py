@@ -368,7 +368,7 @@ plt.savefig('outfiles/compare_cdf_nonormal.png', dpi=300, bbox_inches='tight')
 plt.close()
 print("Errors / Values for CDF P at s30:")
 for i in range(len(bin_centers)):
-    print(f"Bin center: {bin_centers[i]:.4f}, Value: {dpdfs_pos_fid_s30[i]:.4f}, Error: {err_pos[i]:.4f}, Error/Value: {err_pos[i]/dpdfs_pos_fid_s30[i]:.2f}")  
+    print(f"Bin center: {bin_centers[i]:.4f}, Value: {dpdfs_pos_fid_s30[i]:.4f}, Error: {err_pos[i]:.4f}, Error/Value: {err_pos[i]/dpdfs_pos_fid_s30[i]:.6f}")  
 
 
 # compare 1,2,4,8 NN pos same/opp 
@@ -419,7 +419,7 @@ plt.close()
 # print errors / values
 print("Errors / Values for 1NN P-P at s30:")
 for i in range(len(bin_edges1)):
-    print(f"Bin edge: {bin_edges1[i]:.1f}, Value: {nn_pos_same1_s30[i]:.4f}, Error: {e_ps1[i]:.4f}, Error/Value: {e_ps1[i]/nn_pos_same1_s30[i]:.2f}")
+    print(f"Bin edge: {bin_edges1[i]:.1f}, Value: {nn_pos_same1_s30[i]:.4f}, Error: {e_ps1[i]:.4f}, Error/Value: {e_ps1[i]/nn_pos_same1_s30[i]:.6f}")
 
 
 # compare ++, +-, --, -+ for 2NN at s90
@@ -548,10 +548,10 @@ plt.close()
 
 print("Errors / Values for P-N at s30:")
 for i in range(len(bin_centers)):
-    print(f"Bin center: {bin_centers[i]:.1f}, Value: {pn_fid_s30[i]:.4f}, Error: {err_pn_s30[i]:.4f}, Error/Value: {err_pn_s30[i]/pn_fid_s30[i]:.2f}")
+    print(f"Bin center: {bin_centers[i]:.1f}, Value: {pn_fid_s30[i]:.4f}, Error: {err_pn_s30[i]:.4f}, Error/Value: {err_pn_s30[i]/pn_fid_s30[i]:.6f}")
 print("Errors / Values for N-N at s30:")
 for i in range(len(bin_centers)):   
-    print(f"Bin center: {bin_centers[i]:.1f}, Value: {nn_fid_s30[i]:.4f}, Error: {err_nn_s30[i]:.4f}, Error/Value: {err_nn_s30[i]/nn_fid_s30[i]:.2f}")  
+    print(f"Bin center: {bin_centers[i]:.1f}, Value: {nn_fid_s30[i]:.4f}, Error: {err_nn_s30[i]:.4f}, Error/Value: {err_nn_s30[i]/nn_fid_s30[i]:.6f}")  
 print("Errors / Values for P-P at s30:")
 for i in range(len(bin_centers)):
-    print(f"Bin center: {bin_centers[i]:.1f}, Value: {pp_fid_s30[i]:.4f}, Error: {err_pp_s30[i]:.4f}, Error/Value: {err_pp_s30[i]/pp_fid_s30[i]:.2f}")
+    print(f"Bin center: {bin_centers[i]:.1f}, Value: {pp_fid_s30[i]:.4f}, Error: {err_pp_s30[i]:.4f}, Error/Value: {err_pp_s30[i]/pp_fid_s30[i]:.6f}")

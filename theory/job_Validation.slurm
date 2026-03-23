@@ -10,4 +10,4 @@
 #SBATCH --mail-user=j.bai@ed.ac.uk # set mail address
 
 setenv OMP_NUM_THREADS $SLURM_JOB_CPUS_PER_NODE
-python TheoryValidation.py
+python scale_validation.py

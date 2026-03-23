@@ -406,9 +406,16 @@ class DefectFinder:
         return self.psi
 
     
-    def convergence_power_spectrum(self):
+    def convergence_power_spectrum(self, lmax=None):
         """Compute the convergence power spectrum Cl."""
-        self.cl_kappa = hp.anafast(self.kappa_bar)
+        if lmax is None:
+            lmax = 3 * self.nside - 1
+        self.cl_kappa = hp.anafast(
+            self.kappa_bar,
+            use_pixel_weights=True,
+            datapath='/home/jbai/.astropy/healpy-data',
+            lmax=lmax
+        )
         self.ell = np.arange(len(self.cl_kappa))
         return self.ell, self.cl_kappa
 
@@ -422,10 +429,29 @@ class DefectFinder:
         self.ell = np.arange(len(self.cl_psi))
         return self.ell, self.cl_psi
 
-    def potential_power_moments(self, n, lmax=None):
+    def lens_potential_power_spectrum_from_kappa(self, lmax=None):
+        """Compute Cl_psi directly from Cl_kappa via harmonic-space conversion.
+
+        Uses Cl_psi = 4 * Cl_kappa / [ell(ell+1)]^2 for ell >= 2.
+        """
+        if lmax is None:
+            lmax = 3 * self.nside - 1
+        ell, cl_kappa = self.convergence_power_spectrum(lmax=lmax)
+        cl_psi = np.zeros_like(cl_kappa)
+        valid = ell >= 2
+        cl_psi[valid] = 4.0 * cl_kappa[valid] / (ell[valid] * (ell[valid] + 1.0))**2
+        self.ell = ell
+        self.cl_psi = cl_psi
+        return self.ell, self.cl_psi
+
+    def potential_power_moments(self, n, lmax=None, psi_method='from_psi_map'):
         """Compute the moments of the lensing potential power spectrum."""
-        if not hasattr(self, 'cl_psi'):
+        if psi_method == 'from_psi_map':
             self.lens_potential_power_spectrum(lmax=lmax)
+        elif psi_method == 'from_kappa_cl':
+            self.lens_potential_power_spectrum_from_kappa(lmax=lmax)
+        else:
+            raise ValueError("psi_method must be 'from_psi_map' or 'from_kappa_cl'")
         def legendre_derivative(ell, n):
             import math
             m = int(n/2)
@@ -441,9 +467,9 @@ class DefectFinder:
         moment = np.sum((2*self.ell+1)/(4*np.pi) * self.cl_psi * lgd_factorials)
         return moment
     
-    def number_estimation(self, lmax=None):
-        m6 = self.potential_power_moments(6, lmax=lmax)
-        m4 = self.potential_power_moments(4, lmax=lmax)
+    def number_estimation(self, lmax=None, psi_method='from_psi_map'):
+        m6 = self.potential_power_moments(6, lmax=lmax, psi_method=psi_method)
+        m4 = self.potential_power_moments(4, lmax=lmax, psi_method=psi_method)
         self.d = np.abs(m6 / m4) * 3 / (10 * np.pi)
         return self.d
     

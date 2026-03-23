@@ -1,8 +1,10 @@
 import pyccl as ccl
 import numpy as np
+import healpy as hp
 
 
-def DefectDensity(cosmo, dndz, lmax, filter=None, filter_angle=None):
+def DefectDensity(cosmo, dndz, lmax, filter=None, filter_angle=None,
+                  include_pixel_window=False, nside=None):
     """Compute the angular power spectrum of the projected density of
     topological defects.
 
@@ -16,10 +18,23 @@ def DefectDensity(cosmo, dndz, lmax, filter=None, filter_angle=None):
             Default is None.
         filter_angle (:obj:`float`, optional): scale of the filter in
             radians. Only used if filter is not None.
+        include_pixel_window (:obj:`bool`, optional): if True, include
+            HEALPix pixel window suppression in harmonic space.
+            Default is False.
+        nside (:obj:`int`, optional): HEALPix nside for pixel window.
+            Required if include_pixel_window is True.
     """ 
     ells = np.arange(lmax + 1)
     tracer = ccl.WeakLensingTracer(cosmo, dndz=dndz)
     cl_kappa = ccl.angular_cl(cosmo, tracer, tracer, ells)
+
+    if include_pixel_window:
+        if nside is None:
+            raise ValueError("nside must be provided when include_pixel_window=True")
+        # Map-domain pixelization corresponds to multiplying Cl by W_ell^2.
+        pixwin = hp.pixwin(nside=int(nside), lmax=lmax, pol=False)
+        cl_kappa = cl_kappa * pixwin**2
+
     cl_psi = 4 / (ells[1:] * (ells[1:] + 1))**2 * cl_kappa[1:]
     cl_psi = np.insert(cl_psi, 0, 0.0)
     def legendre_derivative(ell, n):
@@ -39,7 +54,7 @@ def DefectDensity(cosmo, dndz, lmax, filter=None, filter_angle=None):
     
     if filter == 'gaussian' and filter_angle is not None:
         gauss_filter = gaussian_filter(ells, filter_angle)
-        cl_psi *= gauss_filter
+        cl_psi *= gauss_filter**2
 
     m6 = np.sum((2*ells+1)/(4*np.pi) * cl_psi * lgd_factorials_6)
     m4 = np.sum((2*ells+1)/(4*np.pi) * cl_psi * lgd_factorials_4)
