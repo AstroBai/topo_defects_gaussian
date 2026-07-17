@@ -8,7 +8,7 @@ from scipy.interpolate import interp1d
 from tqdm import tqdm
 from healpy.sphtfunc import smoothing
 import glass
-DATA_DIR = "/cephfs/jbai/DefectFisherGaussian"
+DATA_DIR = "/home/jbai/cephfs_copy/cephfs/jbai/DefectFisherGaussian"
 fid = {'Om': 0.3,
        'sigma8': 0.8}
 Ob = 0.049
@@ -148,14 +148,14 @@ for i, param in enumerate(params):
     all_nn_combined_s90 = []
     
     for seed in tqdm(range(n_seeds), desc=f"Seeds for param set {i}"):
-        # kappa_bar_unsmoothed, kappa_bar, gamm1_bar, gamm2_bar, phi_bar = GenMap(param_dict, nside=res, lmax=res*3, random_type='gaussian', random_seed=seed * 1000 + i)
-        # os.makedirs(f"{DATA_DIR}/TrainMaps", exist_ok=True)
-        # np.savez(f"{DATA_DIR}/TrainMaps/train_map_{i}_seed_{seed}.npz",
-        #         kappa_bar_unsmoothed=kappa_bar_unsmoothed,
-        #         kappa_bar=kappa_bar,
-        #         gamm1_bar=gamm1_bar,
-        #         gamm2_bar=gamm2_bar,
-        #         phi_bar=phi_bar)
+        kappa_bar_unsmoothed, kappa_bar, gamm1_bar, gamm2_bar, phi_bar = GenMap(param_dict, nside=res, lmax=res*3, random_type='gaussian', random_seed=seed * 1000 + i)
+        os.makedirs(f"{DATA_DIR}/TrainMaps", exist_ok=True)
+        np.savez(f"{DATA_DIR}/TrainMaps/train_map_{i}_seed_{seed}.npz",
+                kappa_bar_unsmoothed=kappa_bar_unsmoothed,
+                kappa_bar=kappa_bar,
+                gamm1_bar=gamm1_bar,
+                gamm2_bar=gamm2_bar,
+                phi_bar=phi_bar)
         # Find defects
         df = DefectFinder(data_path=f"{DATA_DIR}/TrainMaps/train_map_{i}_seed_{seed}.npz")
         sigmas = [np.radians(15/60), np.radians(30/60), np.radians(90/60)]
@@ -166,7 +166,7 @@ for i, param in enumerate(params):
             df.kappa_bar = smoothing(df.kappa_bar_unsmoothed, sigma=sigma, lmax=res*3)
             df.gamm1_bar, df.gamm2_bar = glass.shear_from_convergence(df.kappa_bar, lmax=res*3)
             df.phi_bar = 0.5 * np.arctan2(df.gamm2_bar, df.gamm1_bar)
-            # df.find_defects(savepath=f"{DATA_DIR}/TrainDefects/realisation_{i}_s{s}_seed_{seed}_defects.npz", cluster=True)
+            df.find_defects(savepath=f"{DATA_DIR}/TrainDefects/realisation_{i}_s{s}_seed_{seed}_defects.npz", cluster=True)
             df.load_defects(defect_datapath=f"{DATA_DIR}/TrainDefects/realisation_{i}_s{s}_seed_{seed}_defects.npz")
             df.save_defects(savepath=f"{DATA_DIR}/TrainDefects/realisation_{i}_s{s}_seed_{seed}_defects")
 

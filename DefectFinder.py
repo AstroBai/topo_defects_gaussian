@@ -5,6 +5,7 @@ from tqdm import tqdm
 from astropy.io import fits
 import treecorr
 import glass
+import re
 from scipy.interpolate import interp1d
 
 class DefectFinder:
@@ -83,7 +84,8 @@ class DefectFinder:
                 clustered_defects[pix] = wnum
                 neighbors = hp.get_all_neighbours(self.nside, pix)
                 for neighbor in neighbors:
-                    visited.add(neighbor)
+                    if neighbor >= 0 and neighbor in self.defects and self.defects[neighbor] == wnum:
+                        visited.add(neighbor)
             self.defects = clustered_defects
         if savepath:
             np.savez(savepath, defects=self.defects)
@@ -237,16 +239,18 @@ class DefectFinder:
         else:
             plt.savefig("outfiles/shear_field_patch_hires.png", dpi=300, bbox_inches='tight')
 
-    def correlation_function(self, charge1_path, charge2_path, min_sep=1., max_sep=100., n_bins=10):
+    def correlation_function(self, charge1_path, charge2_path, min_sep=1., max_sep=100., n_bins=10,
+                             random_multiplier=100, random_seed=None):
         """Compute the two-point correlation function of defects with given charges"""
         cat1 = treecorr.Catalog(charge1_path,ra_col='RA',dec_col='DEC',ra_units='degrees',dec_units='degrees')
         cat2 = treecorr.Catalog(charge2_path,ra_col='RA',dec_col='DEC',ra_units='degrees',dec_units='degrees')
+        rng = np.random.default_rng(random_seed)
         if charge1_path == charge2_path:
             # create random catalog, numbers should be 100x larger than data catalog
             #print("Computing auto-correlation")
-            n_random = cat1.nobj * 100
-            ra_random = np.random.uniform(0, 360, n_random)
-            dec_random = np.degrees(np.arcsin(np.random.uniform(-1, 1, n_random)))  # uniform in sin(dec)
+            n_random = max(int(cat1.nobj * random_multiplier), 2)
+            ra_random = rng.uniform(0, 360, n_random)
+            dec_random = np.degrees(np.arcsin(rng.uniform(-1, 1, n_random)))  # uniform in sin(dec)
             cat_rand = treecorr.Catalog(ra=ra_random, dec=dec_random, ra_units='degrees', dec_units='degrees')
             dd = treecorr.NNCorrelation(min_sep=min_sep, max_sep=max_sep, nbins=n_bins, sep_units='arcmin', bin_type='Log')
             rr = treecorr.NNCorrelation(min_sep=min_sep, max_sep=max_sep, nbins=n_bins, sep_units='arcmin', bin_type='Log')
@@ -262,13 +266,13 @@ class DefectFinder:
         else:
             # create random catalogs for both
             #print("Computing cross-correlation")
-            n_random1 = cat1.nobj * 100
-            ra_random1 = np.random.uniform(0, 360, n_random1)
-            dec_random1 = np.degrees(np.arcsin(np.random.uniform(-1, 1, n_random1)))  # uniform in sin(dec)
+            n_random1 = max(int(cat1.nobj * random_multiplier), 2)
+            ra_random1 = rng.uniform(0, 360, n_random1)
+            dec_random1 = np.degrees(np.arcsin(rng.uniform(-1, 1, n_random1)))  # uniform in sin(dec)
             cat_rand1 = treecorr.Catalog(ra=ra_random1, dec=dec_random1, ra_units='degrees', dec_units='degrees')
-            n_random2 = cat2.nobj * 100
-            ra_random2 = np.random.uniform(0, 360, n_random2)
-            dec_random2 = np.degrees(np.arcsin(np.random.uniform(-1, 1, n_random2)))  # uniform in sin(dec)
+            n_random2 = max(int(cat2.nobj * random_multiplier), 2)
+            ra_random2 = rng.uniform(0, 360, n_random2)
+            dec_random2 = np.degrees(np.arcsin(rng.uniform(-1, 1, n_random2)))  # uniform in sin(dec)
             cat_rand2 = treecorr.Catalog(ra=ra_random2, dec=dec_random2, ra_units='degrees', dec_units='degrees')
             dd = treecorr.NNCorrelation(min_sep=min_sep, max_sep=max_sep, nbins=n_bins, sep_units='arcmin', bin_type='Log')
             rr = treecorr.NNCorrelation(min_sep=min_sep, max_sep=max_sep, nbins=n_bins, sep_units='arcmin', bin_type='Log')
@@ -282,6 +286,189 @@ class DefectFinder:
             xi, varxi = dd.calculateXi(rr=rr, dr=d1r2, rd=r1d2)
             covmat = dd.cov
             return thetas, xi, varxi, covmat
+
+    def correlation_function_unsigned(self, charge_paths, min_sep=1., max_sep=100., n_bins=10,
+                                      random_multiplier=100, random_seed=None):
+        """Compute charge-blind two-point correlation by combining charge-split FITS catalogs.
+
+        Parameters
+        ----------
+        charge_paths : str or sequence of str
+            One or more FITS paths (e.g. +0.5 and -0.5 catalogs) containing RA/DEC
+            columns. All catalogs are merged before computing the correlation.
+        """
+        if isinstance(charge_paths, str):
+            charge_paths = [charge_paths]
+        if charge_paths is None or len(charge_paths) == 0:
+            raise ValueError("charge_paths must contain at least one FITS file path.")
+
+        ra_all = []
+        dec_all = []
+        for path in charge_paths:
+            with fits.open(path) as hdul:
+                if len(hdul) < 2 or hdul[1].data is None:
+                    raise ValueError(f"FITS file has no table extension: {path}")
+                data = hdul[1].data
+                col_names = list(data.names)
+                upper_names = [name.upper() for name in col_names]
+                if 'RA' not in upper_names or 'DEC' not in upper_names:
+                    raise ValueError(f"FITS file must contain RA and DEC columns: {path}")
+                ra_col = col_names[upper_names.index('RA')]
+                dec_col = col_names[upper_names.index('DEC')]
+                ra_all.append(np.asarray(data[ra_col], dtype=float))
+                dec_all.append(np.asarray(data[dec_col], dtype=float))
+
+        ra = np.concatenate(ra_all) if len(ra_all) > 0 else np.array([])
+        dec = np.concatenate(dec_all) if len(dec_all) > 0 else np.array([])
+        cat = treecorr.Catalog(ra=ra, dec=dec, ra_units='degrees', dec_units='degrees')
+
+        if cat.nobj < 2:
+            raise ValueError("Need at least 2 defects to compute correlation_function_unsigned.")
+
+        rng = np.random.default_rng(random_seed)
+        n_random = max(int(cat.nobj * random_multiplier), 2)
+        ra_random = rng.uniform(0, 360, n_random)
+        dec_random = np.degrees(np.arcsin(rng.uniform(-1, 1, n_random)))
+        cat_rand = treecorr.Catalog(ra=ra_random, dec=dec_random, ra_units='degrees', dec_units='degrees')
+
+        dd = treecorr.NNCorrelation(min_sep=min_sep, max_sep=max_sep, nbins=n_bins, sep_units='arcmin', bin_type='Log')
+        rr = treecorr.NNCorrelation(min_sep=min_sep, max_sep=max_sep, nbins=n_bins, sep_units='arcmin', bin_type='Log')
+        dr = treecorr.NNCorrelation(min_sep=min_sep, max_sep=max_sep, nbins=n_bins, sep_units='arcmin', bin_type='Log')
+
+        dd.process(cat, cat)
+        rr.process(cat_rand, cat_rand)
+        dr.process(cat, cat_rand)
+
+        thetas = dd.meanr
+        xi, varxi = dd.calculateXi(rr=rr, dr=dr)
+        covmat = dd.cov
+        return thetas, xi, varxi, covmat
+
+    def _parse_charge_from_path(self, path):
+        """Parse charge value from a filename like '*_charge_+0.5.fits'."""
+        m = re.search(r'_charge_([+-]?\d+(?:\.\d+)?)\.fits$', path)
+        if m is None:
+            raise ValueError(f"Cannot parse charge from path: {path}")
+        return float(m.group(1))
+
+    def _resolve_pos_neg_paths(self, charge_paths):
+        """Resolve representative positive/negative catalog paths."""
+        if isinstance(charge_paths, dict):
+            charge_to_path = {float(k): v for k, v in charge_paths.items()}
+        else:
+            if isinstance(charge_paths, str):
+                charge_paths = [charge_paths]
+            if charge_paths is None or len(charge_paths) == 0:
+                raise ValueError("charge_paths must contain at least one FITS file path.")
+            charge_to_path = {self._parse_charge_from_path(p): p for p in charge_paths}
+
+        pos = sorted([q for q in charge_to_path if q > 0])
+        neg = sorted([q for q in charge_to_path if q < 0])
+        if len(pos) == 0 or len(neg) == 0:
+            raise ValueError("Need at least one positive and one negative charge catalog.")
+
+        # Use the smallest-magnitude positive/negative charge by default.
+        q_pos = min(pos, key=lambda q: abs(q))
+        q_neg = min(neg, key=lambda q: abs(q))
+        return charge_to_path[q_pos], charge_to_path[q_neg]
+
+    def number_correlation(self, charge_paths, min_sep=1., max_sep=100., n_bins=10,
+                           random_multiplier=100, random_seed=None):
+        """Compute number correlation
+
+            g_N = (g_++ + g_-- + 2 g_+-) / 4
+
+        using the base correlation_function for g_++, g_--, g_+-.
+        """
+        pos_path, neg_path = self._resolve_pos_neg_paths(charge_paths)
+        rng = np.random.default_rng(random_seed)
+
+        seed_pp = int(rng.integers(0, 2**31 - 1))
+        seed_nn = int(rng.integers(0, 2**31 - 1))
+        seed_pn = int(rng.integers(0, 2**31 - 1))
+
+        theta_pp, g_pp, var_pp, cov_pp = self.correlation_function(
+            pos_path, pos_path, min_sep=min_sep, max_sep=max_sep, n_bins=n_bins,
+            random_multiplier=random_multiplier, random_seed=seed_pp
+        )
+        theta_nn, g_nn, var_nn, cov_nn = self.correlation_function(
+            neg_path, neg_path, min_sep=min_sep, max_sep=max_sep, n_bins=n_bins,
+            random_multiplier=random_multiplier, random_seed=seed_nn
+        )
+        theta_pn, g_pn, var_pn, cov_pn = self.correlation_function(
+            pos_path, neg_path, min_sep=min_sep, max_sep=max_sep, n_bins=n_bins,
+            random_multiplier=random_multiplier, random_seed=seed_pn
+        )
+
+        if not (len(theta_pp) == len(theta_nn) == len(theta_pn)):
+            raise RuntimeError("Bin-count mismatch between g_pp/g_nn/g_pn correlations.")
+
+        g_n = 0.25 * (g_pp + g_nn + 2.0 * g_pn)
+        var_n = 0.25**2 * (var_pp + var_nn + (2.0**2) * var_pn)
+        cov_n = 0.25**2 * (cov_pp + cov_nn + (2.0**2) * cov_pn)
+        theta_ref = (theta_pp + theta_nn + theta_pn) / 3.0
+        return theta_ref, g_n, var_n, cov_n
+
+    def charge_correlation(self, charge_paths, min_sep=1., max_sep=100., n_bins=10,
+                           random_multiplier=100, random_seed=None):
+        """Compute charge correlation
+
+            g_Q = (g_++ + g_-- - 2 g_+-) / 4
+
+        using the base correlation_function for g_++, g_--, g_+-.
+        """
+        pos_path, neg_path = self._resolve_pos_neg_paths(charge_paths)
+        rng = np.random.default_rng(random_seed)
+
+        seed_pp = int(rng.integers(0, 2**31 - 1))
+        seed_nn = int(rng.integers(0, 2**31 - 1))
+        seed_pn = int(rng.integers(0, 2**31 - 1))
+
+        theta_pp, g_pp, var_pp, cov_pp = self.correlation_function(
+            pos_path, pos_path, min_sep=min_sep, max_sep=max_sep, n_bins=n_bins,
+            random_multiplier=random_multiplier, random_seed=seed_pp
+        )
+        theta_nn, g_nn, var_nn, cov_nn = self.correlation_function(
+            neg_path, neg_path, min_sep=min_sep, max_sep=max_sep, n_bins=n_bins,
+            random_multiplier=random_multiplier, random_seed=seed_nn
+        )
+        theta_pn, g_pn, var_pn, cov_pn = self.correlation_function(
+            pos_path, neg_path, min_sep=min_sep, max_sep=max_sep, n_bins=n_bins,
+            random_multiplier=random_multiplier, random_seed=seed_pn
+        )
+
+        if not (len(theta_pp) == len(theta_nn) == len(theta_pn)):
+            raise RuntimeError("Bin-count mismatch between g_pp/g_nn/g_pn correlations.")
+
+        g_q = 0.25 * (g_pp + g_nn - 2.0 * g_pn)
+        var_q = 0.25**2 * (var_pp + var_nn + (2.0**2) * var_pn)
+        cov_q = 0.25**2 * (cov_pp + cov_nn + (2.0**2) * cov_pn)
+        theta_ref = (theta_pp + theta_nn + theta_pn) / 3.0
+        return theta_ref, g_q, var_q, cov_q
+
+    def correlation_function_unsigned(self, charge_paths, min_sep=1., max_sep=100., n_bins=10,
+                                      random_multiplier=100, random_seed=None):
+        """Backward-compatible alias of number_correlation."""
+        return self.number_correlation(
+            charge_paths,
+            min_sep=min_sep,
+            max_sep=max_sep,
+            n_bins=n_bins,
+            random_multiplier=random_multiplier,
+            random_seed=random_seed,
+        )
+
+    def correlation_function_signed(self, charge_paths, min_sep=1., max_sep=100., n_bins=10,
+                                    random_multiplier=100, random_seed=None):
+        """Backward-compatible alias of charge_correlation."""
+        return self.charge_correlation(
+            charge_paths,
+            min_sep=min_sep,
+            max_sep=max_sep,
+            n_bins=n_bins,
+            random_multiplier=random_multiplier,
+            random_seed=random_seed,
+        )
 
     def nearest_distance(self, charge, k=1):
         """Compute the nearest neighbor distance distribution for defects with given charge. Unit: arcmin."""
@@ -470,7 +657,7 @@ class DefectFinder:
     def number_estimation(self, lmax=None, psi_method='from_psi_map'):
         m6 = self.potential_power_moments(6, lmax=lmax, psi_method=psi_method)
         m4 = self.potential_power_moments(4, lmax=lmax, psi_method=psi_method)
-        self.d = np.abs(m6 / m4) * 3 / (10 * np.pi)
+        self.d = np.abs(m6 / m4) * 3 / (10 * np.pi) + 1/np.pi # for spherical correction
         return self.d
     
     def number(self):

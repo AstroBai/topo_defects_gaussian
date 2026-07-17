@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.interpolate import interp1d
 
-DATA_DIR = "/cephfs/jbai/DefectFisherGaussian"
+DATA_DIR = "/home/jbai/cephfs_copy/cephfs/jbai/DefectFisherGaussian"
 fid = {'Om': 0.3,
        'sigma8': 0.8}
 Ob = 0.049
@@ -965,7 +965,7 @@ y = deriv_pp_corrs_s30_mean[0:10]
 y_err = np.sqrt(np.diag(deriv_pp_corrs_s30_cov[0:10, 0:10]))
 y_mean_err = y_err / np.sqrt(n_seeds)
 
-ax.plot(bin_centers, y, c='C0', ls='-', label=r'$\partial \xi^{\rm pos-pos}(\theta) / \partial \Omega_{\rm m}$')
+ax.plot(bin_centers, y, c='C0', ls='-', label=r'$\partial g^{\rm pos-pos}(\theta) / \partial \Omega_{\rm m}$')
 # ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C0')
 ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C0')
 
@@ -973,16 +973,16 @@ y = deriv_pp_corrs_s30_mean[10:20]
 y_err = np.sqrt(np.diag(deriv_pp_corrs_s30_cov[10:20, 10:20])) 
 y_mean_err = y_err / np.sqrt(n_seeds)
 
-ax.plot(bin_centers, y, c='C1', ls='-', label=r'$\partial \xi^{\rm pos-pos}(\theta) / \partial \sigma_8$')
+ax.plot(bin_centers, y, c='C1', ls='-', label=r'$\partial g^{\rm pos-pos}(\theta) / \partial \sigma_8$')
 # ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C1')
 ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C1')
 ax.legend(loc='upper left', ncol=1, fontsize=8)
 ax.set_ylim(-0.3, 0.3)
 ax.set_yticks([-0.2, -0.1, 0.0, 0.1, 0.2])
-# ax.set_title(r'$\partial \xi^{\rm PP}(\theta) / \partial p$')
+# ax.set_title(r'$\partial g^{\rm PP}(\theta) / \partial p$')
 ax.set_xscale('log')
 ax.set_xlabel(r'$\theta$ [arcmin]')
-ax.set_ylabel(r'$\partial \xi(\theta)/\partial p$')
+ax.set_ylabel(r'$\partial g(\theta)/\partial p$')
 ax.axhline(0, color='gray', linestyle='--', linewidth=0.8)
 ax.set_xticks([50, 100, 150])
 ax.set_xticklabels(['50', '100', '150'])
@@ -993,21 +993,21 @@ y = deriv_nn_corrs_s30_mean[0:10]
 y_err = np.sqrt(np.diag(deriv_nn_corrs_s30_cov[0:10, 0:10]))
 y_mean_err = y_err / np.sqrt(n_seeds)
 
-ax.plot(bin_centers, y, c='C0', ls='-', label=r'$\partial \xi^{\rm neg-neg}(\theta) / \partial \Omega_{\rm m}$')
+ax.plot(bin_centers, y, c='C0', ls='-', label=r'$\partial g^{\rm neg-neg}(\theta) / \partial \Omega_{\rm m}$')
 # ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C0')
 ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C0')
 
 y = deriv_nn_corrs_s30_mean[10:20]
 y_err = np.sqrt(np.diag(deriv_nn_corrs_s30_cov[10:20, 10:20])) 
     
-ax.plot(bin_centers, y, c='C1', ls='-', label=r'$\partial \xi^{\rm neg-neg}(\theta) / \partial \sigma_8$')
+ax.plot(bin_centers, y, c='C1', ls='-', label=r'$\partial g^{\rm neg-neg}(\theta) / \partial \sigma_8$')
 # ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C1')
 ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C1')
 ax.legend(loc='upper left', ncol=1, fontsize=8)
 ax.set_ylim(-0.3, 0.3)
 ax.set_yticks([-0.2, -0.1, 0.0, 0.1, 0.2])
 # ax.set_ylim(-1, 1)
-# ax.set_title(r'$\partial \xi^{\rm NN}(\theta) / \partial p$')
+# ax.set_title(r'$\partial g^{\rm NN}(\theta) / \partial p$')
 ax.set_xscale('log')
 ax.set_xlabel(r'$\theta$ [arcmin]')
 ax.axhline(0, color='gray', linestyle='--', linewidth=0.8)
@@ -1020,18 +1020,18 @@ y = deriv_pn_corrs_s30_mean[0:10]
 y_err = np.sqrt(np.diag(deriv_pn_corrs_s30_cov[0:10, 0:10]))
 y_mean_err = y_err / np.sqrt(n_seeds)
 
-ax.plot(bin_centers, y, c='C0', ls='-', label=r'$\partial \xi^{\rm pos-neg}(\theta) / \partial \Omega_{\rm m}$')
+ax.plot(bin_centers, y, c='C0', ls='-', label=r'$\partial g^{\rm pos-neg}(\theta) / \partial \Omega_{\rm m}$')
 # ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C0')
 ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C0')
 
 y = deriv_pn_corrs_s30_mean[10:20]
 y_err = np.sqrt(np.diag(deriv_pn_corrs_s30_cov[10:20, 10:20])) 
 
-ax.plot(bin_centers, y, c='C1', ls='-', label=r'$\partial \xi^{\rm pos-neg}(\theta) / \partial \sigma_8$')
+ax.plot(bin_centers, y, c='C1', ls='-', label=r'$\partial g^{\rm pos-neg}(\theta) / \partial \sigma_8$')
 # ax.fill_between(bin_centers, y - y_err, y + y_err, alpha=0.1, color='C1')
 ax.fill_between(bin_centers, y - y_mean_err, y + y_mean_err, alpha=0.3, color='C1')
 ax.legend(loc='upper left', ncol=1, fontsize=8)
-# ax.set_title(r'$\partial \xi^{\rm PN}(\theta) / \partial p$')
+# ax.set_title(r'$\partial g^{\rm PN}(\theta) / \partial p$')
 ax.set_xscale('log')
 ax.set_xlabel(r'$\theta$ [arcmin]')
 ax.set_ylim(-3.5, 3.5)

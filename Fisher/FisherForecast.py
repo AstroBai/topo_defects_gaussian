@@ -237,7 +237,7 @@ class FisherProbe:
     
 #     return new_deriv, new_inv_cov
 
-RAW_DATA_DIR = '/cephfs/jbai/DefectMockGaussian'
+RAW_DATA_DIR = '/home/jbai/cephfs_copy/cephfs/jbai/DefectMockGaussian'
 def load_mock_samples(scale_deg, n_realizations=1000):
     s = int(scale_deg) # 15, 30, 90
     print(f"Loading samples for scale s{s}...")
@@ -285,11 +285,22 @@ def load_mock_samples(scale_deg, n_realizations=1000):
             d = np.load(f"{RAW_DATA_DIR}/PosNeg/realisation_{i}_s{s}_pos_neg_corr.npz")
             data['pn'].append(d['xi_pn']) # Check key name
             
-            d = np.load(f"{RAW_DATA_DIR}/PKs/realisation_{i}_s{s}_pos_kappa_corr.npz")
-            data['pk'].append(d['xi_pk'])
+            # d = np.load(f"{RAW_DATA_DIR}/PKs/realisation_{i}_s{s}_pos_kappa_corr.npz")
+            # data['pk'].append(d['xi_pk'])
             
-            d = np.load(f"{RAW_DATA_DIR}/NKs/realisation_{i}_s{s}_neg_kappa_corr.npz")
-            data['nk'].append(d['xi_nk'])
+            # d = np.load(f"{RAW_DATA_DIR}/NKs/realisation_{i}_s{s}_neg_kappa_corr.npz")
+            # data['nk'].append(d['xi_nk'])
+
+            # Load NNs Combined
+            d = np.load(f"{RAW_DATA_DIR}/NNs/realisation_{i}_s{s}_NNs.npz")
+            
+            nn_comb = []
+            for scale_idx in [1, 2, 4, 8]:
+                nn_comb.extend(d[f'nn_pos_same{scale_idx}_cum'])
+                nn_comb.extend(d[f'nn_neg_same{scale_idx}_cum'])
+                nn_comb.extend(d[f'nn_pos_opp{scale_idx}_cum'])
+                nn_comb.extend(d[f'nn_neg_opp{scale_idx}_cum'])
+            data['nns'].append(np.array(nn_comb))
 
             # Load Defect-Peak/Fit 
             d = np.load(f"{RAW_DATA_DIR}/PosPeak/realisation_{i}_s{s}_pos_peak_corr.npz")
@@ -300,16 +311,6 @@ def load_mock_samples(scale_deg, n_realizations=1000):
             data['npk'].append(d['xi'])
             d = np.load(f"{RAW_DATA_DIR}/NegMin/realisation_{i}_s{s}_neg_min_corr.npz")
             data['nmn'].append(d['xi'])
-
-            # Load NNs Combined
-            d = np.load(f"{RAW_DATA_DIR}/NNs/realisation_{i}_s{s}_NNs.npz")
-            nn_comb = []
-            for scale_idx in [1, 2, 4, 8]:
-                nn_comb.extend(d[f'nn_pos_same{scale_idx}_cum'])
-                nn_comb.extend(d[f'nn_neg_same{scale_idx}_cum'])
-                nn_comb.extend(d[f'nn_pos_opp{scale_idx}_cum'])
-                nn_comb.extend(d[f'nn_neg_opp{scale_idx}_cum'])
-            data['nns'].append(np.array(nn_comb))
             
         except FileNotFoundError:
             pass
@@ -322,7 +323,7 @@ def load_mock_samples(scale_deg, n_realizations=1000):
             
     return final_data
 
-DATA_DIR = "/cephfs/jbai/DefectFisherGaussian"
+DATA_DIR = "/home/jbai/cephfs_copy/cephfs/jbai/DefectFisherGaussian"
 fid = {'Om': 0.3,
        'sigma8': 0.8}
 Ob = 0.049
@@ -726,6 +727,9 @@ deriv_nn_corrs_s90 = np.array(deriv_nn_corrs_s90)
 deriv_pn_corrs_s15 = np.array(deriv_pn_corrs_s15)
 deriv_pn_corrs_s30 = np.array(deriv_pn_corrs_s30)
 deriv_pn_corrs_s90 = np.array(deriv_pn_corrs_s90)
+deriv_gq_corrs_s15 = (deriv_pp_corrs_s15 + deriv_nn_corrs_s15 - 2.0 * deriv_pn_corrs_s15) / 4.0
+deriv_gq_corrs_s30 = (deriv_pp_corrs_s30 + deriv_nn_corrs_s30 - 2.0 * deriv_pn_corrs_s30) / 4.0
+deriv_gq_corrs_s90 = (deriv_pp_corrs_s90 + deriv_nn_corrs_s90 - 2.0 * deriv_pn_corrs_s90) / 4.0
 deriv_pk_corrs_s15 = np.array(deriv_pk_corrs_s15)
 deriv_pk_corrs_s30 = np.array(deriv_pk_corrs_s30)
 deriv_pk_corrs_s90 = np.array(deriv_pk_corrs_s90)
@@ -755,6 +759,7 @@ deriv_dcorrs_combined_s30 = np.hstack((deriv_pp_corrs_s30, deriv_nn_corrs_s30, d
 deriv_dcorrs_combined_s90 = np.hstack((deriv_pp_corrs_s90, deriv_nn_corrs_s90, deriv_pn_corrs_s90))
 deriv_dcorrs_combined_all_scales = np.hstack((deriv_dcorrs_combined_s15, deriv_dcorrs_combined_s30, deriv_dcorrs_combined_s90))
 print("DERIV DCORRS COMBINED S90:", deriv_dcorrs_combined_s90)
+deriv_gq_corrs_all_scales = np.hstack((deriv_gq_corrs_s15, deriv_gq_corrs_s30, deriv_gq_corrs_s90))
 deriv_nns_combined_s15 = np.array(deriv_nns_combined_s15)
 deriv_nns_combined_s30 = np.array(deriv_nns_combined_s30)
 deriv_nns_combined_s90 = np.array(deriv_nns_combined_s90)
@@ -772,9 +777,17 @@ slics_samples = {}
 scale_map = {15: 15, 30: 30, 90: 90} 
 
 # 1. Load Samples
+def add_gq_samples(samples):
+    if all(k in samples for k in ("pp", "nn", "pn")):
+        samples["gq"] = (samples["pp"] + samples["nn"] - 2.0 * samples["pn"]) / 4.0
+    return samples
+
 samples_s15 = load_mock_samples(15, n_realizations=n)
 samples_s30 = load_mock_samples(30, n_realizations=n)
 samples_s90 = load_mock_samples(90, n_realizations=n)
+samples_s15 = add_gq_samples(samples_s15)
+samples_s30 = add_gq_samples(samples_s30)
+samples_s90 = add_gq_samples(samples_s90)
 samples_map = {15: samples_s15, 30: samples_s30, 90: samples_s90}
 
 # 2. Define Helper for processing a single probe/scale
@@ -873,52 +886,64 @@ deriv_pn_corrs_s30, inv_cov_pn_s30 = probe_pn_s30.deriv_filt, probe_pn_s30.inv_c
 probe_pn_s90 = process_probe("pn_s90", samples_s90, 'pn', deriv_pn_corrs_s90, n)
 deriv_pn_corrs_s90, inv_cov_pn_s90 = probe_pn_s90.deriv_filt, probe_pn_s90.inv_cov_filt
 
-probe_pk_s15 = process_probe("pk_s15", samples_s15, 'pk', deriv_pk_corrs_s15, n)
-deriv_pk_corrs_s15, inv_cov_pk_s15 = probe_pk_s15.deriv_filt, probe_pk_s15.inv_cov_filt
+probe_gq_s15 = process_probe("gq_s15", samples_s15, 'gq', deriv_gq_corrs_s15, n)
+deriv_gq_corrs_s15, inv_cov_gq_s15 = probe_gq_s15.deriv_filt, probe_gq_s15.inv_cov_filt
 
-probe_pk_s30 = process_probe("pk_s30", samples_s30, 'pk', deriv_pk_corrs_s30, n)
-deriv_pk_corrs_s30, inv_cov_pk_s30 = probe_pk_s30.deriv_filt, probe_pk_s30.inv_cov_filt
+probe_gq_s30 = process_probe("gq_s30", samples_s30, 'gq', deriv_gq_corrs_s30, n)
+deriv_gq_corrs_s30, inv_cov_gq_s30 = probe_gq_s30.deriv_filt, probe_gq_s30.inv_cov_filt
 
-probe_pk_s90 = process_probe("pk_s90", samples_s90, 'pk', deriv_pk_corrs_s90, n)
-deriv_pk_corrs_s90, inv_cov_pk_s90 = probe_pk_s90.deriv_filt, probe_pk_s90.inv_cov_filt
+probe_gq_s90 = process_probe("gq_s90", samples_s90, 'gq', deriv_gq_corrs_s90, n)
+deriv_gq_corrs_s90, inv_cov_gq_s90 = probe_gq_s90.deriv_filt, probe_gq_s90.inv_cov_filt
 
-probe_nk_s15 = process_probe("nk_s15", samples_s15, 'nk', deriv_nk_corrs_s15, n)
-deriv_nk_corrs_s15, inv_cov_nk_s15 = probe_nk_s15.deriv_filt, probe_nk_s15.inv_cov_filt
+probe_gq_all_scales = FisherProbe.combine("gq_all", [probe_gq_s15, probe_gq_s30, probe_gq_s90])
+deriv_gq_corrs_all_scales, inv_cov_gq_all_scales = probe_gq_all_scales.deriv_filt, probe_gq_all_scales.inv_cov_filt
 
-probe_nk_s30 = process_probe("nk_s30", samples_s30, 'nk', deriv_nk_corrs_s30, n)
-deriv_nk_corrs_s30, inv_cov_nk_s30 = probe_nk_s30.deriv_filt, probe_nk_s30.inv_cov_filt
+# probe_pk_s15 = process_probe("pk_s15", samples_s15, 'pk', deriv_pk_corrs_s15, n)
+# deriv_pk_corrs_s15, inv_cov_pk_s15 = probe_pk_s15.deriv_filt, probe_pk_s15.inv_cov_filt
 
-probe_nk_s90 = process_probe("nk_s90", samples_s90, 'nk', deriv_nk_corrs_s90, n)
-deriv_nk_corrs_s90, inv_cov_nk_s90 = probe_nk_s90.deriv_filt, probe_nk_s90.inv_cov_filt
+# probe_pk_s30 = process_probe("pk_s30", samples_s30, 'pk', deriv_pk_corrs_s30, n)
+# deriv_pk_corrs_s30, inv_cov_pk_s30 = probe_pk_s30.deriv_filt, probe_pk_s30.inv_cov_filt
 
-# 7b. Process Defect-Peak/Minima (DPC)
-probe_ppk_s15 = process_probe("ppk_s15", samples_s15, 'ppk', deriv_ppk_corrs_s15, n)
-probe_pmn_s15 = process_probe("pmn_s15", samples_s15, 'pmn', deriv_pmn_corrs_s15, n)
-probe_npk_s15 = process_probe("npk_s15", samples_s15, 'npk', deriv_npk_corrs_s15, n)
-probe_nmn_s15 = process_probe("nmn_s15", samples_s15, 'nmn', deriv_nmn_corrs_s15, n)
+# probe_pk_s90 = process_probe("pk_s90", samples_s90, 'pk', deriv_pk_corrs_s90, n)
+# deriv_pk_corrs_s90, inv_cov_pk_s90 = probe_pk_s90.deriv_filt, probe_pk_s90.inv_cov_filt
 
-probe_ppk_s30 = process_probe("ppk_s30", samples_s30, 'ppk', deriv_ppk_corrs_s30, n)
-probe_pmn_s30 = process_probe("pmn_s30", samples_s30, 'pmn', deriv_pmn_corrs_s30, n)
-probe_npk_s30 = process_probe("npk_s30", samples_s30, 'npk', deriv_npk_corrs_s30, n)
-probe_nmn_s30 = process_probe("nmn_s30", samples_s30, 'nmn', deriv_nmn_corrs_s30, n)
+# probe_nk_s15 = process_probe("nk_s15", samples_s15, 'nk', deriv_nk_corrs_s15, n)
+# deriv_nk_corrs_s15, inv_cov_nk_s15 = probe_nk_s15.deriv_filt, probe_nk_s15.inv_cov_filt
 
-probe_ppk_s90 = process_probe("ppk_s90", samples_s90, 'ppk', deriv_ppk_corrs_s90, n)
-probe_pmn_s90 = process_probe("pmn_s90", samples_s90, 'pmn', deriv_pmn_corrs_s90, n)
-probe_npk_s90 = process_probe("npk_s90", samples_s90, 'npk', deriv_npk_corrs_s90, n)
-probe_nmn_s90 = process_probe("nmn_s90", samples_s90, 'nmn', deriv_nmn_corrs_s90, n)
+# probe_nk_s30 = process_probe("nk_s30", samples_s30, 'nk', deriv_nk_corrs_s30, n)
+# deriv_nk_corrs_s30, inv_cov_nk_s30 = probe_nk_s30.deriv_filt, probe_nk_s30.inv_cov_filt
 
-# 7c. Combine DPC (PPK + PMN + NPK + NMN)
-probe_dpc_combined_s15 = FisherProbe.combine("dpc_s15", [probe_ppk_s15, probe_pmn_s15, probe_npk_s15, probe_nmn_s15])
-deriv_dpc_combined_s15, inv_cov_dpc_combined_s15 = probe_dpc_combined_s15.deriv_filt, probe_dpc_combined_s15.inv_cov_filt
+# probe_nk_s90 = process_probe("nk_s90", samples_s90, 'nk', deriv_nk_corrs_s90, n)
+# deriv_nk_corrs_s90, inv_cov_nk_s90 = probe_nk_s90.deriv_filt, probe_nk_s90.inv_cov_filt
 
-probe_dpc_combined_s30 = FisherProbe.combine("dpc_s30", [probe_ppk_s30, probe_pmn_s30, probe_npk_s30, probe_nmn_s30])
-deriv_dpc_combined_s30, inv_cov_dpc_combined_s30 = probe_dpc_combined_s30.deriv_filt, probe_dpc_combined_s30.inv_cov_filt
+# # 7b. Process Defect-Peak/Minima (DPC)
+# probe_ppk_s15 = process_probe("ppk_s15", samples_s15, 'ppk', deriv_ppk_corrs_s15, n)
+# probe_pmn_s15 = process_probe("pmn_s15", samples_s15, 'pmn', deriv_pmn_corrs_s15, n)
+# probe_npk_s15 = process_probe("npk_s15", samples_s15, 'npk', deriv_npk_corrs_s15, n)
+# probe_nmn_s15 = process_probe("nmn_s15", samples_s15, 'nmn', deriv_nmn_corrs_s15, n)
 
-probe_dpc_combined_s90 = FisherProbe.combine("dpc_s90", [probe_ppk_s90, probe_pmn_s90, probe_npk_s90, probe_nmn_s90])
-deriv_dpc_combined_s90, inv_cov_dpc_combined_s90 = probe_dpc_combined_s90.deriv_filt, probe_dpc_combined_s90.inv_cov_filt
+# probe_ppk_s30 = process_probe("ppk_s30", samples_s30, 'ppk', deriv_ppk_corrs_s30, n)
+# probe_pmn_s30 = process_probe("pmn_s30", samples_s30, 'pmn', deriv_pmn_corrs_s30, n)
+# probe_npk_s30 = process_probe("npk_s30", samples_s30, 'npk', deriv_npk_corrs_s30, n)
+# probe_nmn_s30 = process_probe("nmn_s30", samples_s30, 'nmn', deriv_nmn_corrs_s30, n)
 
-probe_dpc_combined_all_scales = FisherProbe.combine("dpc_all", [probe_dpc_combined_s15, probe_dpc_combined_s30, probe_dpc_combined_s90])
-deriv_dpc_combined_all_scales, inv_cov_dpc_combined_all_scales = probe_dpc_combined_all_scales.deriv_filt, probe_dpc_combined_all_scales.inv_cov_filt
+# probe_ppk_s90 = process_probe("ppk_s90", samples_s90, 'ppk', deriv_ppk_corrs_s90, n)
+# probe_pmn_s90 = process_probe("pmn_s90", samples_s90, 'pmn', deriv_pmn_corrs_s90, n)
+# probe_npk_s90 = process_probe("npk_s90", samples_s90, 'npk', deriv_npk_corrs_s90, n)
+# probe_nmn_s90 = process_probe("nmn_s90", samples_s90, 'nmn', deriv_nmn_corrs_s90, n)
+
+# # 7c. Combine DPC (PPK + PMN + NPK + NMN)
+# probe_dpc_combined_s15 = FisherProbe.combine("dpc_s15", [probe_ppk_s15, probe_pmn_s15, probe_npk_s15, probe_nmn_s15])
+# deriv_dpc_combined_s15, inv_cov_dpc_combined_s15 = probe_dpc_combined_s15.deriv_filt, probe_dpc_combined_s15.inv_cov_filt
+
+# probe_dpc_combined_s30 = FisherProbe.combine("dpc_s30", [probe_ppk_s30, probe_pmn_s30, probe_npk_s30, probe_nmn_s30])
+# deriv_dpc_combined_s30, inv_cov_dpc_combined_s30 = probe_dpc_combined_s30.deriv_filt, probe_dpc_combined_s30.inv_cov_filt
+
+# probe_dpc_combined_s90 = FisherProbe.combine("dpc_s90", [probe_ppk_s90, probe_pmn_s90, probe_npk_s90, probe_nmn_s90])
+# deriv_dpc_combined_s90, inv_cov_dpc_combined_s90 = probe_dpc_combined_s90.deriv_filt, probe_dpc_combined_s90.inv_cov_filt
+
+# probe_dpc_combined_all_scales = FisherProbe.combine("dpc_all", [probe_dpc_combined_s15, probe_dpc_combined_s30, probe_dpc_combined_s90])
+# deriv_dpc_combined_all_scales, inv_cov_dpc_combined_all_scales = probe_dpc_combined_all_scales.deriv_filt, probe_dpc_combined_all_scales.inv_cov_filt
 
 # 8. Combined Correlations (PP + NN + PN)
 probe_dcorrs_combined_s15 = FisherProbe.combine("dcorr_s15", [probe_pp_s15, probe_nn_corr_s15, probe_pn_s15])
@@ -1009,6 +1034,11 @@ fisher_matrix_pn_s15 = np.zeros((n_params, n_params))
 fisher_matrix_pn_s30 = np.zeros((n_params, n_params))
 fisher_matrix_pn_s90 = np.zeros((n_params, n_params))
 
+fisher_matrix_gq_s15 = np.zeros((n_params, n_params))
+fisher_matrix_gq_s30 = np.zeros((n_params, n_params))
+fisher_matrix_gq_s90 = np.zeros((n_params, n_params))
+fisher_matrix_gq_all_scales = np.zeros((n_params, n_params))
+
 fisher_matrix_pk_s15 = np.zeros((n_params, n_params))
 fisher_matrix_pk_s30 = np.zeros((n_params, n_params))
 fisher_matrix_pk_s90 = np.zeros((n_params, n_params))
@@ -1068,6 +1098,11 @@ for i in range(n_params):
     deriv_pn_corrs_i_s15 = deriv_pn_corrs_s15[i]
     deriv_pn_corrs_i_s30 = deriv_pn_corrs_s30[i]
     deriv_pn_corrs_i_s90 = deriv_pn_corrs_s90[i]
+
+    deriv_gq_corrs_i_s15 = deriv_gq_corrs_s15[i]
+    deriv_gq_corrs_i_s30 = deriv_gq_corrs_s30[i]
+    deriv_gq_corrs_i_s90 = deriv_gq_corrs_s90[i]
+    deriv_gq_corrs_i_all_scales = deriv_gq_corrs_all_scales[i]
 
     deriv_pk_corrs_i_s15 = deriv_pk_corrs_s15[i]
     deriv_pk_corrs_i_s30 = deriv_pk_corrs_s30[i]
@@ -1132,6 +1167,11 @@ for i in range(n_params):
         deriv_pn_corrs_j_s30 = deriv_pn_corrs_s30[j]
         deriv_pn_corrs_j_s90 = deriv_pn_corrs_s90[j]
 
+        deriv_gq_corrs_j_s15 = deriv_gq_corrs_s15[j]
+        deriv_gq_corrs_j_s30 = deriv_gq_corrs_s30[j]
+        deriv_gq_corrs_j_s90 = deriv_gq_corrs_s90[j]
+        deriv_gq_corrs_j_all_scales = deriv_gq_corrs_all_scales[j]
+
         deriv_pk_corrs_j_s15 = deriv_pk_corrs_s15[j]
         deriv_pk_corrs_j_s30 = deriv_pk_corrs_s30[j]
         deriv_pk_corrs_j_s90 = deriv_pk_corrs_s90[j]
@@ -1190,18 +1230,23 @@ for i in range(n_params):
         fisher_matrix_pn_s30[i, j] = deriv_pn_corrs_i_s30 @ inv_cov_pn_s30 @ deriv_pn_corrs_j_s30
         fisher_matrix_pn_s90[i, j] = deriv_pn_corrs_i_s90 @ inv_cov_pn_s90 @ deriv_pn_corrs_j_s90
 
-        fisher_matrix_pk_s15[i, j] = deriv_pk_corrs_i_s15 @ inv_cov_pk_s15 @ deriv_pk_corrs_j_s15
-        fisher_matrix_pk_s30[i, j] = deriv_pk_corrs_i_s30 @ inv_cov_pk_s30 @ deriv_pk_corrs_j_s30
-        fisher_matrix_pk_s90[i, j] = deriv_pk_corrs_i_s90 @ inv_cov_pk_s90 @ deriv_pk_corrs_j_s90
+        fisher_matrix_gq_s15[i, j] = deriv_gq_corrs_i_s15 @ inv_cov_gq_s15 @ deriv_gq_corrs_j_s15
+        fisher_matrix_gq_s30[i, j] = deriv_gq_corrs_i_s30 @ inv_cov_gq_s30 @ deriv_gq_corrs_j_s30
+        fisher_matrix_gq_s90[i, j] = deriv_gq_corrs_i_s90 @ inv_cov_gq_s90 @ deriv_gq_corrs_j_s90
+        fisher_matrix_gq_all_scales[i, j] = deriv_gq_corrs_i_all_scales @ inv_cov_gq_all_scales @ deriv_gq_corrs_j_all_scales
 
-        fisher_matrix_nk_s15[i, j] = deriv_nk_corrs_i_s15 @ inv_cov_nk_s15 @ deriv_nk_corrs_j_s15
-        fisher_matrix_nk_s30[i, j] = deriv_nk_corrs_i_s30 @ inv_cov_nk_s30 @ deriv_nk_corrs_j_s30
-        fisher_matrix_nk_s90[i, j] = deriv_nk_corrs_i_s90 @ inv_cov_nk_s90 @ deriv_nk_corrs_j_s90
+        # fisher_matrix_pk_s15[i, j] = deriv_pk_corrs_i_s15 @ inv_cov_pk_s15 @ deriv_pk_corrs_j_s15
+        # fisher_matrix_pk_s30[i, j] = deriv_pk_corrs_i_s30 @ inv_cov_pk_s30 @ deriv_pk_corrs_j_s30
+        # fisher_matrix_pk_s90[i, j] = deriv_pk_corrs_i_s90 @ inv_cov_pk_s90 @ deriv_pk_corrs_j_s90
 
-        fisher_matrix_dpc_combined_s15[i, j] = deriv_dpc_i_s15 @ inv_cov_dpc_combined_s15 @ deriv_dpc_j_s15
-        fisher_matrix_dpc_combined_s30[i, j] = deriv_dpc_i_s30 @ inv_cov_dpc_combined_s30 @ deriv_dpc_j_s30
-        fisher_matrix_dpc_combined_s90[i, j] = deriv_dpc_i_s90 @ inv_cov_dpc_combined_s90 @ deriv_dpc_j_s90
-        fisher_matrix_dpc_combined_all_scales[i, j] = deriv_dpc_i_all_scales @ inv_cov_dpc_combined_all_scales @ deriv_dpc_j_all_scales
+        # fisher_matrix_nk_s15[i, j] = deriv_nk_corrs_i_s15 @ inv_cov_nk_s15 @ deriv_nk_corrs_j_s15
+        # fisher_matrix_nk_s30[i, j] = deriv_nk_corrs_i_s30 @ inv_cov_nk_s30 @ deriv_nk_corrs_j_s30
+        # fisher_matrix_nk_s90[i, j] = deriv_nk_corrs_i_s90 @ inv_cov_nk_s90 @ deriv_nk_corrs_j_s90
+
+        # fisher_matrix_dpc_combined_s15[i, j] = deriv_dpc_i_s15 @ inv_cov_dpc_combined_s15 @ deriv_dpc_j_s15
+        # fisher_matrix_dpc_combined_s30[i, j] = deriv_dpc_i_s30 @ inv_cov_dpc_combined_s30 @ deriv_dpc_j_s30
+        # fisher_matrix_dpc_combined_s90[i, j] = deriv_dpc_i_s90 @ inv_cov_dpc_combined_s90 @ deriv_dpc_j_s90
+        # fisher_matrix_dpc_combined_all_scales[i, j] = deriv_dpc_i_all_scales @ inv_cov_dpc_combined_all_scales @ deriv_dpc_j_all_scales
 
         fisher_matrix_dcorrs_combined_s15[i, j] = deriv_dcorrs_i_s15 @ inv_cov_dcorrs_combined_s15 @ deriv_dcorrs_j_s15
         fisher_matrix_dcorrs_combined_s30[i, j] = deriv_dcorrs_i_s30 @ inv_cov_dcorrs_combined_s30 @ deriv_dcorrs_j_s30
@@ -1252,18 +1297,23 @@ Fisher_pn_s15 = fisher_matrix_pn_s15
 Fisher_pn_s30 = fisher_matrix_pn_s30
 Fisher_pn_s90 = fisher_matrix_pn_s90
 
-Fisher_pk_s15 = fisher_matrix_pk_s15
-Fisher_pk_s30 = fisher_matrix_pk_s30
-Fisher_pk_s90 = fisher_matrix_pk_s90
+Fisher_gq_s15 = fisher_matrix_gq_s15
+Fisher_gq_s30 = fisher_matrix_gq_s30
+Fisher_gq_s90 = fisher_matrix_gq_s90
+Fisher_gq_all_scales = fisher_matrix_gq_all_scales
 
-Fisher_nk_s15 = fisher_matrix_nk_s15
-Fisher_nk_s30 = fisher_matrix_nk_s30
-Fisher_nk_s90 = fisher_matrix_nk_s90
+# Fisher_pk_s15 = fisher_matrix_pk_s15
+# Fisher_pk_s30 = fisher_matrix_pk_s30
+# Fisher_pk_s90 = fisher_matrix_pk_s90
 
-Fisher_dpc_combined_s15 = fisher_matrix_dpc_combined_s15
-Fisher_dpc_combined_s30 = fisher_matrix_dpc_combined_s30
-Fisher_dpc_combined_s90 = fisher_matrix_dpc_combined_s90
-Fisher_dpc_combined_all_scales = fisher_matrix_dpc_combined_all_scales
+# Fisher_nk_s15 = fisher_matrix_nk_s15
+# Fisher_nk_s30 = fisher_matrix_nk_s30
+# Fisher_nk_s90 = fisher_matrix_nk_s90
+
+# Fisher_dpc_combined_s15 = fisher_matrix_dpc_combined_s15
+# Fisher_dpc_combined_s30 = fisher_matrix_dpc_combined_s30
+# Fisher_dpc_combined_s90 = fisher_matrix_dpc_combined_s90
+# Fisher_dpc_combined_all_scales = fisher_matrix_dpc_combined_all_scales
 
 Fisher_dcorrs_combined_s15 = fisher_matrix_dcorrs_combined_s15
 Fisher_dcorrs_combined_s30 = fisher_matrix_dcorrs_combined_s30
@@ -1336,21 +1386,31 @@ pn_s15_samples = GaussianND(mean, covariance_pn_s15, names=names, labels=labels,
 pn_s30_samples = GaussianND(mean, covariance_pn_s30, names=names, labels=labels, label=r"$\xi^{+-}(\theta), \ \theta_G=30'$")
 pn_s90_samples = GaussianND(mean, covariance_pn_s90, names=names, labels=labels, label=r"$\xi^{+-}(\theta), \ \theta_G=90'$")
 
+covariance_gq_s15 = np.linalg.inv(Fisher_gq_s15)
+covariance_gq_s30 = np.linalg.inv(Fisher_gq_s30)
+covariance_gq_s90 = np.linalg.inv(Fisher_gq_s90)
+covariance_gq_all_scales = np.linalg.inv(Fisher_gq_all_scales)
+
+gq_s15_samples = GaussianND(mean, covariance_gq_s15, names=names, labels=labels, label=r"$g_Q(\theta), \ \theta_G=15'$")
+gq_s30_samples = GaussianND(mean, covariance_gq_s30, names=names, labels=labels, label=r"$g_Q(\theta), \ \theta_G=30'$")
+gq_s90_samples = GaussianND(mean, covariance_gq_s90, names=names, labels=labels, label=r"$g_Q(\theta), \ \theta_G=90'$")
+gq_all_scales_samples = GaussianND(mean, covariance_gq_all_scales, names=names, labels=labels, label=r"$g_Q(\theta)$, all scales")
+
 dcorr_combined_s15_samples = GaussianND(mean, np.linalg.inv(Fisher_dcorrs_combined_s15), names=names, labels=labels, label=r"D-2PCF, $\theta_G=15'$")
 dcorr_combined_s30_samples = GaussianND(mean, np.linalg.inv(Fisher_dcorrs_combined_s30), names=names, labels=labels, label=r"D-2PCF, $\theta_G=30'$")
 dcorr_combined_s90_samples = GaussianND(mean, np.linalg.inv(Fisher_dcorrs_combined_s90), names=names, labels=labels, label=r"D-2PCF, $\theta_G=90'$")
 dcorr_combined_all_scales_samples = GaussianND(mean, np.linalg.inv(Fisher_dcorrs_combined_all_scales), names=names, labels=labels, label=r'D-2PCF, all scales')
 
 # DPC (Defect-Peak/Minima) Samples
-covariance_dpc_combined_s15 = np.linalg.inv(Fisher_dpc_combined_s15)
-covariance_dpc_combined_s30 = np.linalg.inv(Fisher_dpc_combined_s30)
-covariance_dpc_combined_s90 = np.linalg.inv(Fisher_dpc_combined_s90)
-covariance_dpc_combined_all_scales = np.linalg.inv(Fisher_dpc_combined_all_scales)
+# covariance_dpc_combined_s15 = np.linalg.inv(Fisher_dpc_combined_s15)
+# covariance_dpc_combined_s30 = np.linalg.inv(Fisher_dpc_combined_s30)
+# covariance_dpc_combined_s90 = np.linalg.inv(Fisher_dpc_combined_s90)
+# covariance_dpc_combined_all_scales = np.linalg.inv(Fisher_dpc_combined_all_scales)
 
-dpc_combined_s15_samples = GaussianND(mean, covariance_dpc_combined_s15, names=names, labels=labels, label=r"D-Peak/Min, $\theta_G=15'$")
-dpc_combined_s30_samples = GaussianND(mean, covariance_dpc_combined_s30, names=names, labels=labels, label=r"D-Peak/Min, $\theta_G=30'$")
-dpc_combined_s90_samples = GaussianND(mean, covariance_dpc_combined_s90, names=names, labels=labels, label=r"D-Peak/Min, $\theta_G=90'$")
-dpc_combined_all_scales_samples = GaussianND(mean, covariance_dpc_combined_all_scales, names=names, labels=labels, label=r'D-Peak/Min, all scales')
+# dpc_combined_s15_samples = GaussianND(mean, covariance_dpc_combined_s15, names=names, labels=labels, label=r"D-Peak/Min, $\theta_G=15'$")
+# dpc_combined_s30_samples = GaussianND(mean, covariance_dpc_combined_s30, names=names, labels=labels, label=r"D-Peak/Min, $\theta_G=30'$")
+# dpc_combined_s90_samples = GaussianND(mean, covariance_dpc_combined_s90, names=names, labels=labels, label=r"D-Peak/Min, $\theta_G=90'$")
+# dpc_combined_all_scales_samples = GaussianND(mean, covariance_dpc_combined_all_scales, names=names, labels=labels, label=r'D-Peak/Min, all scales')
 
 covariance_kk_s15 = np.linalg.inv(Fisher_kk_s15)
 covariance_kk_s30 = np.linalg.inv(Fisher_kk_s30)
@@ -1411,7 +1471,7 @@ g.plot_2d([pdf_s90_samples, pdf_s30_samples, pdf_s15_samples, pdf_all_scales_sam
                 colors=[color_map(i) for i in range(3)] + ['red', 'black'],
                 lws=2,
                 )
-g.add_legend([r"PDF, $\theta_G=90'$", r"PDF, $\theta_G=30'$", r"PDF, $\theta_G=15'$", r"PDF, all scales", r'$\kappa\text{-2PCF}$, all scales'], legend_loc='upper right', fontsize=7)
+g.add_legend([r"$\kappa$-PDF, $\theta_G=90'$", r"$\kappa$-PDF, $\theta_G=30'$", r"$\kappa$-PDF, $\theta_G=15'$", r"$\kappa$-PDF, all scales", r'$\kappa\text{-2PCF}$, all scales'], legend_loc='upper right', fontsize=7)
 g.export("outfiles/pdf.png", dpi=300)
 
 g = plots.get_subplot_plotter(width_inch=4)
@@ -1461,6 +1521,18 @@ g.export("outfiles/dcdf_nn_combined.png", dpi=300)
 
 g = plots.get_subplot_plotter(width_inch=4)
 g.settings.num_plot_contours = 1
+g.plot_2d([gq_s90_samples, gq_s30_samples, gq_s15_samples, gq_all_scales_samples, kk_all_scales_samples],
+                param1="Om", param2="sigma8",
+                filled=[False, False, False, False, False],
+                lims = [0.2, 0.4, 0.7, 0.9],
+                colors=[color_map(i) for i in range(3)] + ['red', 'black'],
+                lws=2,
+                )
+g.add_legend([r"$g_Q(\theta), \ \theta_G=90'$", r"$g_Q(\theta), \ \theta_G=30'$", r"$g_Q(\theta), \ \theta_G=15'$", r"$g_Q(\theta)$, all scales", r'$\kappa\text{-2PCF}$, all scales'], legend_loc='upper right', fontsize=7)
+g.export("outfiles/gq.png", dpi=300)
+
+g = plots.get_subplot_plotter(width_inch=4)
+g.settings.num_plot_contours = 1
 g.plot_2d([kk_all_scales_samples, pdf_all_scales_samples, dpdf_nn_combined_all_scales_samples, defects_pdf_combined_all_scales_samples, all_all_scales_samples],
                 param1="Om", param2="sigma8",
                 filled=[False, False, False, False, False],
@@ -1469,7 +1541,7 @@ g.plot_2d([kk_all_scales_samples, pdf_all_scales_samples, dpdf_nn_combined_all_s
                 lws=2,
                 # alphas=[0.7, 0.7, 1.0, 1.0],
                 ls=['solid', 'solid', 'solid', 'solid', 'dashed'])    
-g.add_legend([r'$\kappa\text{-2PCF}$, all scales', r'PDF, all scales', r'Defects, all scales', r'Defects + PDF, all scales', r'Defects + PDF + $\kappa\text{-2PCF}$, all scales'], legend_loc='upper right', fontsize=7)
+g.add_legend([r'$\kappa\text{-2PCF}$, all scales', r'$\kappa\text{-PDF}$, all scales', r'Defects, all scales', r'Defects + $\kappa\text{-PDF}$, all scales', r'Defects + $\kappa\text{-PDF}$ + $\kappa\text{-2PCF}$, all scales'], legend_loc='upper right', fontsize=7)
 g.add_text("Gaussian", 0.1, 0.1)
 g.export("outfiles/all_combined.png", dpi=300)
 
@@ -1485,14 +1557,14 @@ g.plot_2d([dcorr_combined_s90_samples, dcorr_combined_s30_samples, dcorr_combine
 g.add_legend([r"D-2PCF, $\theta_G=90'$", r"D-2PCF, $\theta_G=30'$", r"D-2PCF, $\theta_G=15'$", r"D-2PCF, all scales", r'$\kappa\text{-2PCF}$, all scales'], legend_loc='upper right', fontsize=7)
 g.export("outfiles/dcorrs.png", dpi=300)
 
-g = plots.get_subplot_plotter(width_inch=4)
-g.settings.num_plot_contours = 1
-g.plot_2d([dpc_combined_s90_samples, dpc_combined_s30_samples, dpc_combined_s15_samples, dpc_combined_all_scales_samples, kk_all_scales_samples],
-                param1="Om", param2="sigma8",
-                filled=[False, False, False, False, False],
-                lims = [0.2, 0.4, 0.7, 0.9],
-                colors=[color_map(i) for i in range(3)] + ['red', 'black'],
-                lws=2,
-                )
-g.add_legend([r"D-Peak/Min, $\theta_G=90'$", r"D-Peak/Min, $\theta_G=30'$", r"D-Peak/Min, $\theta_G=15'$", r"D-Peak/Min, all scales", r'$\kappa\text{-2PCF}$, all scales'], legend_loc='upper right', fontsize=7)
-g.export("outfiles/dpc.png", dpi=300)
+# g = plots.get_subplot_plotter(width_inch=4)
+# g.settings.num_plot_contours = 1
+# g.plot_2d([dpc_combined_s90_samples, dpc_combined_s30_samples, dpc_combined_s15_samples, dpc_combined_all_scales_samples, kk_all_scales_samples],
+#                 param1="Om", param2="sigma8",
+#                 filled=[False, False, False, False, False],
+#                 lims = [0.2, 0.4, 0.7, 0.9],
+#                 colors=[color_map(i) for i in range(3)] + ['red', 'black'],
+#                 lws=2,
+#                 )
+# g.add_legend([r"D-Peak/Min, $\theta_G=90'$", r"D-Peak/Min, $\theta_G=30'$", r"D-Peak/Min, $\theta_G=15'$", r"D-Peak/Min, all scales", r'$\kappa\text{-2PCF}$, all scales'], legend_loc='upper right', fontsize=7)
+# g.export("outfiles/dpc.png", dpi=300)

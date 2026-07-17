@@ -1,6 +1,6 @@
 import numpy as np
 
-DATA_DIR = "/cephfs/jbai/DefectFisherGaussian"
+DATA_DIR = "/home/jbai/cephfs_copy/cephfs/jbai/DefectFisherGaussian"
 fid = {'Om': 0.3,
        'sigma8': 0.8}
 Ob = 0.049
@@ -539,7 +539,7 @@ plt.axhline(0, color='grey', linestyle='--', linewidth=1)
 # plt.axhline(-1, color='red', linestyle='-.', linewidth=1)
 plt.xlabel(r'$\theta$ [arcmin]')
 plt.xscale('log')
-plt.ylabel(r'$\xi(\theta)$')
+plt.ylabel(r'$g(\theta)$')
 plt.title(r'$\theta_G$ = 30 arcmin')
 plt.subplots_adjust(wspace=0)
 plt.legend()

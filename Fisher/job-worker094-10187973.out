@@ -1,0 +1,15 @@
+no change     /home/jbai/miniconda3/condabin/conda
+no change     /home/jbai/miniconda3/bin/conda
+no change     /home/jbai/miniconda3/bin/conda-env
+no change     /home/jbai/miniconda3/bin/activate
+no change     /home/jbai/miniconda3/bin/deactivate
+no change     /home/jbai/miniconda3/etc/profile.d/conda.sh
+no change     /home/jbai/miniconda3/etc/fish/conf.d/conda.fish
+no change     /home/jbai/miniconda3/shell/condabin/Conda.psm1
+no change     /home/jbai/miniconda3/shell/condabin/conda-hook.ps1
+no change     /home/jbai/miniconda3/lib/python3.13/site-packages/xontrib/conda.xsh
+no change     /home/jbai/miniconda3/etc/profile.d/conda.csh
+no change     /home/jbai/.bashrc
+No action taken.
+[{'Om': 0.19999999999999998, 'sigma8': 0.8} {'Om': 0.4, 'sigma8': 0.8}
+ {'Om': 0.3, 'sigma8': 0.7000000000000001} {'Om': 0.3, 'sigma8': 0.9}]

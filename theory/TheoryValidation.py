@@ -114,7 +114,7 @@ for sigma8 in tqdm(sigma8s):
         df.shear_amp = np.sqrt(df.gamm1_bar**2 + df.gamm2_bar**2)
         df.phi_bar = 0.5 * np.arctan2(df.gamm2_bar, df.gamm1_bar)
 
-        df.find_defects(savepath=f"{DATA_DIR}/defects_data_sigma8{sigma8}_{seed}.npz", cluster=True)
+        # df.find_defects(savepath=f"{DATA_DIR}/defects_data_sigma8{sigma8}_{seed}.npz", cluster=True)
         df.load_defects(f"{DATA_DIR}/defects_data_sigma8{sigma8}_{seed}.npz")
         df.save_defects(savepath=f"{DATA_DIR}/defects_data_sigma8{sigma8}_{seed}")
         
@@ -145,8 +145,8 @@ fig, ax1 = plt.subplots(figsize=(4, 3))
 
 # Plot Omega_m on bottom axis
 ax1.plot(Oms, density_theory_list_Om, label=r'Theory ($\Omega_{\rm m}$)', ls='--', color=color_map(0))
-ax1.fill_between(Oms, np.array(density_sim_list_Om) - np.array(density_sim_std_list_Om), np.array(density_sim_list_Om) + np.array(density_sim_std_list_Om), alpha=0.3, label=r'Expected ($\Omega_{\rm m}$)', color=color_map(0))
-ax1.errorbar(Oms, density_finder_list_Om, yerr=density_finder_std_list_Om, label=r'Measured ($\Omega_{\rm m}$)', fmt='o', markersize=3, color=color_map(0))
+ax1.fill_between(Oms, np.array(density_sim_list_Om) - np.array(density_sim_std_list_Om)/np.sqrt(10), np.array(density_sim_list_Om) + np.array(density_sim_std_list_Om)/np.sqrt(10), alpha=0.3, label=r'Expected ($\Omega_{\rm m}$)', color=color_map(0))
+ax1.errorbar(Oms, density_finder_list_Om, yerr=density_finder_std_list_Om/np.sqrt(10), label=r'Measured ($\Omega_{\rm m}$)', fmt='o', markersize=3, color=color_map(0))
 ax1.set_xlabel(r'$\Omega_{\rm m}$')
 ax1.set_ylabel('Defect Density')
 ax1.set_xticks(Oms)
@@ -154,8 +154,8 @@ ax1.set_xticks(Oms)
 # Plot sigma8 on top axis
 ax2 = ax1.twiny()
 ax2.plot(sigma8s, density_theory_list_sigma8, label=r'Theory ($\sigma_{\rm 8}$)', ls='--', color=color_map(1))
-ax2.fill_between(sigma8s, np.array(density_sim_list_sigma8) - np.array(density_sim_std_list_sigma8), np.array(density_sim_list_sigma8) + np.array(density_sim_std_list_sigma8), alpha=0.3, label=r'Expected ($\sigma_{\rm 8}$)', color=color_map(1))
-ax2.errorbar(sigma8s, density_finder_list_sigma8, yerr=density_finder_std_list_sigma8, label=r'Measured ($\sigma_{\rm 8}$)', fmt='o', markersize=3, color=color_map(1))
+ax2.fill_between(sigma8s, np.array(density_sim_list_sigma8) - np.array(density_sim_std_list_sigma8)/np.sqrt(10), np.array(density_sim_list_sigma8) + np.array(density_sim_std_list_sigma8)/np.sqrt(10), alpha=0.3, label=r'Expected ($\sigma_{\rm 8}$)', color=color_map(1))
+ax2.errorbar(sigma8s, density_finder_list_sigma8, yerr=density_finder_std_list_sigma8/np.sqrt(10), label=r'Measured ($\sigma_{\rm 8}$)', fmt='o', markersize=3, color=color_map(1))
 ax2.set_xlabel(r'$\sigma_{\rm 8}$')
 ax2.set_xticks(sigma8s)
 

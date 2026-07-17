@@ -4,10 +4,10 @@
 #SBATCH --error=job-%N-%j.error            # set error log name %N=first node, %j=job number
 #SBATCH --job-name=Validation        # set job name
 #SBATCH -p all                             # set partition (queue)
-#SBATCH --cpus-per-task=64
+#SBATCH --cpus-per-task=8
 #SBATCH --mem=16G
 #SBATCH --mail-type=ALL                    # set mail alerts
 #SBATCH --mail-user=j.bai@ed.ac.uk # set mail address
 
 setenv OMP_NUM_THREADS $SLURM_JOB_CPUS_PER_NODE
-python scale_validation.py
+python -u scale_validation.py

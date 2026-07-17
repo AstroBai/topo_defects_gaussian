@@ -5,7 +5,7 @@ from tqdm import tqdm
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from DefectFinder import DefectFinder
 realizations = 1000
-DATA_DIR = '/cephfs/jbai/DefectMockGaussian'
+DATA_DIR = '/home/jbai/cephfs_copy/cephfs/jbai/DefectMockGaussian'
 for i in tqdm(range(realizations)):
     sigmas = [np.radians(15/60), np.radians(30/60), np.radians(90/60)]
     for sigma in sigmas:
