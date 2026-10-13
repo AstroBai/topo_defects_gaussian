@@ -1483,7 +1483,7 @@ g.plot_2d([dpdf_combined_s90_samples, dpdf_combined_s30_samples, dpdf_combined_s
                 colors=[color_map(i) for i in range(3)] + ['red', 'black'],
                 lws=2,
                 )
-g.add_legend([r"$\text{D-CDF}, \ \theta_G=90'$", r"$\text{D-CDF}, \ \theta_G=30'$", r"$\text{D-CDF}, \ \theta_G=15'$", r"D-CDF, all scales", r'$\kappa\text{-2PCF}$, all scales'], legend_loc='upper right', fontsize=7)
+g.add_legend([r"$\text{DCC-CDF}, \ \theta_G=90'$", r"$\text{DCC-CDF}, \ \theta_G=30'$", r"$\text{DCC-CDF}, \ \theta_G=15'$", r"DCC-CDF, all scales", r'$\kappa\text{-2PCF}$, all scales'], legend_loc='upper right', fontsize=7)
 g.export("outfiles/dcdf.png", dpi=300)
 
 g = plots.get_subplot_plotter(width_inch=4)
@@ -1504,7 +1504,7 @@ g.plot_2d([nns_s90_samples, nns_s30_samples, nns_s15_samples, nns_all_scales_sam
                 colors=[color_map(i) for i in range(3)] + ['red', 'black'],
                 lws=2,
                 )
-g.add_legend([r"$\text{kNN}, \ \theta_G=90'$", r"$\text{kNN}, \ \theta_G=30'$", r"$\text{kNN}, \ \theta_G=15'$", r"$\text{kNN}$, all scales", r'$\kappa\text{-2PCF}$, all scales'], legend_loc='upper right', fontsize=7)
+g.add_legend([r"$\text{kNN-CDF}, \ \theta_G=90'$", r"$\text{kNN-CDF}, \ \theta_G=30'$", r"$\text{kNN-CDF}, \ \theta_G=15'$", r"$\text{kNN-CDF}$, all scales", r'$\kappa\text{-2PCF}$, all scales'], legend_loc='upper right', fontsize=7)
 g.export("outfiles/nns.png", dpi=300)
 
 g = plots.get_subplot_plotter(width_inch=4)

@@ -241,10 +241,10 @@ samples_furthest = GaussianND(mean=[fid['Om'], fid['sigma8']], cov=cov_params_fu
 
 # one sigma contour (numerical vs analytical)
 g.plot_2d([samples, samples_analytic, samples_closest], ['Om', 'sigma8'], 
-          filled=False, colors=['red', 'black', 'red'], ls=['solid', 'dashed', 'dotted'],
+          filled=False, colors=['red', 'black', 'magenta'], ls=['dotted', 'dashed', 'solid'],
           contour_labels=[r'Numerical $g_{\rm Q}(\theta)$', r'Analytical $g_{\rm Q}(\theta)$', r'Conservative Numerical Bound'], contour_colors=['red', 'black', 'red'], contour_ls=['solid', 'dashed', 'dashdot'],
-          lims = [0.3-1, 0.3+1, 0.8-2, 0.8+2],
-          lws=2)
+          lims = [0.3-0.3, 0.3+0.3, 0.8-0.5, 0.8+0.5],
+          lws=4)
 
 
 g.add_legend(legend_labels=[r'Numerical $g_{\rm Q}(\theta)$', r'Analytical $g_{\rm Q}(\theta)$', r'Conservative Numerical Bound'], legend_loc='upper right', fontsize=4)
@@ -259,7 +259,7 @@ xtick_labels = [r'$10^2$', r'$2\times10^2$', r'$3\times10^2$', r'$4\times10^2$',
 ax = axs[0]
 ax.errorbar(theta, dgQ_dOm, yerr=dgQ_dOm_stds/np.sqrt(100), label=r'$\partial g_{\rm Q} / \partial \Omega_{\rm m}$ Numerical', capsize=3, fmt='o')
 ax.plot(theta, fisher_derivative_Om, label=r'$\partial g_{\rm Q} / \partial \Omega_{\rm m}$ Analytical', linestyle='dashed')
-ax.set_xscale('log')
+# ax.set_xscale('log')
 ax.set_xlim(90, 600)
 ax.xaxis.set_major_locator(FixedLocator(xticks))
 ax.xaxis.set_major_formatter(FixedFormatter(xtick_labels[:-1] + ['']))
@@ -269,7 +269,7 @@ ax.legend()
 ax = axs[1]
 ax.errorbar(theta, dgQ_dsigma8, yerr=dgQ_dsigma8_stds/np.sqrt(100), label=r'$\partial g_{\rm Q} / \partial \sigma_8$ Numerical', capsize=3, fmt='o')
 ax.plot(theta, fisher_derivative_sigma8, label=r'$\partial g_{\rm Q} / \partial \sigma_8$ Analytical', linestyle='dashed')
-ax.set_xscale('log')
+# ax.set_xscale('log')
 ax.set_xlabel(r'$\theta$ [arcmin]')
 ax.set_xlim(90, 600)
 ax.xaxis.set_major_locator(FixedLocator(xticks))

@@ -9,29 +9,29 @@ def lens_potential(pos, epsilon=0.3):
     x, y = pos
     return -np.exp(-x**2/(1+epsilon) - y**2/(1-epsilon))
 
-# 创建网格
+
 x_1d = np.linspace(-2, 2, 51)
 y_1d = np.linspace(-2, 2, 51)
 x, y = np.meshgrid(x_1d, y_1d)
 
-# 将网格重塑为位置向量
+
 positions = np.stack([x.flatten(), y.flatten()], axis=1)
 
-# 计算Hessian矩阵（二阶导数）
+
 hessian_fn = jacfwd(jacfwd(lens_potential))
 hessians = jax.vmap(hessian_fn)(positions)
 
-# 重塑回网格形状
+
 d2psi_dx2 = hessians[:, 0, 0].reshape(x.shape)
 d2psi_dy2 = hessians[:, 1, 1].reshape(x.shape)
 d2psi_dxdy = hessians[:, 0, 1].reshape(x.shape)
 
-# 计算透镜量
+
 kappa = 0.5 * (d2psi_dx2 + d2psi_dy2)
 gamm1 = 0.5 * (d2psi_dx2 - d2psi_dy2)
 gamm2 = d2psi_dxdy
 
-# 计算剪切方向
+
 phi = 0.5 * np.arctan2(gamm2, gamm1)
 ux = np.cos(phi)
 uy = np.sin(phi)
@@ -108,10 +108,9 @@ defect_dict = find_defects(phi, x.shape[0], shear_amp)
 print(f"Found {len(defect_dict)} defects:")
 
 
-# 绘图
+
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(32/3, 4))
 
-# 左图：convergence with shear vectors
 im1 = ax1.imshow(kappa, extent=[-2, 2, -2, 2], cmap='RdYlBu_r', origin='lower')
 plt.colorbar(im1, ax=ax1, label=r'Convergence $\kappa$')
 step = 2
@@ -133,7 +132,6 @@ ax1.set_xticks([-2, -1, 0, 1, 2])
 ax1.set_yticks([-2, -1, 0, 1, 2])
 ax1.set_aspect('equal')
 
-# 右图：shear amplitude
 shear_amp = np.sqrt(gamm1**2 + gamm2**2)
 im2 = ax2.imshow(shear_amp, extent=[-2, 2, -2, 2], cmap='plasma', origin='lower')
 plt.colorbar(im2, ax=ax2, label=r'Shear Amplitude $|\gamma|$')
